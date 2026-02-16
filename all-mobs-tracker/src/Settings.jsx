@@ -1,89 +1,77 @@
 import React from 'react';
 
 const Settings = ({ 
-  allMobs, 
-  displayedMobs, 
-  trackedCount, 
   variantMode, 
   setVariantMode, 
+  showRealBaby,
+  setShowRealBaby,
+  showBreedBaby,
+  setShowBreedBaby,
   resetAll, 
   onClose 
 }) => {
+  // Stile per il toggle personalizzato
+  const ToggleBtn = ({ label, active, onClick }) => (
+    <div className="flex justify-between items-center bg-stone-900/50 p-3 border-2 border-stone-700">
+      <span className="text-xl text-stone-300 uppercase">{label}</span>
+      <button 
+        onClick={onClick}
+        className={`w-16 h-8 border-b-4 transition-all ${
+          active 
+          ? 'bg-green-600 border-green-900 translate-y-0' 
+          : 'bg-stone-600 border-stone-800'
+        }`}
+      >
+        <div className={`h-full w-1/2 bg-white/20 transition-all ${active ? 'translate-x-full' : 'translate-x-0'}`} />
+      </button>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-stone-900 p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-stone-800 rounded-lg shadow-2xl p-6 border-4 border-stone-700">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold text-green-400">Impostazioni</h2>
-            <button
-              onClick={onClose}
-              className="bg-stone-700 hover:bg-stone-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-['VT323']">
+      <div className="bg-stone-800 w-full max-w-lg rounded-lg shadow-2xl p-6 border-4 border-stone-600 relative">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-4xl text-green-400 uppercase tracking-widest shadow-black drop-shadow-md">Impostazioni</h2>
+          <button onClick={onClose} className="bg-stone-600 hover:bg-stone-500 text-white px-4 py-2 text-xl border-b-4 border-stone-800 active:border-b-0 active:translate-y-1 transition-all">X</button>
+        </div>
+
+        <div className="space-y-6">
+          {/* Selezione Modalità */}
+          <section>
+            <label className="block text-2xl text-stone-300 mb-2 uppercase">Modalità Varianti</label>
+            <select
+              value={variantMode}
+              onChange={(e) => setVariantMode(e.target.value)}
+              className="w-full bg-stone-900 text-xl text-white border-4 border-stone-700 p-3 focus:border-green-500 outline-none uppercase"
             >
-              Chiudi
-            </button>
-          </div>
+              <option value="none">Nessuna (Solo Base)</option>
+              <option value="main">Principali (1.1, 1.2...)</option>
+              <option value="complex">Complesse</option>
+              <option value="all">Tutte (Complete)</option>
+            </select>
+          </section>
 
-          <div className="space-y-6">
-            {/* Modalità Varianti */}
-            <div>
-              <label className="block text-white text-lg font-semibold mb-3">
-                Modalità Visualizzazione Varianti
-              </label>
-              <select
-                value={variantMode}
-                onChange={(e) => setVariantMode(e.target.value)}
-                className="w-full bg-stone-900 text-white border-2 border-stone-700 rounded-lg px-4 py-3 text-base focus:border-green-500 focus:outline-none"
-              >
-                <option value="none">Nessuna Variante</option>
-                <option value="main">Varianti Principali</option>
-                <option value="complex">Varianti Complesse</option>
-                <option value="all">Tutte le Varianti</option>
-              </select>
-              
-              <div className="mt-4 bg-stone-900 rounded-lg p-4 text-gray-300 text-sm space-y-2">
-                <p className="font-semibold text-green-400">Dettagli visualizzazione:</p>
-                <ul className="space-y-2 ml-4 list-disc">
-                  <li>
-                    <strong className="text-white">Nessuna Variante:</strong> Solo mob base e il primo di ogni gruppo.
-                  </li>
-                  <li>
-                    <strong className="text-white">Varianti Principali:</strong> Include varianti di primo livello.
-                  </li>
-                  <li>
-                    <strong className="text-white">Varianti Complesse:</strong> Include varianti fino al secondo livello numerico.
-                  </li>
-                  <li>
-                    <strong className="text-white">Tutte le Varianti:</strong> Mostra l'intero database incluse le variazioni di colore.
-                  </li>
-                </ul>
-              </div>
-            </div>
+          {/* Nuovi Toggle per i Baby */}
+          <section className="space-y-2">
+            <label className="block text-2xl text-stone-300 uppercase">Filtri Speciali</label>
+            <ToggleBtn 
+              label="Show Natual Spawning Baby" 
+              active={showRealBaby} 
+              onClick={() => setShowRealBaby(!showRealBaby)} 
+            />
+            <ToggleBtn 
+              label="Show Breed Baby" 
+              active={showBreedBaby} 
+              onClick={() => setShowBreedBaby(!showBreedBaby)} 
+            />
+          </section>
 
-            {/* Statistiche */}
-            <div className="bg-stone-900 rounded-lg p-4 border-2 border-stone-700">
-              <h3 className="text-white font-semibold mb-2">Statistiche</h3>
-              <div className="text-gray-300 text-sm grid grid-cols-2 gap-2">
-                <p>Totale caricati: <span className="text-green-400 font-bold">{allMobs.length}</span></p>
-                <p>Visualizzati: <span className="text-green-400 font-bold">{displayedMobs.length}</span></p>
-                <p>Tracciati: <span className="text-green-400 font-bold">{trackedCount}</span></p>
-                <div className="col-span-2 mt-2 pt-2 border-t border-stone-700 space-y-1">
-                  <p>Base: {allMobs.filter(m => m.type === 'base').length}</p>
-                  <p>Principali: {allMobs.filter(m => m.type === 'main_variant').length}</p>
-                  <p>Complesse: {allMobs.filter(m => m.type === 'complex_variant').length}</p>
-                  <p>Colore: {allMobs.filter(m => m.type === 'color_variant').length}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-stone-700">
-              <button
-                onClick={resetAll}
-                className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg"
-              >
-                Reset Progressi
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={resetAll}
+            className="w-full bg-red-700 hover:bg-red-600 text-white text-2xl py-3 border-b-4 border-red-900 active:border-b-0 active:translate-y-1 transition-all uppercase tracking-wider"
+          >
+            Reset Progressi
+          </button>
         </div>
       </div>
     </div>
