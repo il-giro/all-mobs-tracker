@@ -12,20 +12,19 @@ const MobTracker = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Nuovi stati per le varianti Baby
   const [showRealBaby, setShowRealBaby] = useState(true);
   const [showBreedBaby, setShowBreedBaby] = useState(false);
 
-  // Parser dei nomi file avanzato
+  // Parser dei nomi file aggiornato per suffissi safe (_B e _A)
   const parseFileName = (fileName) => {
     let nameWithoutExt = fileName.replace(/\.(png|jpg|jpeg|gif|webp)$/i, '');
     
-    // Identifica i tag Baby
-    const isRealBaby = nameWithoutExt.endsWith('#');
-    const isBreedBaby = nameWithoutExt.endsWith('@');
+    // Identifica i tag Baby usando i nuovi suffissi safe
+    const isRealBaby = nameWithoutExt.endsWith('_B');
+    const isBreedBaby = nameWithoutExt.endsWith('_A');
     
-    // Pulisce il nome dai simboli per il parsing dei numeri
-    const cleanName = nameWithoutExt.replace(/[#@]$/, '');
+    // Pulisce il nome dai suffissi per il parsing dei numeri
+    const cleanName = nameWithoutExt.replace(/_(B|A)$/, '');
 
     let data = {
       isRealBaby,
@@ -37,7 +36,7 @@ const MobTracker = () => {
       type: 'base'
     };
 
-    // Pattern 3 numeri (Color Variant): 1.1.1Cat
+    // Pattern 3 numeri: 1.1.1Cat
     const match3 = cleanName.match(/^(\d+)\.(\d+)\.(\d+)(.+)$/);
     if (match3) {
       data.type = 'color_variant';
@@ -46,6 +45,7 @@ const MobTracker = () => {
       data.num3 = parseInt(match3[3]);
       data.name = match3[4];
     } else {
+      // Pattern 2 numeri: 1.1Chicken
       const match2 = cleanName.match(/^(\d+)\.(\d+)(.+)$/);
       if (match2) {
         data.type = 'complex_variant';
@@ -53,6 +53,7 @@ const MobTracker = () => {
         data.num2 = parseInt(match2[2]);
         data.name = match2[3];
       } else {
+        // Pattern 1 numero: 1CopperGolem
         const match1 = cleanName.match(/^(\d+)(.+)$/);
         if (match1) {
           data.type = 'main_variant';
@@ -64,17 +65,16 @@ const MobTracker = () => {
       }
     }
 
-    // Formattazione estetica
     data.name = data.name.replace(/-/g, ' ').replace(/([A-Z])/g, ' $1').trim();
-    
-    // Aggiunge suffissi visivi in base al tipo di baby
-    if (isBreedBaby) data.name += " Baby";
+    if (isRealBaby) data.name += " (Baby)";
+    if (isBreedBaby) data.name += " (Breed)";
 
     return data;
   };
 
   useEffect(() => {
     const loadMobs = async () => {
+      // Globbing dei file
       const modules = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
       const mobsData = Object.keys(modules).map(path => {
         const fileName = path.split('/').pop();
@@ -85,7 +85,7 @@ const MobTracker = () => {
         };
       });
 
-      // Ordinamento: Alfabetico -> Gerarchico -> Baby
+      // Ordinamento
       mobsData.sort((a, b) => {
         const nameA = a.name.replace(/\(.*\)/, '').trim();
         const nameB = b.name.replace(/\(.*\)/, '').trim();
@@ -109,18 +109,17 @@ const MobTracker = () => {
     loadMobs();
   }, []);
 
-  // LOGICA DI FILTRO (Integrazione Baby + Tua Logica Varianti)
   useEffect(() => {
     let filtered = allMobs;
 
-    // 1. Filtro Esclusione Baby
+    // 1. Filtro Baby
     filtered = filtered.filter(m => {
       if (m.isRealBaby && !showRealBaby) return false;
       if (m.isBreedBaby && !showBreedBaby) return false;
       return true;
     });
 
-    // 2. Tua Logica Varianti (Mantenuta)
+    // 2. Logica Varianti
     if (variantMode === 'none') {
       filtered = filtered.filter(m => m.type === 'base' || (m.num1 === 1 && (m.num2 === 1 || !m.num2) && (m.num3 === 1 || !m.num3)));
     } else if (variantMode === 'main') {
@@ -134,7 +133,7 @@ const MobTracker = () => {
       filtered = filtered.filter(m => m.type !== 'color_variant' || m.num3 === 1);
     }
 
-    // 3. Filtro Ricerca
+    // 3. Ricerca
     if (searchQuery) {
       filtered = filtered.filter(m => m.name.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -148,7 +147,7 @@ const MobTracker = () => {
   useEffect(() => { localStorage.setItem('allMobsShowBreed', JSON.stringify(showBreedBaby)); }, [showBreedBaby]);
 
   const toggleMob = (id) => setTrackedMobs(prev => ({ ...prev, [id]: !prev[id] }));
-  const resetAll = () => { if(confirm('Reset totale progressi?')) setTrackedMobs({}); setShowSettings(false); };
+  const resetAll = () => { if(confirm('Reset progressi?')) setTrackedMobs({}); setShowSettings(false); };
   
   const trackedCount = Object.values(trackedMobs).filter(Boolean).length;
 
@@ -181,63 +180,36 @@ const MobTracker = () => {
                   placeholder="Cerca mob..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full md:w-64 bg-[#0a0a0a] border-4 border-stone-700 text-2xl px-3 py-1 text-white placeholder-stone-600 focus:border-green-500 outline-none h-[48px]"
+                  className="w-full md:w-64 bg-[#0a0a0a] border-4 border-stone-700 text-2xl px-3 py-1 text-white outline-none h-[48px]"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-2 text-2xl text-stone-500 hover:text-white">X</button>
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-2 text-stone-500 hover:text-white">X</button>
                 )}
               </div>
-
-              <button onClick={() => setShowSettings(true)} className={btnClass}>
-                Settings
-              </button>
+              <button onClick={() => setShowSettings(true)} className={btnClass}>Settings</button>
             </div>
           </div>
 
-          {/* DASHBOARD STATS */}
-          <div className="bg-[#1a1a1a] p-4 rounded border-4 border-stone-700 grid grid-cols-2 md:grid-cols-6 gap-4 text-center shadow-inner">
-            <div className="col-span-2 md:col-span-1 flex flex-col justify-center border-b-2 md:border-b-0 md:border-r-2 border-stone-700 pb-2 md:pb-0">
+          <div className="bg-[#1a1a1a] p-4 rounded border-4 border-stone-700 grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
+            <div className="col-span-2 md:col-span-1 border-stone-700 md:border-r-2">
                <span className="text-stone-400 text-xl uppercase">Visti</span>
-               <span className="text-4xl text-white">
-                 {trackedCount} <span className="text-stone-600 text-2xl">/ {displayedMobs.length}</span>
-               </span>
+               <div className="text-4xl">{trackedCount} <span className="text-stone-600 text-2xl">/ {displayedMobs.length}</span></div>
             </div>
-            
-            <div className="flex flex-col">
-              <span className="text-blue-400 text-xl uppercase">Base</span>
-              <span className="text-3xl">{allMobs.filter(m => m.type === 'base' && !m.isRealBaby && !m.isBreedBaby).length}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-yellow-400 text-xl uppercase">Varianti</span>
-              <span className="text-3xl">{allMobs.filter(m => m.type === 'main_variant').length}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-purple-400 text-xl uppercase">Complesse</span>
-              <span className="text-3xl">{allMobs.filter(m => m.type === 'complex_variant').length}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-red-400 text-xl uppercase">Colorate</span>
-              <span className="text-3xl">{allMobs.filter(m => m.type === 'color_variant').length}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-pink-400 text-xl uppercase">Baby</span>
-              <span className="text-3xl">{allMobs.filter(m => m.isRealBaby || m.isBreedBaby).length}</span>
-            </div>
+            <div className="flex flex-col"><span className="text-blue-400 text-xl">BASE</span><span className="text-3xl">{allMobs.filter(m => m.type === 'base' && !m.isRealBaby && !m.isBreedBaby).length}</span></div>
+            <div className="flex flex-col"><span className="text-yellow-400 text-xl">VARIANTI</span><span className="text-3xl">{allMobs.filter(m => m.type === 'main_variant').length}</span></div>
+            <div className="flex flex-col"><span className="text-purple-400 text-xl">COMPLESSE</span><span className="text-3xl">{allMobs.filter(m => m.type === 'complex_variant').length}</span></div>
+            <div className="flex flex-col"><span className="text-red-400 text-xl">COLORI</span><span className="text-3xl">{allMobs.filter(m => m.type === 'color_variant').length}</span></div>
+            <div className="flex flex-col"><span className="text-pink-400 text-xl">BABY</span><span className="text-3xl">{allMobs.filter(m => m.isRealBaby || m.isBreedBaby).length}</span></div>
           </div>
 
-          {/* PROGRESS BAR */}
           <div className="mt-6 bg-[#0a0a0a] h-8 border-4 border-stone-700 relative overflow-hidden">
-            <div 
-              className="bg-gradient-to-r from-green-700 to-green-500 h-full transition-all duration-500 ease-out" 
-              style={{ width: `${displayedMobs.length > 0 ? (trackedCount / displayedMobs.length) * 100 : 0}%` }} 
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-xl text-white drop-shadow-[0_2px_2px_rgba(0,0,0,1)] tracking-widest">
+            <div className="bg-gradient-to-r from-green-700 to-green-500 h-full transition-all duration-500" style={{ width: `${displayedMobs.length > 0 ? (trackedCount / displayedMobs.length) * 100 : 0}%` }} />
+            <div className="absolute inset-0 flex items-center justify-center text-xl drop-shadow-[0_2px_2px_rgba(0,0,0,1)]">
               {displayedMobs.length > 0 ? Math.round((trackedCount / displayedMobs.length) * 100) : 0}% COMPLETATO
             </div>
           </div>
         </header>
 
-        {/* GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 gap-3">
           {displayedMobs.map((mob) => {
             const isTracked = trackedMobs[mob.fileName];
@@ -245,42 +217,32 @@ const MobTracker = () => {
               <div
                 key={mob.fileName}
                 onClick={() => toggleMob(mob.fileName)}
-                className={`group relative bg-stone-800 border-4 transition-all cursor-pointer overflow-hidden
-                  ${isTracked ? 'border-green-600' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1'}
-                `}
+                className={`group relative bg-stone-800 border-4 transition-all cursor-pointer overflow-hidden ${isTracked ? 'border-green-600' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1'}`}
               >
                 <div className={`aspect-square p-2 flex items-center justify-center bg-[#181818] relative ${isTracked ? 'opacity-40' : ''}`}>
-                  <img 
-                    src={mob.image} 
-                    alt={mob.name} 
-                    className="max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform duration-200" 
-                  />
+                  <img src={mob.image} alt={mob.name} className="max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform" />
                   
-                  {/* Badge per i Baby */}
-                  {(mob.isRealBaby || mob.isBreedBaby) && !isTracked && (
-                    <div className="absolute top-1 right-1 bg-pink-600 text-[10px] px-2 pb-1 pt-1 border-2 border-stone-900 leading-none">
-                      BABY
-                    </div>
-                  )}
-
-                  {/* Badge per i Colorati */}
-                  {mob.type === 'color_variant' && !isTracked && (
-                    <div className="absolute top-1 right-1 bg-red-600 text-[10px] px-2 pb-1 pt-1 border-2 border-stone-900 leading-none">
-                      COLOR
-                    </div>
+                  {!isTracked && (
+                    (mob.isRealBaby || mob.isBreedBaby) ? (
+                      <div className="absolute top-1 right-1 bg-pink-600 text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md">
+                        BABY
+                      </div>
+                    ) : mob.type === 'color_variant' ? (
+                      <div className="absolute top-1 right-1 bg-red-600 text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md">
+                        COLOR
+                      </div>
+                    ) : null
                   )}
                 </div>
 
                 {isTracked && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
                     <span className="text-green-500 text-7xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">✔</span>
                   </div>
                 )}
 
                 <div className={`p-1 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : 'bg-stone-800 border-stone-700'}`}>
-                  <p className="text-[12px] leading-tight text-stone-200 uppercase truncate">
-                    {mob.name}
-                  </p>
+                  <p className="text-[12px] leading-tight text-stone-200 uppercase truncate">{mob.name}</p>
                 </div>
               </div>
             );
