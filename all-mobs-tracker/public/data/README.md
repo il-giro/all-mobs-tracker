@@ -28,4 +28,6 @@ textures
 1 camel
 1 camelHUsk
 1 trident nutilus
+goat horns
+llama carpets
 

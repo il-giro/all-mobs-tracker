@@ -28,7 +28,7 @@ const Settings = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-['VT323']">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-stone-800 w-full max-w-lg rounded-lg shadow-2xl p-6 border-4 border-stone-600 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-4xl text-green-400 uppercase tracking-widest shadow-black drop-shadow-md">Impostazioni</h2>
