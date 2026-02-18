@@ -13,11 +13,12 @@ wandareing trader
 baby husk caml riding
 zombie horse
 enderman holding blocks
-
-
+trader llama
+spear z-pilgin
 1 strider is unobtainable
-
-
+zombie nautilus
+wolfs
+zombie villagers
 
 
 
@@ -30,4 +31,4 @@ textures
 1 trident nutilus
 goat horns
 llama carpets
-
+2 hoglin jockey
