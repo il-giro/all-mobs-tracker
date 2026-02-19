@@ -32,3 +32,6 @@ textures
 goat horns
 llama carpets
 2 hoglin jockey
+2 sheep jab sheared
+
+
