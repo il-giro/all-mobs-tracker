@@ -27,8 +27,8 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, resetAll
               onChange={(e) => setVariantMode(e.target.value)}
               className="w-full bg-stone-900 text-white border-4 border-stone-700 p-3 outline-none uppercase font-bold"
             >
-              <option value="none">Solo Basi (1.1)</option>
-              <option value="main">Principali (1.x)</option>
+              <option value="none">Normali</option>
+              <option value="main">Varianti principali</option>
               <option value="all">Tutte</option>
             </select>
           </section>

@@ -26,8 +26,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md font-bold`}>
                   {mob.complexBadge.label}
                 </div>
-              ) : mob.type === 'color_variant' ? (
-                <div className="bg-red-600 text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md font-bold">COLOR</div>
               ) : null}
             </div>
           </>
