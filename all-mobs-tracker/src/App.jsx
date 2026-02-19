@@ -1,4 +1,4 @@
-import MobTracker from './MobTracker'
+import MobTracker from './components/MobTracker'
 import './index.css'
 
 function App() {
