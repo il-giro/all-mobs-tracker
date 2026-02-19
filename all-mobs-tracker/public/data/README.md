@@ -6,9 +6,8 @@ missing baby cat
 and collar colors
 happy ghast
 horse
-sheep
 tropical fish
-villager
+baby villager
 wandareing trader
 baby husk caml riding
 zombie horse
