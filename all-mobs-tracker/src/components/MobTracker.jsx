@@ -59,7 +59,6 @@ const MobTracker = () => {
     load();
   }, []);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') {
@@ -86,36 +85,28 @@ const MobTracker = () => {
   useEffect(() => { localStorage.setItem('mobTracker_filters', JSON.stringify(filters)); }, [filters]);
   useEffect(() => { localStorage.setItem('mobTracker_mode', variantMode); }, [variantMode]);
 
-  // Se il folder selezionato viene disattivato, torna a 'all'
   useEffect(() => {
     if (selectedFolder === 'all') return;
     if (selectedFolder.startsWith('special:')) {
       const mob = allMobs.find(m => m.folder === selectedFolder);
       if (mob?.specialSuffixId && !filters[mob.specialSuffixId]) setSelectedFolder('all');
     } else {
-      // Cartella normale: controlla se è linkata a un ComplexConfig disattivato
       const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${selectedFolder}/`));
       if (linked && !filters[linked.id]) setSelectedFolder('all');
     }
   }, [filters, selectedFolder, allMobs]);
 
-  // Pulsanti special: visibili solo se filters[suffixId] è ON
   const specialBtns = useMemo(() => {
     const map = new Map();
     allMobs.forEach(m => {
       if (m.specialSuffixId && !map.has(m.folder)) {
         const config = SuffixConfig[m.specialSuffixId];
-        map.set(m.folder, {
-          folderKey: m.folder,
-          suffixId: m.specialSuffixId,
-          label: config?.label ?? m.specialSuffixId,
-        });
+        map.set(m.folder, { folderKey: m.folder, suffixId: m.specialSuffixId, label: config?.label ?? m.specialSuffixId });
       }
     });
     return Array.from(map.values()).filter(b => filters[b.suffixId]);
   }, [allMobs, filters]);
 
-  // Pulsanti cartelle normali: spariscono se il loro ComplexConfig è OFF
   const normalFolderBtns = useMemo(() => {
     const set = new Set();
     allMobs.forEach(m => {
@@ -123,37 +114,62 @@ const MobTracker = () => {
     });
     return Array.from(set).sort().filter(f => {
       const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${f}/`));
-      // Se è linkata a un ComplexConfig, mostra solo se il filtro è ON
       if (linked) return filters[linked.id];
-      // Altrimenti sempre visibile
       return true;
     });
   }, [allMobs, filters]);
 
+  // suffixId del filtro special selezionato, per il match multi-suffisso
+  const selectedSpecialSuffixId = useMemo(() => {
+    if (!selectedFolder.startsWith('special:')) return null;
+    return specialBtns.find(b => b.folderKey === selectedFolder)?.suffixId ?? null;
+  }, [selectedFolder, specialBtns]);
+
   const displayedMobs = useMemo(() => {
     return allMobs.filter(mob => {
       if (searchQuery && !mob.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      if (selectedFolder !== 'all' && mob.folder !== selectedFolder) return false;
+
+      // Filtro cartella
+      if (selectedFolder !== 'all') {
+        if (selectedSpecialSuffixId) {
+          // Punto 4: mostra il mob se è nella cartella speciale OPPURE se ha quel suffisso
+          // tra gli activeSuffixes (es. Zombie_PB appare sia in pumpkin che in baby)
+          const inFolder = mob.folder === selectedFolder;
+          const hasSuffix = mob.activeSuffixes.includes(selectedSpecialSuffixId);
+          const isSpecialMob = mob.specialSuffixId === selectedSpecialSuffixId;
+          if (!inFolder && !hasSuffix && !isSpecialMob) return false;
+        } else {
+          if (mob.folder !== selectedFolder) return false;
+        }
+      }
+
+      // Mob in cartella special: visibile solo se il suo suffisso è ON
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
+
+      // Suffissi attivi
       for (const suffix of mob.activeSuffixes) {
         if (!filters[suffix]) return false;
       }
+
+      // ComplexConfig
       if (mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }
+
+      // Varianti
       if (variantMode === 'none') {
         if (mob.num1 > 1 || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       } else if (variantMode === 'main') {
         if ((mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       }
+
       return true;
     });
-  }, [allMobs, filters, variantMode, searchQuery, selectedFolder]);
+  }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId]);
 
   const trackedCount = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
   const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
-
   const hasFilters = specialBtns.length > 0 || normalFolderBtns.length > 0;
 
   return (
@@ -174,7 +190,6 @@ const MobTracker = () => {
         <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl text-green-400 drop-shadow-md uppercase whitespace-nowrap">Mob Tracker</h1>
-
             <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-3/4 justify-end">
               <div className="relative flex-grow max-w-2xl">
                 <input
@@ -186,15 +201,12 @@ const MobTracker = () => {
                   className="w-full bg-black border-4 border-stone-700 py-2 pl-3 pr-10 text-xl outline-none focus:border-green-500 transition-colors"
                 />
                 {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white font-bold text-xl pb-1"
-                  >X</button>
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white  text-xl pb-1">X</button>
                 )}
               </div>
               <div className="flex gap-4 shrink-0">
-                <button onClick={() => setShowStats(true)} className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase font-bold transition-transform active:translate-y-1 active:border-b-0">Stats</button>
-                <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase font-bold transition-transform active:translate-y-1 active:border-b-0">Settings</button>
+                <button onClick={() => setShowStats(true)} className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase  transition-transform active:translate-y-1 active:border-b-0">Stats</button>
+                <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase  transition-transform active:translate-y-1 active:border-b-0">Settings</button>
               </div>
             </div>
           </div>
@@ -203,37 +215,31 @@ const MobTracker = () => {
             <div className="mb-4 flex flex-wrap gap-2 items-center">
               <button
                 onClick={() => setSelectedFolder('all')}
-                className={`px-3 py-1 text-sm font-bold uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-              >
-                Tutti
-              </button>
+                className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+              >Tutti</button>
 
               {specialBtns.length > 0 && (
                 <>
-                  <span className="text-stone-600 font-bold select-none">|</span>
+                  <span className="text-stone-600  select-none">|</span>
                   {specialBtns.map(b => (
                     <button
                       key={b.folderKey}
                       onClick={() => setSelectedFolder(b.folderKey)}
-                      className={`px-3 py-1 text-sm font-bold uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
-                    >
-                      ✦ {b.label}
-                    </button>
+                      className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
+                    >✦ {b.label}</button>
                   ))}
                 </>
               )}
 
               {normalFolderBtns.length > 0 && (
                 <>
-                  <span className="text-stone-600 font-bold select-none">|</span>
+                  <span className="text-stone-600  select-none">|</span>
                   {normalFolderBtns.map(f => (
                     <button
                       key={f}
                       onClick={() => setSelectedFolder(f)}
-                      className={`px-3 py-1 text-sm font-bold uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-                    >
-                      {f}
-                    </button>
+                      className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                    >{f}</button>
                   ))}
                 </>
               )}
@@ -241,7 +247,7 @@ const MobTracker = () => {
           )}
 
           <div className="bg-black/50 p-4 border-4 border-stone-700 relative overflow-hidden">
-            <div className="flex justify-between mb-2 text-xl font-bold uppercase">
+            <div className="flex justify-between mb-2 text-xl  uppercase">
               <span>Progress</span>
               <span>{trackedCount} / {displayedMobs.length} ({displayedMobs.length > 0 ? Math.round((trackedCount / displayedMobs.length) * 100) : 0}%)</span>
             </div>

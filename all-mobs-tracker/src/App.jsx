@@ -1,8 +1,7 @@
-import MobTracker from './components/MobTracker'
-import './index.css'
+import MobTracker from './components/MobTracker';
 
-function App() {
-  return <MobTracker />
-}
+const App = () => {
+  return <MobTracker />;
+};
 
-export default App
+export default App;

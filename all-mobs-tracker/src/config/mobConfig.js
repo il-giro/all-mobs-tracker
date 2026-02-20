@@ -4,15 +4,21 @@ export const SuffixConfig = {
     'B': { id: 'B', label: 'BABY-MONSTER', color: 'bg-pink-600', defaultShow: true },
     'C': { id: 'C', label: 'BABY-ANIMAL', color: 'bg-red-600', defaultShow: false },
     'P': { id: 'P', label: 'PUMPKIN', color: 'bg-orange-600', defaultShow: false },
+    'J': { id: 'J', label: 'JOCKEY', color: 'bg-yellow-600', defaultShow: true }
 };
 
+// Priorità badge: il PRIMO ha priorità massima.
+// Se un mob ha più suffissi, viene mostrato solo il badge con priorità più alta.
+// Modifica l'ordine qui per cambiare la priorità.
+export const SuffixPriority = ['P', 'J', 'B', 'C', 'A'];
+
 // Mappa esplicita: nome sottocartella di /special/ → id in SuffixConfig
-// La chiave deve essere il nome ESATTO della cartella (case-insensitive nel codice)
 export const SpecialFolderMap = {
   'baby breed':    'A',
   'baby monster':  'B',
   'baby animal':   'C',
   'pumpkin':       'P',
+  'jockey':        'J'
 };
 
 // Configurazione dei Mob con logica complessa (es: Villagers, Horses)
@@ -96,8 +102,7 @@ export const ComplexConfig = [
     isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
     formatName: (match) => {
       const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const sheared = { 1: '', 2: 'Sheared'};
-      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: '_jeb'};
+      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: '_jeb' };
       return `Sheep ${color[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' (Sheared)' : '');
     },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
