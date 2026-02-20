@@ -58,98 +58,104 @@ Use this to track which mobs have all their variants properly added to the track
 ### Passive
 
 - [x] Allay
-- [ ] Armadillo
-- [ ] Axolotl
-- [ ] Bat
-- [ ] Cat
-- [ ] Chicken
-- [ ] Cod
-- [ ] Cow
-- [ ] Donkey
-- [ ] Frog
-- [ ] Glow Squid
-- [ ] Horse
-- [ ] Mooshroom
-- [ ] Mule
-- [ ] Ocelot
-- [ ] Parrot
-- [ ] Pig
-- [ ] Pufferfish
-- [ ] Rabbit
-- [ ] Salmon
-- [ ] Sheep
-- [ ] Skeleton Horse
-- [ ] Sniffer
-- [ ] Snow Golem
-- [ ] Squid
+- [x] Armadillo
+- [ ] Axolotl (missing green)
+- [x] Bat
+- [x] Bat
+- [ ] Cat (baby)
+- [x] Camel
+- [ ] Camel husk
+- [x] Chicken
+- [x] Cod
+- [x] Copper Golem
+- [x] Cow
+- [x] Donkey
+- [x] Frog
+- [x] Glow Squid
+- [ ] Happy Ghast (colors)
+- [ ] Horse (baby)
+- [x] Mooshroom
+- [x] Mule
+- [x] Ocelot
+- [x] Parrot
+- [x] Pig
+- [ ] Rabbit (killer)
+- [x] Salmon
+- [x] Sheep
+- [ ] Skeleton Horse (varaints)
+- [x] Sniffer
+- [x] Snow Golem
+- [x] Squid
 - [ ] Strider
-- [ ] Tadpole
+- [x] Tadpole
 - [ ] Tropical Fish
-- [ ] Turtle
-- [ ] Villager
+- [x] Turtle
+- [ ] Villager (baby)
 - [ ] Wandering Trader
 - [ ] Zombie Horse
 
 ### Neutral
 
-- [ ] Bee
-- [ ] Cave Spider
-- [ ] Dolphin
-- [ ] Drowned
+- [x] Bee
+- [x] Cave Spider
+- [x] Dolphin
+- [x] Drowned
 - [ ] Enderman
-- [ ] Goat
-- [ ] Iron Golem
-- [ ] Llama
-- [ ] Panda
-- [ ] Piglin
-- [ ] Polar Bear
-- [ ] Spider
+- [x] Fox
+- [x] Goat
+- [x] Iron Golem
+- [x] Llama
+- [x] Panda
+- [x] Nautilus
+- [x] Piglin
+- [x] Pufferfish
+- [x] Polar Bear
+- [ ] Spider (varaints)
 - [ ] Wolf
-- [ ] Zombified Piglin
+- [x] Zombified Piglin
 
 ### Hostile
 
-- [ ] Blaze
-- [ ] Bogged
-- [ ] Breeze
-- [ ] Creeper
-- [ ] Elder Guardian
-- [ ] Endermite
+- [x] Blaze
+- [x] Bogged
+- [x] Breeze
+- [x] Creeper
+- [x] Elder Guardian
+- [x] Endermite
 - [ ] Evoker
-- [ ] Ghast
-- [ ] Guardian
-- [ ] Hoglin
-- [ ] Husk
-- [ ] Magma Cube
-- [ ] Phantom
+- [x] Ghast
+- [x] Guardian
+- [ ] Hoglin ?
+- [ ] Husk ?
+- [x] Magma Cube
+- [x] Phantom
 - [ ] Pillager
-- [ ] Ravager
-- [ ] Shulker
-- [ ] Silverfish
+- [x] Ravager
+- [x] Shulker
+- [x] Silverfish
 - [ ] Skeleton
-- [ ] Slime
+- [x] Slime
 - [ ] Stray
-- [ ] Vex
+- [x] Vex
 - [ ] Vindicator
-- [ ] Warden
+- [x] Warden
 - [ ] Witch
-- [ ] Wither Skeleton
-- [ ] Zoglin
-- [ ] Zombie
+- [x] Wither Skeleton
+- [x] Zoglin
+- [x] Zombie
 - [ ] Zombie Villager
 
 ### Bosses
 
-- [ ] Elder Guardian
-- [ ] Ender Dragon
-- [ ] Wither
+- [x] Ender Dragon
+- [x] Wither
 
 ### Special / Variants
 
-- [ ] Baby variants (all breedable mobs)
-- [ ] Baby monster variants
-- [ ] Pumpkin variants (all mobs that can spawn with pumpkin)
-- [ ] Jockey variants
+- [ ] All Baby variants (all breedable mobs)
+- [ ] All Baby monster variants
+- [ ] All Pumpkin variants (all mobs that can spawn with pumpkin)
+- [ ] All Jockey variants
 - [ ] Unobtainable variants
 
 ---
