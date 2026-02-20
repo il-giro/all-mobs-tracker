@@ -57,7 +57,7 @@ Use this to track which mobs have all their variants properly added to the track
 
 ### Passive
 
-- [ ] Allay
+- [x] Allay
 - [ ] Armadillo
 - [ ] Axolotl
 - [ ] Bat
