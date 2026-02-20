@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Settings from './Settings';
 import MobCard from './MobCard';
+import Stats from './Stats';
 import { parseFileName } from '../utils/mobParser';
 import { SuffixConfig, ComplexConfig } from '../config/mobConfig';
 
@@ -10,8 +11,8 @@ const MobTracker = () => {
   const [variantMode, setVariantMode] = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
-  // Inizializza filtri dinamici dalla config
   const [filters, setFilters] = useState(() => {
     const saved = JSON.parse(localStorage.getItem('mobTracker_filters'));
     if (saved) return saved;
@@ -34,30 +35,23 @@ const MobTracker = () => {
     load();
   }, []);
 
-  // Salvataggi
   useEffect(() => { localStorage.setItem('mobTracker_saves', JSON.stringify(trackedMobs)); }, [trackedMobs]);
   useEffect(() => { localStorage.setItem('mobTracker_filters', JSON.stringify(filters)); }, [filters]);
   useEffect(() => { localStorage.setItem('mobTracker_mode', variantMode); }, [variantMode]);
 
-  // Logica di Filtro
   const displayedMobs = useMemo(() => {
     return allMobs.filter(mob => {
-      // 1. Filtro Cerca
       if (searchQuery && !mob.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
 
-      // 2. Filtro Suffissi (Se il mob ha un suffisso spento nei filtri, lo nascondo)
       for (const suffix of mob.activeSuffixes) {
         if (!filters[suffix]) return false;
       }
 
-      // 3. Filtro Categorie Complesse (Villagers/Horses)
       if (mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
-        // Mostra solo se è la base assoluta (es. 1.1) e non ha suffissi (es. niente _B)
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }
 
-      // 4. Modalità Varianti
       if (variantMode === 'none') {
         if (mob.num1 > 1 || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       } else if (variantMode === 'main') {
@@ -77,17 +71,47 @@ const MobTracker = () => {
         <Settings 
           variantMode={variantMode} setVariantMode={setVariantMode}
           filters={filters} toggleFilter={(id) => setFilters(p => ({...p, [id]: !p[id]}))}
-          resetAll={() => confirm('Reset?') && setTrackedMobs({})} onClose={() => setShowSettings(false)}
+          resetAll={() => confirm('Sei sicuro di voler resettare tutti i progressi?') && setTrackedMobs({})} 
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+      
+      {showStats && (
+        <Stats 
+          allMobs={allMobs} 
+          trackedMobs={trackedMobs} 
+          onClose={() => setShowStats(false)} 
         />
       )}
 
       <div className="max-w-[1600px] mx-auto">
         <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
-            <h1 className="text-4xl md:text-6xl text-green-400 drop-shadow-md uppercase">Mob Tracker</h1>
-            <div className="flex gap-4 w-full md:w-auto">
-              <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="bg-black border-4 border-stone-700 p-2 text-xl flex-grow outline-none focus:border-green-500" />
-              <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase font-bold">Settings</button>
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl text-green-400 drop-shadow-md uppercase whitespace-nowrap">Mob Tracker</h1>
+            
+            {/* Barra superiore allungata con input e bottoni */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-3/4 justify-end">
+              <div className="relative flex-grow max-w-2xl">
+                <input 
+                  type="text" 
+                  placeholder="Search..." 
+                  value={searchQuery} 
+                  onChange={e => setSearchQuery(e.target.value)} 
+                  className="w-full bg-black border-4 border-stone-700 py-2 pl-3 pr-10 text-xl outline-none focus:border-green-500 transition-colors" 
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white font-bold text-xl pb-1"
+                  >
+                    X
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-4 shrink-0">
+                <button onClick={() => setShowStats(true)} className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase font-bold transition-transform active:translate-y-1 active:border-b-0">Stats</button>
+                <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase font-bold transition-transform active:translate-y-1 active:border-b-0">Settings</button>
+              </div>
             </div>
           </div>
 
@@ -97,7 +121,7 @@ const MobTracker = () => {
               <span>{trackedCount} / {displayedMobs.length} ({displayedMobs.length > 0 ? Math.round((trackedCount/displayedMobs.length)*100) : 0}%)</span>
             </div>
             <div className="h-6 bg-stone-900 border-2 border-stone-700 p-1">
-              <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${(trackedCount/displayedMobs.length)*100}%` }} />
+              <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${displayedMobs.length > 0 ? (trackedCount/displayedMobs.length)*100 : 0}%` }} />
             </div>
           </div>
         </header>
