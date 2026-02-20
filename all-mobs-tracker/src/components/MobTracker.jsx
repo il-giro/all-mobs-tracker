@@ -119,21 +119,36 @@ const MobTracker = () => {
     });
   }, [allMobs, filters]);
 
-  // suffixId del filtro special selezionato, per il match multi-suffisso
   const selectedSpecialSuffixId = useMemo(() => {
     if (!selectedFolder.startsWith('special:')) return null;
     return specialBtns.find(b => b.folderKey === selectedFolder)?.suffixId ?? null;
   }, [selectedFolder, specialBtns]);
 
+  // Costruisce la stringa di ricerca per un mob:
+  // es. Turtle con suffisso C → "turtle baby"
+  // così "baby turtle" o "turtle baby" trovano entrambi
+  const getMobSearchString = (mob) => {
+    const shortLabels = mob.activeSuffixes
+      .map(id => SuffixConfig[id]?.shortLabel)
+      .filter(Boolean);
+    // Deduplicati (es. A e C hanno entrambi "baby")
+    const unique = [...new Set(shortLabels)];
+    return [mob.name, ...unique].join(' ').toLowerCase();
+  };
+
   const displayedMobs = useMemo(() => {
     return allMobs.filter(mob => {
-      if (searchQuery && !mob.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      // Ricerca su nome + shortLabel dei suffissi
+      if (searchQuery) {
+        const searchStr = getMobSearchString(mob);
+        const query = searchQuery.toLowerCase().trim();
+        // Supporta ricerca con parole in qualsiasi ordine: "baby turtle" = "turtle baby"
+        const words = query.split(/\s+/);
+        if (!words.every(w => searchStr.includes(w))) return false;
+      }
 
-      // Filtro cartella
       if (selectedFolder !== 'all') {
         if (selectedSpecialSuffixId) {
-          // Punto 4: mostra il mob se è nella cartella speciale OPPURE se ha quel suffisso
-          // tra gli activeSuffixes (es. Zombie_PB appare sia in pumpkin che in baby)
           const inFolder = mob.folder === selectedFolder;
           const hasSuffix = mob.activeSuffixes.includes(selectedSpecialSuffixId);
           const isSpecialMob = mob.specialSuffixId === selectedSpecialSuffixId;
@@ -143,21 +158,17 @@ const MobTracker = () => {
         }
       }
 
-      // Mob in cartella special: visibile solo se il suo suffisso è ON
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
 
-      // Suffissi attivi
       for (const suffix of mob.activeSuffixes) {
         if (!filters[suffix]) return false;
       }
 
-      // ComplexConfig
       if (mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }
 
-      // Varianti
       if (variantMode === 'none') {
         if (mob.num1 > 1 || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       } else if (variantMode === 'main') {
@@ -222,9 +233,7 @@ const MobTracker = () => {
                 <>
                   <span className="text-stone-600  select-none">|</span>
                   {specialBtns.map(b => (
-                    <button
-                      key={b.folderKey}
-                      onClick={() => setSelectedFolder(b.folderKey)}
+                    <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
                       className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
                     >✦ {b.label}</button>
                   ))}
@@ -235,9 +244,7 @@ const MobTracker = () => {
                 <>
                   <span className="text-stone-600  select-none">|</span>
                   {normalFolderBtns.map(f => (
-                    <button
-                      key={f}
-                      onClick={() => setSelectedFolder(f)}
+                    <button key={f} onClick={() => setSelectedFolder(f)}
                       className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
                     >{f}</button>
                   ))}

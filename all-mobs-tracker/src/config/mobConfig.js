@@ -1,16 +1,18 @@
 // Configurazione dei Suffissi (es: _B, _A, _P)
+// shortLabel: parola usata nel nome del mob al posto della lettera (es. "(baby)" invece di "(A)")
+// Usato anche dalla ricerca: "baby turtle" trova "turtle" con suffisso A/B/C
 export const SuffixConfig = {
-    'A': { id: 'A', label: 'BABY-BREED', color: 'bg-purple-600', defaultShow: false },
-    'B': { id: 'B', label: 'BABY-MONSTER', color: 'bg-pink-600', defaultShow: true },
-    'C': { id: 'C', label: 'BABY-ANIMAL', color: 'bg-red-600', defaultShow: false },
-    'P': { id: 'P', label: 'PUMPKIN', color: 'bg-orange-600', defaultShow: false },
-    'J': { id: 'J', label: 'JOCKEY', color: 'bg-yellow-600', defaultShow: true }
+    'A': { id: 'A', label: 'BABY-BREED',    shortLabel: 'baby',         color: 'bg-purple-600', defaultShow: false },
+    'B': { id: 'B', label: 'BABY-MONSTER',  shortLabel: 'baby',         color: 'bg-pink-600',   defaultShow: true  },
+    'C': { id: 'C', label: 'BABY-ANIMAL',   shortLabel: 'baby',         color: 'bg-green-600',  defaultShow: false },
+    'P': { id: 'P', label: 'PUMPKIN',       shortLabel: 'pumpkin',      color: 'bg-orange-600', defaultShow: false },
+    'J': { id: 'J', label: 'JOCKEY',        shortLabel: 'jockey',       color: 'bg-yellow-600', defaultShow: true  },
+    'U': { id: 'U', label: 'UNOBTAINABLE',  shortLabel: '',             color: 'bg-red-600',    defaultShow: false },
+    'T': { id: 'T', label: 'TEXTURE',       shortLabel: 'wrong texture',color: 'bg-blue-600',   defaultShow: true  },
 };
 
 // Priorità badge: il PRIMO ha priorità massima.
-// Se un mob ha più suffissi, viene mostrato solo il badge con priorità più alta.
-// Modifica l'ordine qui per cambiare la priorità.
-export const SuffixPriority = ['P', 'J', 'B', 'C', 'A'];
+export const SuffixPriority = ['T', 'U', 'P', 'J', 'B', 'C', 'A'];
 
 // Mappa esplicita: nome sottocartella di /special/ → id in SuffixConfig
 export const SpecialFolderMap = {
@@ -18,7 +20,8 @@ export const SpecialFolderMap = {
   'baby monster':  'B',
   'baby animal':   'C',
   'pumpkin':       'P',
-  'jockey':        'J'
+  'jockey':        'J',
+  'unobtainable':  'U',
 };
 
 // Configurazione dei Mob con logica complessa (es: Villagers, Horses)
