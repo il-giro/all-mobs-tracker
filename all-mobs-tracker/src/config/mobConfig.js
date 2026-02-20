@@ -9,9 +9,9 @@ export const SuffixConfig = {
 // Mappa esplicita: nome sottocartella di /special/ → id in SuffixConfig
 // La chiave deve essere il nome ESATTO della cartella (case-insensitive nel codice)
 export const SpecialFolderMap = {
-  'baby animal':   'C',
   'baby breed':    'A',
   'baby monster':  'B',
+  'baby animal':   'C',
   'pumpkin':       'P',
 };
 
@@ -82,6 +82,23 @@ export const ComplexConfig = [
       const type = { 1: 'Brown', 2: 'Creamy', 3: 'Gray', 4: 'White' };
       const carpetColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
       return `Llama ${type[n1] || ''} ${carpetColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' with Chest' : '');
+    },
+    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
+  },
+  {
+    id: 'sheep',
+    label: 'Varianti Sheep',
+    pathIncludes: '/sheeps/',
+    regex: /^(\d+)\.(\d+)\.(\d+)/,
+    type: 'color_variant',
+    badgeColor: 'bg-gray-600',
+    defaultShow: false,
+    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
+    formatName: (match) => {
+      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
+      const sheared = { 1: '', 2: 'Sheared'};
+      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: '_jeb'};
+      return `Sheep ${color[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' (Sheared)' : '');
     },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
   },

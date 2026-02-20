@@ -31,18 +31,17 @@ const MobTracker = () => {
         const parts = path.split('/');
         const dataIdx = parts.indexOf('data');
         const fileName = parts[parts.length - 1];
-        const afterData = parts.slice(dataIdx + 1, -1); // segmenti tra 'data' e il file
+        const afterData = parts.slice(dataIdx + 1, -1);
 
         let folder = 'root';
-        let specialSuffixId = null; // es. 'C', 'A', 'B', 'P'
+        let specialSuffixId = null;
 
         if (afterData.length === 0) {
           folder = 'root';
         } else if (afterData[0].toLowerCase() === 'special' && afterData[1]) {
-          // Cerca il nome della sottocartella nella mappa esplicita (case-insensitive)
           const subName = afterData[1].toLowerCase();
           specialSuffixId = SpecialFolderMap[subName] ?? null;
-          folder = `special:${afterData[1]}`; // es. "special:baby animal"
+          folder = `special:${afterData[1]}`;
         } else {
           folder = afterData[0];
         }
@@ -52,7 +51,7 @@ const MobTracker = () => {
           image: path.replace('/public', ''),
           fileName,
           folder,
-          specialSuffixId, // id diretto nel SuffixConfig, es. 'C'
+          specialSuffixId,
         };
       }).sort((a, b) => a.name.localeCompare(b.name));
       setAllMobs(data);
@@ -87,17 +86,20 @@ const MobTracker = () => {
   useEffect(() => { localStorage.setItem('mobTracker_filters', JSON.stringify(filters)); }, [filters]);
   useEffect(() => { localStorage.setItem('mobTracker_mode', variantMode); }, [variantMode]);
 
-  // Se il filtro selezionato è una special che viene disattivata, torna a 'all'
+  // Se il folder selezionato viene disattivato, torna a 'all'
   useEffect(() => {
+    if (selectedFolder === 'all') return;
     if (selectedFolder.startsWith('special:')) {
       const mob = allMobs.find(m => m.folder === selectedFolder);
-      if (mob?.specialSuffixId && !filters[mob.specialSuffixId]) {
-        setSelectedFolder('all');
-      }
+      if (mob?.specialSuffixId && !filters[mob.specialSuffixId]) setSelectedFolder('all');
+    } else {
+      // Cartella normale: controlla se è linkata a un ComplexConfig disattivato
+      const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${selectedFolder}/`));
+      if (linked && !filters[linked.id]) setSelectedFolder('all');
     }
   }, [filters, selectedFolder, allMobs]);
 
-  // Pulsanti special: uno per sottocartella, visibile solo se filters[suffixId] è ON
+  // Pulsanti special: visibili solo se filters[suffixId] è ON
   const specialBtns = useMemo(() => {
     const map = new Map();
     allMobs.forEach(m => {
@@ -110,48 +112,41 @@ const MobTracker = () => {
         });
       }
     });
-    // Mostra solo se il toggle nelle Settings è ON
     return Array.from(map.values()).filter(b => filters[b.suffixId]);
   }, [allMobs, filters]);
 
-  // Pulsanti cartelle normali (esclude root e special)
+  // Pulsanti cartelle normali: spariscono se il loro ComplexConfig è OFF
   const normalFolderBtns = useMemo(() => {
     const set = new Set();
     allMobs.forEach(m => {
       if (m.folder !== 'root' && !m.folder.startsWith('special:')) set.add(m.folder);
     });
-    return Array.from(set).sort();
-  }, [allMobs]);
+    return Array.from(set).sort().filter(f => {
+      const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${f}/`));
+      // Se è linkata a un ComplexConfig, mostra solo se il filtro è ON
+      if (linked) return filters[linked.id];
+      // Altrimenti sempre visibile
+      return true;
+    });
+  }, [allMobs, filters]);
 
   const displayedMobs = useMemo(() => {
     return allMobs.filter(mob => {
-      // Ricerca testo
       if (searchQuery && !mob.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-
-      // Filtro cartella selezionata
       if (selectedFolder !== 'all' && mob.folder !== selectedFolder) return false;
-
-      // Mob in cartella special: visibile solo se il suo suffisso è ON nelle Settings
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
-
-      // Suffissi normali (activeSuffixes dal parser, es. _B _P sui file root)
       for (const suffix of mob.activeSuffixes) {
         if (!filters[suffix]) return false;
       }
-
-      // ComplexConfig
       if (mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }
-
-      // Varianti
       if (variantMode === 'none') {
         if (mob.num1 > 1 || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       } else if (variantMode === 'main') {
         if ((mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       }
-
       return true;
     });
   }, [allMobs, filters, variantMode, searchQuery, selectedFolder]);
@@ -204,11 +199,8 @@ const MobTracker = () => {
             </div>
           </div>
 
-          {/* Filtri */}
           {hasFilters && (
             <div className="mb-4 flex flex-wrap gap-2 items-center">
-
-              {/* Tutti */}
               <button
                 onClick={() => setSelectedFolder('all')}
                 className={`px-3 py-1 text-sm font-bold uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
@@ -216,7 +208,6 @@ const MobTracker = () => {
                 Tutti
               </button>
 
-              {/* Special — colore viola, prima */}
               {specialBtns.length > 0 && (
                 <>
                   <span className="text-stone-600 font-bold select-none">|</span>
@@ -232,7 +223,6 @@ const MobTracker = () => {
                 </>
               )}
 
-              {/* Cartelle normali — colore verde */}
               {normalFolderBtns.length > 0 && (
                 <>
                   <span className="text-stone-600 font-bold select-none">|</span>

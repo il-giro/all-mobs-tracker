@@ -3,16 +3,24 @@ import { SuffixConfig, ComplexConfig } from '../config/mobConfig';
 
 const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, resetAll, onClose }) => {
   const ToggleBtn = ({ label, active, onClick }) => (
-    <div className="flex justify-between items-center bg-stone-900/50 p-3 border-2 border-stone-700 hover:bg-stone-800 transition-colors">
+    <div
+      onClick={onClick}
+      className="flex justify-between items-center bg-stone-900/50 p-3 border-2 border-stone-700 hover:bg-stone-800 transition-colors cursor-pointer select-none"
+    >
       <span className="text-lg text-stone-300 uppercase font-bold truncate pr-2">{label}</span>
-      <button 
-        onClick={onClick} 
-        className={`relative w-14 h-7 border-2 shrink-0 transition-colors duration-200 ${active ? 'bg-green-500 border-green-800' : 'bg-stone-900 border-stone-600'}`}
+
+      {/* Toggle */}
+      <div
+        className={`relative w-14 h-7 border-2 shrink-0 transition-colors duration-300 ${active ? 'bg-green-500 border-green-700' : 'bg-stone-900 border-stone-600'}`}
       >
-        <div 
-          className={`absolute top-0 left-0 h-full w-1/2 bg-stone-300 border-2 border-stone-500 shadow-sm transition-transform duration-200 ${active ? 'translate-x-full' : 'translate-x-0'}`} 
-        />
-      </button>
+        {/* Pallino scorrevole */}
+        <div
+          className={`absolute top-0 bottom-0 w-1/2 flex items-center justify-center transition-transform duration-300 ease-in-out ${active ? 'translate-x-full' : 'translate-x-0'}`}
+        >
+          <div className={`w-4 h-4 border-2 transition-colors duration-300 ${active ? 'bg-white border-green-900' : 'bg-stone-400 border-stone-600'}`} />
+        </div>
+
+      </div>
     </div>
   );
 
@@ -38,7 +46,6 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, resetAll
             </select>
           </section>
 
-          {/* Divisione in due colonne per Categorie e Suffissi */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <section className="space-y-3 bg-stone-900/40 p-4 border-2 border-stone-700">
               <label className="block text-xl text-amber-500 uppercase font-bold mb-4 border-b-2 border-stone-600 pb-2">Categorie Complesse</label>
