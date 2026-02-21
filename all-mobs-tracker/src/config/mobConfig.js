@@ -1,11 +1,27 @@
 // Configurazione dei Suffissi (es: _B, _A, _P)
-// Puoi aggiungere qualsiasi lettera qui e apparirà ovunque nel programma
+// shortLabel: parola usata nel nome del mob al posto della lettera (es. "(baby)" invece di "(A)")
+// Usato anche dalla ricerca: "baby turtle" trova "turtle" con suffisso A/B/C
 export const SuffixConfig = {
-    'A': { id: 'A', label: 'BABY-BREED', color: 'bg-purple-600', defaultShow: false },
-    'B': { id: 'B', label: 'BABY-MONSTER', color: 'bg-pink-600', defaultShow: true },
-    'C': { id: 'C', label: 'BABY-ANIMAL', color: 'bg-red-600', defaultShow: false },
-    'P': { id: 'P', label: 'PUMPKIN', color: 'bg-orange-600', defaultShow: false },
-  // Aggiungi qui: 'S': { id: 'S', label: 'SPECIAL', color: 'bg-yellow-600', defaultShow: true },
+    'A': { id: 'A', label: 'BABY-BREED',    shortLabel: 'baby',         color: 'bg-purple-600', defaultShow: false },
+    'B': { id: 'B', label: 'BABY-MONSTER',  shortLabel: 'baby',         color: 'bg-pink-600',   defaultShow: true  },
+    'C': { id: 'C', label: 'BABY-ANIMAL',   shortLabel: 'baby',         color: 'bg-green-600',  defaultShow: false },
+    'P': { id: 'P', label: 'PUMPKIN',       shortLabel: 'pumpkin',      color: 'bg-orange-600', defaultShow: false },
+    'J': { id: 'J', label: 'JOCKEY',        shortLabel: 'jockey',       color: 'bg-yellow-600', defaultShow: true  },
+    'U': { id: 'U', label: 'UNOBTAINABLE',  shortLabel: '',             color: 'bg-red-600',    defaultShow: false },
+    'T': { id: 'T', label: 'TEXTURE',       shortLabel: 'wrong texture',color: 'bg-blue-600',   defaultShow: true  },
+};
+
+// Priorità badge: il PRIMO ha priorità massima.
+export const SuffixPriority = ['T', 'U', 'P', 'J', 'B', 'C', 'A'];
+
+// Mappa esplicita: nome sottocartella di /special/ → id in SuffixConfig
+export const SpecialFolderMap = {
+  'baby breed':    'A',
+  'baby monster':  'B',
+  'baby animal':   'C',
+  'pumpkin':       'P',
+  'jockey':        'J',
+  'unobtainable':  'U',
 };
 
 // Configurazione dei Mob con logica complessa (es: Villagers, Horses)
@@ -18,7 +34,6 @@ export const ComplexConfig = [
     type: 'complex_variant',
     badgeColor: 'bg-amber-600',
     defaultShow: false,
-    // Se il filtro è spento, mostriamo comunque la versione 1.1 base
     isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
     formatName: (match) => {
       const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
@@ -46,7 +61,7 @@ export const ComplexConfig = [
     },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
   },
-    {
+  {
     id: 'enderman',
     label: 'Varianti Enderman',
     pathIncludes: '/endermans/',
@@ -56,13 +71,13 @@ export const ComplexConfig = [
     defaultShow: false,
     isBaseCondition: (n1) => n1 === 1,
     formatName: (match) => {
-        const n1 = parseInt(match[1]);
-        const block = { 1: '', 2: 'Sand', 3: 'Cactus', 4: 'Tnt', 5: 'Grass'};
-        return `Enderman ${block[n1] || ""}`;
+      const n1 = parseInt(match[1]);
+      const block = { 1: '', 2: 'Sand', 3: 'Cactus', 4: 'Tnt', 5: 'Grass' };
+      return `Enderman ${block[n1] || ''}`;
     },
-    extractNums: (match) => ({ num1: parseInt(match[1])})
-    },
-    {
+    extractNums: (match) => ({ num1: parseInt(match[1]) })
+  },
+  {
     id: 'llama',
     label: 'Varianti Llama',
     pathIncludes: '/llamas/',
@@ -72,12 +87,27 @@ export const ComplexConfig = [
     defaultShow: false,
     isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
     formatName: (match) => {
-        const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-        const type = { 1: 'Brown', 2: 'Creamy', 3: 'Gray', 4: 'White'};
-        const equip = { 1: '', 2: 'Chest'};
-        const carpetColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
-        return `Llama ${type[n1] || ''} ${carpetColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' with Chest' : '');
+      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
+      const type = { 1: 'Brown', 2: 'Creamy', 3: 'Gray', 4: 'White' };
+      const carpetColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
+      return `Llama ${type[n1] || ''} ${carpetColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' with Chest' : '');
     },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
+  },
+  {
+    id: 'sheep',
+    label: 'Varianti Sheep',
+    pathIncludes: '/sheeps/',
+    regex: /^(\d+)\.(\d+)\.(\d+)/,
+    type: 'color_variant',
+    badgeColor: 'bg-gray-600',
+    defaultShow: false,
+    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
+    formatName: (match) => {
+      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
+      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: '_jeb' };
+      return `Sheep ${color[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' (Sheared)' : '');
     },
+    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
+  },
 ];

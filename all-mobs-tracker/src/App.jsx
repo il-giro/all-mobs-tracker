@@ -6,4 +6,4 @@ function App() {
   return <MobTracker />
 }
 
-export default App
+export default App;

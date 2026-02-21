@@ -1,55 +1,167 @@
-# All Mobs Tracker 🎮
+# 🐾 All Mobs Tracker
 
-Un'applicazione React per tracciare tutti i mob di Minecraft con supporto per varianti multiple.
+**Track every Minecraft mob variant — because the completionist in you demands it.**
 
-## 🚀 Quick Start
-
-### 1. Visita il sito
-
-[all-mobs-tracker.vercel.app](https://all-mobs-tracker.vercel.app/)
-
-## ✨ Funzionalità
-
-- ✅ **Griglia Responsive** - Si adatta perfettamente a desktop, tablet e mobile
-- 🎯 **Click per Tracciare** - Clicca su un mob per segnarlo come trovato
-- 🔄 **4 Tipi di Varianti** - Sistema intelligente per gestire varianti semplici, complesse e con colori
-- 💾 **Salvataggio Automatico** - I progressi vengono salvati nel browser (localStorage)
-- 📊 **Barra di Progresso** - Visualizza quanti mob hai trovato
-- ⚙️ **Pagina Impostazioni** - Scegli quante varianti visualizzare
-- 🎨 **Tema Minecraft** - Design ispirato al gioco con colori verde/pietra
-- 🏷️ **Badge Varianti** - Indicatori colorati per distinguere i tipi di varianti
-- 📈 **Statistiche Dettagliate** - Vedi quanti mob di ogni tipo hai
-
-**Ideale per:** Completisti che vogliono tracciare ogni singola variante
-
-## 🎮 Come Si Usa
-
-1. **Traccia un mob:** Clicca sulla carta del mob (apparirà un ✓)
-2. **Apri impostazioni:** Clicca sul pulsante "⚙️ Impostazioni"
-3. **Scegli modalità:** Seleziona quante varianti vuoi visualizzare
-4. **Visualizza progresso:** La barra in alto mostra quanti mob hai trovato
-5. **Vedi statistiche:** Nella pagina impostazioni puoi vedere statistiche dettagliate
-6. **Reset:** Usa il pulsante "🔄 Reset" per ricominciare
-
-## 🛠️ Tecnologie
-
-- **React 18** - Libreria UI
-- **Vite** - Build tool velocissimo
-- **Tailwind CSS** - Styling utility-first
-- **Local Storage** - Salvataggio progressi
-
-## 🤝 Contribuire
-
-Le pull request sono benvenute! Per modifiche importanti, apri prima un'issue per discutere cosa vorresti cambiare.
-
-
-## 🎯 Roadmap
-
-- [ ] Filtri per tipo di mob (Hostile, Passive, Neutral)
-- [ ] Esportazione/importazione progressi
-- [ ] Modalità scura/chiara
-- [ ] Statistiche dettagliate
+🔗 **[all-mobs-tracker.vercel.app](https://all-mobs-tracker.vercel.app/)**
 
 ---
 
-Creato con ❤️ per i fan di Minecraft
+## About
+
+A personal tracker to keep track of every mob (and mob variant) in Minecraft. Click a card to mark it as found, filter by category, search by name, and track your overall completion progress.
+
+**A few things to know:**
+- The code was written with the help of various AI tools
+- Images are taken from the [Minecraft Wiki](https://minecraft.wiki/) or made by me
+- Some information (names, variant counts, categories) might not be 100% accurate
+- This is a personal project — no guarantees of completeness or correctness
+
+---
+
+## Features
+
+- ✅ Click to track/untrack mobs
+- 🔍 Search by name or suffix (e.g. "baby turtle" finds "Turtle (baby)")
+- 📁 Filter by mob group (folder) or special category
+- ⚙️ Settings to toggle complex variant groups and special suffixes
+- 📊 Stats panel with per-category and per-suffix completion
+- 🖱️ Right-click any card to see all its badges
+- ⌨️ Keyboard shortcuts: `Space` to focus search, `Esc` to close/clear
+
+---
+
+## Future Ideas
+
+A list of things that could be added or improved:
+
+- [ ] Export/import progress (JSON backup)
+- [ ] Multiple save slots / profiles
+- [ ] Mob detail page with description and spawn info
+- [ ] Mark mobs as "seen but not tracked" (partial state)
+- [ ] Sort options (alphabetical, by completion, by category)
+- [ ] Mobile swipe to mark as tracked
+- [ ] Dark/light theme toggle
+- [ ] Confetti or animation on 100% completion
+- [ ] Filter to show only untracked mobs
+- [ ] Filter to show only tracked mobs
+- [ ] Show total count per folder/category in filter buttons
+- [ ] Multiplayer / shared tracking (Supabase or similar)
+- [ ] Changelog or "recently added" section
+- [ ] Better handling of unobtainable mobs (greyed out style)
+
+---
+
+## Mob Checklist
+
+Use this to track which mobs have all their variants properly added to the tracker.
+
+### Passive
+
+- [x] Allay
+- [x] Armadillo
+- [ ] Axolotl (missing green)
+- [x] Bat
+- [x] Bat
+- [ ] Cat (baby)
+- [x] Camel
+- [ ] Camel husk
+- [x] Chicken
+- [x] Cod
+- [x] Copper Golem
+- [x] Cow
+- [x] Donkey
+- [x] Frog
+- [x] Glow Squid
+- [ ] Happy Ghast (colors)
+- [ ] Horse (baby)
+- [x] Mooshroom
+- [x] Mule
+- [x] Ocelot
+- [x] Parrot
+- [x] Pig
+- [ ] Rabbit (killer)
+- [x] Salmon
+- [x] Sheep
+- [ ] Skeleton Horse (varaints)
+- [x] Sniffer
+- [x] Snow Golem
+- [x] Squid
+- [ ] Strider
+- [x] Tadpole
+- [ ] Tropical Fish
+- [x] Turtle
+- [ ] Villager (baby)
+- [ ] Wandering Trader
+- [ ] Zombie Horse
+
+### Neutral
+
+- [x] Bee
+- [x] Cave Spider
+- [x] Dolphin
+- [x] Drowned
+- [ ] Enderman
+- [x] Fox
+- [x] Goat
+- [x] Iron Golem
+- [x] Llama
+- [x] Panda
+- [x] Nautilus
+- [x] Piglin
+- [x] Pufferfish
+- [x] Polar Bear
+- [ ] Spider (varaints)
+- [ ] Wolf
+- [x] Zombified Piglin
+
+### Hostile
+
+- [x] Blaze
+- [x] Bogged
+- [x] Breeze
+- [x] Creeper
+- [x] Elder Guardian
+- [x] Endermite
+- [ ] Evoker
+- [x] Ghast
+- [x] Guardian
+- [ ] Hoglin ?
+- [ ] Husk ?
+- [x] Magma Cube
+- [x] Phantom
+- [ ] Pillager
+- [x] Ravager
+- [x] Shulker
+- [x] Silverfish
+- [ ] Skeleton
+- [x] Slime
+- [ ] Stray
+- [x] Vex
+- [ ] Vindicator
+- [x] Warden
+- [ ] Witch
+- [x] Wither Skeleton
+- [x] Zoglin
+- [x] Zombie
+- [ ] Zombie Villager
+
+### Bosses
+
+- [x] Ender Dragon
+- [x] Wither
+
+### Special / Variants
+
+- [ ] All Baby variants (all breedable mobs)
+- [ ] All Baby monster variants
+- [ ] All Pumpkin variants (all mobs that can spawn with pumpkin)
+- [ ] All Jockey variants
+- [ ] Unobtainable variants
+
+---
+
+## Tech Stack
+
+- React + Vite
+- Tailwind CSS
+- Deployed on Vercel
