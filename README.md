@@ -73,7 +73,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Frog
 - [x] Glow Squid
 - [ ] Happy Ghast (colors)
-- [ ] Horse (baby)
+- [ ] Horse (baby) - saddle - armor
 - [x] Mooshroom
 - [x] Mule
 - [x] Ocelot
@@ -113,6 +113,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [ ] Spider (varaints)
 - [ ] Wolf
 - [x] Zombified Piglin
+- [ ] Zombie Nautilus (missing dir)
 
 ### Hostile
 

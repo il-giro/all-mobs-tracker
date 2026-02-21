@@ -1,4 +1,0 @@
-ottimo ora 
-aggiungi dei filtri d iricerca in base alle cartelle che ho creato (macrogruppi di mob) e alle lettere che ho scritto alla fine (ad esempio _P per i pumpking)
-
-inoltre se premo spazio deve andarmi nella barra di ricerca e se premo esc deve uscir dai menu
