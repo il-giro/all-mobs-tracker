@@ -19,12 +19,10 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
   const allBadges = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => SuffixConfig[id]);
   const hasAnyBadge = allBadges.length > 0 || !!mob.complexBadge;
 
-  // Nome visualizzato: shortLabel dei suffissi al posto delle lettere
-  // es. "Turtle (baby)" invece di "Turtle (C)"
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
-        const labels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel ?? id))];
-        return `(${labels.join(', ')})`;
+        const labels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))];
+        return labels.length > 0 ? `(${labels.join(', ')})` : '';
       })()
     : '';
 
@@ -41,13 +39,10 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
     e.stopPropagation();
     e._handledByMobCard = true;
 
+    // Chiude sempre gli altri tooltip
     window.dispatchEvent(new CustomEvent(TOOLTIP_EVENT, { detail: { id: instanceId.current } }));
 
-    if (!hasAnyBadge) {
-      setTooltipSide(null);
-      return;
-    }
-
+    // Toggle: se già aperto, chiudi
     if (tooltipSide !== null) {
       setTooltipSide(null);
       return;
@@ -88,14 +83,14 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
           <>
             {topSuffixBadge && (
               <div className="absolute top-1 right-1 z-20">
-                <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md `}>
+                <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
                   {topSuffixBadge.label}
                 </div>
               </div>
             )}
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
-                <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md `}>
+                <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
                   {mob.complexBadge.label}
                 </div>
               </div>
@@ -110,15 +105,14 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
         )}
       </div>
 
-      {/* Nome con shortLabel */}
       <div className={`p-1 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : 'bg-stone-800 border-stone-700'}`}>
         <p className="text-[10px] leading-tight text-stone-200 uppercase truncate px-1">
           {mob.name} {suffixDisplay}
         </p>
       </div>
 
-      {/* Tooltip */}
-      {tooltipSide && hasAnyBadge && (
+      {/* Tooltip — si apre su tutte le card */}
+      {tooltipSide && (
         <div
           onClick={e => e.stopPropagation()}
           onContextMenu={e => {
@@ -136,35 +130,41 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
           }}
           className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3 min-w-[180px]"
         >
-          <p className="text-sm text-white uppercase font-black mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
-            {mob.name}
+          {/* Nome con suffissi */}
+          <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
+            {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
-          <div className="flex flex-col gap-2">
-            {mob.complexBadge && (
-              <div className="flex items-center gap-2">
-                <span className="text-stone-400 text-xs uppercase  w-12 shrink-0">Cat.</span>
-                <div className={`${mob.complexBadge.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none font-black`}>
-                  {mob.complexBadge.label}
-                </div>
-              </div>
-            )}
-            {allBadges.length > 0 && (
-              <div className="flex flex-col gap-1">
-                <span className="text-stone-400 text-xs uppercase  mb-0.5">Suffissi</span>
-                {allBadges.map((b, i) => (
-                  <div key={b.id} className="flex items-center gap-2">
-                    <span className={`text-xs font-black w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
-                      {i === 0 ? '★' : '·'}
-                    </span>
-                    <div className={`${b.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none font-black flex-grow`}>
-                      {b.label}
-                    </div>
-                    {i === 0 && <span className="text-yellow-500 text-[9px]  uppercase">top</span>}
+
+          {hasAnyBadge ? (
+            <div className="flex flex-col gap-2">
+              {mob.complexBadge && (
+                <div className="flex items-center gap-2">
+                  <span className="text-stone-400 text-xs uppercase w-12 shrink-0">Cat.</span>
+                  <div className={`${mob.complexBadge.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
+                    {mob.complexBadge.label}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
+              {allBadges.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-stone-400 text-xs uppercase mb-0.5">Categories</span>
+                  {allBadges.map((b, i) => (
+                    <div key={b.id} className="flex items-center gap-2">
+                      <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
+                        {i === 0 ? '★' : '·'}
+                      </span>
+                      <div className={`${b.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
+                        {b.label}
+                      </div>
+                      {i === 0 && <span className="text-yellow-500 text-[9px] uppercase">top</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
+          )}
         </div>
       )}
     </div>

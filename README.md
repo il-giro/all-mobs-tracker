@@ -97,7 +97,7 @@ Use this to track which mobs have all their variants properly added to the track
 ### Neutral
 
 - [x] Bee
-- [x] Cave Spider
+- [ ] Cave Spider
 - [x] Dolphin
 - [x] Drowned
 - [ ] Enderman
@@ -123,14 +123,14 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Creeper
 - [x] Elder Guardian
 - [x] Endermite
-- [ ] Evoker
+- [x] Evoker
 - [x] Ghast
 - [x] Guardian
 - [ ] Hoglin ?
-- [ ] Husk ?
+- [x] Husk
 - [x] Magma Cube
 - [x] Phantom
-- [ ] Pillager
+- [x] Pillager
 - [x] Ravager
 - [x] Shulker
 - [x] Silverfish
@@ -138,7 +138,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Slime
 - [ ] Stray
 - [x] Vex
-- [ ] Vindicator
+- [x] Vindicator
 - [x] Warden
 - [ ] Witch
 - [x] Wither Skeleton
