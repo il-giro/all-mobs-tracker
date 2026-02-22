@@ -1,6 +1,4 @@
 // Configurazione dei Suffissi (es: _B, _A, _P)
-// shortLabel: parola usata nel nome del mob al posto della lettera (es. "(baby)" invece di "(A)")
-// Usato anche dalla ricerca: "baby turtle" trova "turtle" con suffisso A/B/C
 export const SuffixConfig = {
     'A': { id: 'A', label: 'BABY-BREED',    shortLabel: 'baby',          color: 'bg-purple-600', defaultShow: false },
     'B': { id: 'B', label: 'BABY-MONSTER',  shortLabel: 'baby',          color: 'bg-pink-600',   defaultShow: true  },
@@ -11,10 +9,8 @@ export const SuffixConfig = {
     'T': { id: 'T', label: 'TEXTURE',       shortLabel: 'wrong texture', color: 'bg-blue-600',   defaultShow: true  },
 };
 
-// Priorità badge: il PRIMO ha priorità massima.
 export const SuffixPriority = ['T', 'U', 'P', 'J', 'B', 'C', 'A'];
 
-// Mappa esplicita: nome sottocartella di /special/ → id in SuffixConfig
 export const SpecialFolderMap = {
   'baby breed':    'A',
   'baby monster':  'B',
@@ -24,23 +20,52 @@ export const SpecialFolderMap = {
   'unobtainable':  'U',
 };
 
-// NOTA: pathIncludes deve essere una stringa UNIVOCA che non sia sottostringa di altri path.
-// Esempio del problema: '/villagers/' è sottostringa di '/zombievillagers/' → conflitto!
-// Soluzione: usare path più specifici come '/villagers/' solo se la cartella si chiama
-// esattamente 'villagers', oppure rinominare la cartella per evitare ambiguità.
-// Il parser controlla i ComplexConfig in ordine: metti i più specifici (zombievillager) PRIMA.
+// Mappa biomi: n1 → { label, icon }
+// Il nome dell'icona deve corrispondere al file in /icons/biomes/
+export const VillagerBiomes = {
+  1: { label: 'Plains',  icon: '/icons/biomes/Plains.png'  },
+  2: { label: 'Desert',  icon: '/icons/biomes/Desert.png'  },
+  3: { label: 'Jungle',  icon: '/icons/biomes/Jungle.png'  },
+  4: { label: 'Savanna', icon: '/icons/biomes/Savanna.png' },
+  5: { label: 'Snow',    icon: '/icons/biomes/SnowyPlains.png'    },
+  6: { label: 'Swamp',   icon: '/icons/biomes/Swamp.png'   },
+  7: { label: 'Taiga',   icon: '/icons/biomes/Taiga.png'   },
+};
 
+// Mappa job: n2 → { label, icon }
+// Il nome dell'icona deve corrispondere al file in /icons/job site/
+export const VillagerJobs = {
+  1:  { label: 'Unemployed',     icon: null },
+  2:  { label: 'Nitwit',         icon: null },
+  3:  { label: 'Armorer',        icon: '/icons/job site/blast-furnace.png'  },
+  4:  { label: 'Butcher',        icon: '/icons/job site/smoker.png'         },
+  5:  { label: 'Cartographer',   icon: '/icons/job site/cartography-table.png' },
+  6:  { label: 'Cleric',         icon: '/icons/job site/brewing-stand.png'  },
+  7:  { label: 'Farmer',         icon: '/icons/job site/composter.png'      },
+  8:  { label: 'Fisherman',      icon: '/icons/job site/barrel.png'         },
+  9:  { label: 'Fletcher',       icon: '/icons/job site/fletching-table.png'},
+  10: { label: 'Leatherworker',  icon: '/icons/job site/cauldron.png'       },
+  11: { label: 'Librarian',      icon: '/icons/job site/lectern.png'        },
+  12: { label: 'Mason',          icon: '/icons/job site/stonecutter.png'    },
+  13: { label: 'Shepherd',       icon: '/icons/job site/loom.png'           },
+  14: { label: 'Toolsmith',      icon: '/icons/job site/smithing-table.png' },
+  15: { label: 'Weaponsmith',    icon: '/icons/job site/grindstone.png'     },
+};
+
+// NOTA: pathIncludes deve essere una stringa UNIVOCA che non sia sottostringa di altri path.
+// Il parser controlla i ComplexConfig in ordine: metti i più specifici PRIMA.
 export const ComplexConfig = [
   {
     id: 'zombie villager',
     label: 'Varianti Zombie Villager',
-    // Deve venire PRIMA di villager perché '/villagers/' è sottostringa di '/zombievillagers/'
     pathIncludes: '/zombievillagers/',
     regex: /^(\d+)\.(\d+)$/,
     type: 'complex_variant',
     badgeColor: 'bg-green-600',
     defaultShow: false,
     isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
+    // Flag: questa configurazione usa icone bioma/job
+    useVillagerIcons: true,
     formatName: (match) => {
       const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
       const biomes = { 1: 'Plains', 2: 'Desert', 3: 'Jungle', 4: 'Savanna', 5: 'Snow', 6: 'Swamp', 7: 'Taiga' };
@@ -58,6 +83,7 @@ export const ComplexConfig = [
     badgeColor: 'bg-amber-600',
     defaultShow: false,
     isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
+    useVillagerIcons: true,
     formatName: (match) => {
       const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
       const biomes = { 1: 'Plains', 2: 'Desert', 3: 'Jungle', 4: 'Savanna', 5: 'Snow', 6: 'Swamp', 7: 'Taiga' };

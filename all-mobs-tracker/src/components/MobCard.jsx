@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SuffixConfig, SuffixPriority } from '../config/mobConfig';
+import { SuffixConfig, SuffixPriority, ComplexConfig, VillagerBiomes, VillagerJobs } from '../config/mobConfig';
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {
@@ -8,6 +8,16 @@ if (typeof window !== 'undefined') {
 }
 
 const TOOLTIP_EVENT = 'mobcard:tooltip';
+
+// Ritorna { biome, job } se il mob è un villager/zombie villager con useVillagerIcons
+const getVillagerIcons = (mob) => {
+  if (!mob.complexId) return null;
+  const config = ComplexConfig.find(c => c.id === mob.complexId);
+  if (!config?.useVillagerIcons) return null;
+  const biome = VillagerBiomes[mob.num1] ?? null;
+  const job   = VillagerJobs[mob.num2]   ?? null;
+  return { biome, job };
+};
 
 const MobCard = ({ mob, isTracked, onToggle }) => {
   const [tooltipSide, setTooltipSide] = useState(null);
@@ -18,6 +28,8 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
   const topSuffixBadge = topSuffixId ? SuffixConfig[topSuffixId] : null;
   const allBadges = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => SuffixConfig[id]);
   const hasAnyBadge = allBadges.length > 0 || !!mob.complexBadge;
+
+  const villagerIcons = getVillagerIcons(mob);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
@@ -38,18 +50,10 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
     e.preventDefault();
     e.stopPropagation();
     e._handledByMobCard = true;
-
-    // Chiude sempre gli altri tooltip
     window.dispatchEvent(new CustomEvent(TOOLTIP_EVENT, { detail: { id: instanceId.current } }));
-
-    // Toggle: se già aperto, chiudi
-    if (tooltipSide !== null) {
-      setTooltipSide(null);
-      return;
-    }
-
+    if (tooltipSide !== null) { setTooltipSide(null); return; }
     const rect = cardRef.current.getBoundingClientRect();
-    const side = rect.right + 200 < window.innerWidth ? 'right' : 'left';
+    const side = rect.right + 220 < window.innerWidth ? 'right' : 'left';
     setTooltipSide(side);
   };
 
@@ -81,6 +85,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
 
         {!isTracked && (
           <>
+            {/* Badge suffisso — in alto a destra */}
             {topSuffixBadge && (
               <div className="absolute top-1 right-1 z-20">
                 <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
@@ -88,11 +93,34 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                 </div>
               </div>
             )}
+            {/* Badge categoria — in alto a sinistra */}
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
                   {mob.complexBadge.label}
                 </div>
+              </div>
+            )}
+            {/* Icona job — in basso a sinistra */}
+            {villagerIcons?.job?.icon && (
+              <div className="absolute bottom-1 left-1 z-20">
+                <img
+                  src={villagerIcons.job.icon}
+                  alt={villagerIcons.job.label}
+                  draggable={false}
+                  className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]"
+                />
+              </div>
+            )}
+            {/* Icona bioma — in basso a destra */}
+            {villagerIcons?.biome?.icon && (
+              <div className="absolute bottom-1 right-1 z-20">
+                <img
+                  src={villagerIcons.biome.icon}
+                  alt={villagerIcons.biome.label}
+                  draggable={false}
+                  className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]"
+                />
               </div>
             )}
           </>
@@ -111,7 +139,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
         </p>
       </div>
 
-      {/* Tooltip — si apre su tutte le card */}
+      {/* Tooltip */}
       {tooltipSide && (
         <div
           onClick={e => e.stopPropagation()}
@@ -128,12 +156,38 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
             [tooltipSide === 'right' ? 'left' : 'right']: '100%',
             [tooltipSide === 'right' ? 'marginLeft' : 'marginRight']: '6px',
           }}
-          className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3 min-w-[180px]"
+          className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3 min-w-[200px]"
         >
-          {/* Nome con suffissi */}
+          {/* Nome */}
           <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
+
+          {/* Icone bioma e job nel tooltip */}
+          {villagerIcons && (
+            <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
+              {villagerIcons.biome && (
+                <div className="flex items-center gap-2">
+                  {villagerIcons.biome.icon
+                    ? <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} className="w-5 h-5 object-contain pixelated shrink-0" />
+                    : <div className="w-5 h-5 bg-stone-700 shrink-0" />
+                  }
+                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.biome.label}</span>
+                  <span className="text-stone-600 text-[9px] uppercase ml-auto">bioma</span>
+                </div>
+              )}
+              {villagerIcons.job && (
+                <div className="flex items-center gap-2">
+                  {villagerIcons.job.icon
+                    ? <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} className="w-5 h-5 object-contain pixelated shrink-0" />
+                    : <div className="w-5 h-5 bg-stone-700 shrink-0" />
+                  }
+                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.job.label}</span>
+                  <span className="text-stone-600 text-[9px] uppercase ml-auto">job</span>
+                </div>
+              )}
+            </div>
+          )}
 
           {hasAnyBadge ? (
             <div className="flex flex-col gap-2">
@@ -163,7 +217,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
               )}
             </div>
           ) : (
-            <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
+            !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
           )}
         </div>
       )}
