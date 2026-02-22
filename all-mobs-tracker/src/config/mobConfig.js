@@ -24,8 +24,31 @@ export const SpecialFolderMap = {
   'unobtainable':  'U',
 };
 
-// Configurazione dei Mob con logica complessa (es: Villagers, Horses)
+// NOTA: pathIncludes deve essere una stringa UNIVOCA che non sia sottostringa di altri path.
+// Esempio del problema: '/villagers/' è sottostringa di '/zombievillagers/' → conflitto!
+// Soluzione: usare path più specifici come '/villagers/' solo se la cartella si chiama
+// esattamente 'villagers', oppure rinominare la cartella per evitare ambiguità.
+// Il parser controlla i ComplexConfig in ordine: metti i più specifici (zombievillager) PRIMA.
+
 export const ComplexConfig = [
+  {
+    id: 'zombie villager',
+    label: 'Varianti Zombie Villager',
+    // Deve venire PRIMA di villager perché '/villagers/' è sottostringa di '/zombievillagers/'
+    pathIncludes: '/zombievillagers/',
+    regex: /^(\d+)\.(\d+)$/,
+    type: 'complex_variant',
+    badgeColor: 'bg-green-600',
+    defaultShow: false,
+    isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
+    formatName: (match) => {
+      const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
+      const biomes = { 1: 'Plains', 2: 'Desert', 3: 'Jungle', 4: 'Savanna', 5: 'Snow', 6: 'Swamp', 7: 'Taiga' };
+      const jobs = { 1: 'Unemployed', 2: 'Nitwit', 3: 'Armorer', 4: 'Butcher', 5: 'Cartographer', 6: 'Cleric', 7: 'Farmer', 8: 'Fisherman', 9: 'Fletcher', 10: 'Leatherworker', 11: 'Librarian', 12: 'Mason', 13: 'Shepherd', 14: 'Toolsmith', 15: 'Weaponsmith' };
+      return `Zombie Villager ${biomes[n1] || n1} ${jobs[n2] || n2}`;
+    },
+    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]) })
+  },
   {
     id: 'villager',
     label: 'Varianti Villager',
@@ -120,7 +143,7 @@ export const ComplexConfig = [
     defaultShow: false,
     isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
     useFileName: true,
-    formatName: () => '',  // non usato, richiesto dalla struttura
+    formatName: () => '',
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]) })
   },
 ];

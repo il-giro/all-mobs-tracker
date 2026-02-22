@@ -40,12 +40,10 @@ export const parseFileName = (fileName, path) => {
           Object.assign(data, config.extractNums(match));
 
           if (config.useFileName) {
-            // Usa il nome del file grezzo, formattato leggibilmente
-            // es. "2.6ZombieNautilus-Netherite-Saddled" → "Zombie Nautilus Netherite Saddled"
             const rawName = cleanName
-              .replace(/^\d+\.\d+(\.\d+)?/, '')       // rimuovi numeri iniziali (1.2, 1.2.3)
-              .replace(/-/g, ' ')                       // trattini → spazi
-              .replace(/([A-Z])/g, ' $1')              // CamelCase → spazi
+              .replace(/^\d+\.\d+(\.\d+)?/, '')
+              .replace(/-/g, ' ')
+              .replace(/([A-Z])/g, ' $1')
               .trim();
             data.name = rawName;
           } else {

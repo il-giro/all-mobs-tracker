@@ -46,10 +46,16 @@ const MobTracker = () => {
           folder = afterData[0];
         }
 
+        // Chiave univoca: path relativo completo senza /public
+        // es. "data/villagers/1.1.png" invece di solo "1.1.png"
+        // Questo evita conflitti tra mob con stesso fileName in cartelle diverse
+        const uniqueKey = path.replace('/public/', '');
+
         return {
           ...parseFileName(fileName, path),
           image: path.replace('/public', ''),
-          fileName,
+          fileName: uniqueKey,   // ← chiave univoca usata per trackedMobs
+          displayFileName: fileName, // ← nome file originale per display se serve
           folder,
           specialSuffixId,
         };
@@ -124,26 +130,19 @@ const MobTracker = () => {
     return specialBtns.find(b => b.folderKey === selectedFolder)?.suffixId ?? null;
   }, [selectedFolder, specialBtns]);
 
-  // Costruisce la stringa di ricerca per un mob:
-  // es. Turtle con suffisso C → "turtle baby"
-  // così "baby turtle" o "turtle baby" trovano entrambi
   const getMobSearchString = (mob) => {
     const shortLabels = mob.activeSuffixes
       .map(id => SuffixConfig[id]?.shortLabel)
       .filter(Boolean);
-    // Deduplicati (es. A e C hanno entrambi "baby")
     const unique = [...new Set(shortLabels)];
     return [mob.name, ...unique].join(' ').toLowerCase();
   };
 
   const displayedMobs = useMemo(() => {
     return allMobs.filter(mob => {
-      // Ricerca su nome + shortLabel dei suffissi
       if (searchQuery) {
         const searchStr = getMobSearchString(mob);
-        const query = searchQuery.toLowerCase().trim();
-        // Supporta ricerca con parole in qualsiasi ordine: "baby turtle" = "turtle baby"
-        const words = query.split(/\s+/);
+        const words = searchQuery.toLowerCase().trim().split(/\s+/);
         if (!words.every(w => searchStr.includes(w))) return false;
       }
 
@@ -212,12 +211,12 @@ const MobTracker = () => {
                   className="w-full bg-black border-4 border-stone-700 py-2 pl-3 pr-10 text-xl outline-none focus:border-green-500 transition-colors"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white  text-xl pb-1">X</button>
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white text-xl pb-1">X</button>
                 )}
               </div>
               <div className="flex gap-4 shrink-0">
-                <button onClick={() => setShowStats(true)} className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase  transition-transform active:translate-y-1 active:border-b-0">Stats</button>
-                <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase  transition-transform active:translate-y-1 active:border-b-0">Settings</button>
+                <button onClick={() => setShowStats(true)} className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
+                <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
               </div>
             </div>
           </div>
@@ -226,15 +225,15 @@ const MobTracker = () => {
             <div className="mb-4 flex flex-wrap gap-2 items-center">
               <button
                 onClick={() => setSelectedFolder('all')}
-                className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
               >Tutti</button>
 
               {specialBtns.length > 0 && (
                 <>
-                  <span className="text-stone-600  select-none">|</span>
+                  <span className="text-stone-600 select-none">|</span>
                   {specialBtns.map(b => (
                     <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
-                      className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
+                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
                     >✦ {b.label}</button>
                   ))}
                 </>
@@ -242,10 +241,10 @@ const MobTracker = () => {
 
               {normalFolderBtns.length > 0 && (
                 <>
-                  <span className="text-stone-600  select-none">|</span>
+                  <span className="text-stone-600 select-none">|</span>
                   {normalFolderBtns.map(f => (
                     <button key={f} onClick={() => setSelectedFolder(f)}
-                      className={`px-3 py-1 text-sm  uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
                     >{f}</button>
                   ))}
                 </>
@@ -254,7 +253,7 @@ const MobTracker = () => {
           )}
 
           <div className="bg-black/50 p-4 border-4 border-stone-700 relative overflow-hidden">
-            <div className="flex justify-between mb-2 text-xl  uppercase">
+            <div className="flex justify-between mb-2 text-xl uppercase">
               <span>Progress</span>
               <span>{trackedCount} / {displayedMobs.length} ({displayedMobs.length > 0 ? Math.round((trackedCount / displayedMobs.length) * 100) : 0}%)</span>
             </div>

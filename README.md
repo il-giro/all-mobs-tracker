@@ -126,7 +126,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Evoker
 - [x] Ghast
 - [x] Guardian
-- [ ] Hoglin ?
+- [x] Hoglin
 - [x] Husk
 - [x] Magma Cube
 - [x] Phantom
@@ -136,11 +136,11 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Silverfish
 - [ ] Skeleton
 - [x] Slime
-- [ ] Stray
+- [x] Stray
 - [x] Vex
 - [x] Vindicator
 - [x] Warden
-- [ ] Witch
+- [x] Witch
 - [x] Wither Skeleton
 - [x] Zoglin
 - [x] Zombie
@@ -155,7 +155,7 @@ Use this to track which mobs have all their variants properly added to the track
 
 - [ ] All Baby variants (all breedable mobs)
 - [ ] All Baby monster variants
-- [ ] All Pumpkin variants (all mobs that can spawn with pumpkin)
+- [X] All Pumpkin variants (all mobs that can spawn with pumpkin)
 - [ ] All Jockey variants
 - [ ] Unobtainable variants
 
