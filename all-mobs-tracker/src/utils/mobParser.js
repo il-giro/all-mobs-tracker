@@ -37,8 +37,21 @@ export const parseFileName = (fileName, path) => {
           data.complexId = config.id;
           data.type = config.type;
           data.complexBadge = { label: config.id, color: config.badgeColor };
-          data.name = config.formatName(match);
           Object.assign(data, config.extractNums(match));
+
+          if (config.useFileName) {
+            // Usa il nome del file grezzo, formattato leggibilmente
+            // es. "2.6ZombieNautilus-Netherite-Saddled" → "Zombie Nautilus Netherite Saddled"
+            const rawName = cleanName
+              .replace(/^\d+\.\d+(\.\d+)?/, '')       // rimuovi numeri iniziali (1.2, 1.2.3)
+              .replace(/-/g, ' ')                       // trattini → spazi
+              .replace(/([A-Z])/g, ' $1')              // CamelCase → spazi
+              .trim();
+            data.name = rawName;
+          } else {
+            data.name = config.formatName(match);
+          }
+
           return data;
         }
       }
@@ -63,8 +76,8 @@ export const parseFileName = (fileName, path) => {
         data.type = 'main_variant';
         data.num1 = parseInt(match1[1]);
         data.name = match1[2];
-      } else { 
-        data.name = cleanName; 
+      } else {
+        data.name = cleanName;
       }
     }
   }

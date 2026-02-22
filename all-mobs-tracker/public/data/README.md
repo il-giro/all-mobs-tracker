@@ -14,7 +14,6 @@ zombie horse
 enderman holding blocks
 trader llama
 spear z-pilgin
-zombie nautilus
 wolfs
 zombie villagers
 

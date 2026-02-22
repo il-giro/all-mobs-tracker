@@ -113,7 +113,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [ ] Spider (varaints)
 - [ ] Wolf
 - [x] Zombified Piglin
-- [ ] Zombie Nautilus (missing dir)
+- [x] Zombie Nautilus
 
 ### Hostile
 
