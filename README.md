@@ -79,10 +79,10 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Ocelot
 - [x] Parrot
 - [x] Pig
-- [ ] Rabbit (killer)
+- [x] Rabbit
 - [x] Salmon
 - [x] Sheep
-- [ ] Skeleton Horse (varaints)
+- [x] Skeleton Horse
 - [x] Sniffer
 - [x] Snow Golem
 - [x] Squid
@@ -97,7 +97,7 @@ Use this to track which mobs have all their variants properly added to the track
 ### Neutral
 
 - [x] Bee
-- [ ] Cave Spider
+- [x] Cave Spider
 - [x] Dolphin
 - [x] Drowned
 - [ ] Enderman
@@ -113,7 +113,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [ ] Spider (varaints)
 - [ ] Wolf
 - [x] Zombified Piglin
-- [x] Zombie Nautilus
+- [ ] Zombie Nautilus jockey
 
 ### Hostile
 
@@ -134,7 +134,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Ravager
 - [x] Shulker
 - [x] Silverfish
-- [ ] Skeleton
+- [x] Skeleton
 - [x] Slime
 - [x] Stray
 - [x] Vex
@@ -144,7 +144,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Wither Skeleton
 - [x] Zoglin
 - [x] Zombie
-- [ ] Zombie Villager
+- [x] Zombie Villager
 
 ### Bosses
 
@@ -154,7 +154,7 @@ Use this to track which mobs have all their variants properly added to the track
 ### Special / Variants
 
 - [ ] All Baby variants (all breedable mobs)
-- [ ] All Baby monster variants
+- [x] All Baby monster variants
 - [X] All Pumpkin variants (all mobs that can spawn with pumpkin)
 - [ ] All Jockey variants
 - [ ] Unobtainable variants
