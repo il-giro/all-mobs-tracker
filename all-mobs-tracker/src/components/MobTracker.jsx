@@ -1,9 +1,21 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Settings from './Settings';
 import MobCard from './MobCard';
+import TropicalFishCard from './TropicalFishCard';
+import { FISH_TYPES } from '../utils/FishRenderer';
 import Stats from './Stats';
 import { parseFileName } from '../utils/mobParser';
 import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
+
+// Genera tutti i 3072 pesci: 12 tipi × 16 body × 16 pattern
+const ALL_FISH = (() => {
+  const fish = [];
+  for (let typeIndex = 0; typeIndex < FISH_TYPES.length; typeIndex++)
+    for (let bodyColor = 0; bodyColor < 16; bodyColor++)
+      for (let patternColor = 0; patternColor < 16; patternColor++)
+        fish.push({ id: `fish_${typeIndex}_${bodyColor}_${patternColor}`, typeIndex, bodyColor, patternColor });
+  return fish;
+})();
 
 const MobTracker = () => {
   const [allMobs, setAllMobs] = useState([]);
@@ -13,6 +25,7 @@ const MobTracker = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('all');
+  const [showFish, setShowFish] = useState(false);
   const searchRef = useRef(null);
 
   const [filters, setFilters] = useState(() => {
@@ -32,30 +45,22 @@ const MobTracker = () => {
         const dataIdx = parts.indexOf('data');
         const fileName = parts[parts.length - 1];
         const afterData = parts.slice(dataIdx + 1, -1);
-
         let folder = 'root';
         let specialSuffixId = null;
-
         if (afterData.length === 0) {
           folder = 'root';
         } else if (afterData[0].toLowerCase() === 'special' && afterData[1]) {
-          const subName = afterData[1].toLowerCase();
-          specialSuffixId = SpecialFolderMap[subName] ?? null;
+          specialSuffixId = SpecialFolderMap[afterData[1].toLowerCase()] ?? null;
           folder = `special:${afterData[1]}`;
         } else {
           folder = afterData[0];
         }
-
-        // Chiave univoca: path relativo completo senza /public
-        // es. "data/villagers/1.1.png" invece di solo "1.1.png"
-        // Questo evita conflitti tra mob con stesso fileName in cartelle diverse
         const uniqueKey = path.replace('/public/', '');
-
         return {
           ...parseFileName(fileName, path),
           image: path.replace('/public', ''),
-          fileName: uniqueKey,   // ← chiave univoca usata per trackedMobs
-          displayFileName: fileName, // ← nome file originale per display se serve
+          fileName: uniqueKey,
+          displayFileName: fileName,
           folder,
           specialSuffixId,
         };
@@ -69,16 +74,11 @@ const MobTracker = () => {
     const handleKey = (e) => {
       if (e.key === 'Escape') {
         if (showSettings) { setShowSettings(false); return; }
-        if (showStats) { setShowStats(false); return; }
-        if (searchQuery) { setSearchQuery(''); return; }
+        if (showStats)    { setShowStats(false);    return; }
+        if (searchQuery)  { setSearchQuery('');     return; }
         if (selectedFolder !== 'all') { setSelectedFolder('all'); return; }
       }
-      if (
-        e.key === ' ' &&
-        document.activeElement.tagName !== 'INPUT' &&
-        document.activeElement.tagName !== 'SELECT' &&
-        document.activeElement.tagName !== 'TEXTAREA'
-      ) {
+      if (e.key === ' ' && !['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) {
         e.preventDefault();
         searchRef.current?.focus();
       }
@@ -87,9 +87,9 @@ const MobTracker = () => {
     return () => window.removeEventListener('keydown', handleKey);
   }, [showSettings, showStats, searchQuery, selectedFolder]);
 
-  useEffect(() => { localStorage.setItem('mobTracker_saves', JSON.stringify(trackedMobs)); }, [trackedMobs]);
-  useEffect(() => { localStorage.setItem('mobTracker_filters', JSON.stringify(filters)); }, [filters]);
-  useEffect(() => { localStorage.setItem('mobTracker_mode', variantMode); }, [variantMode]);
+  useEffect(() => { localStorage.setItem('mobTracker_saves',  JSON.stringify(trackedMobs)); }, [trackedMobs]);
+  useEffect(() => { localStorage.setItem('mobTracker_filters', JSON.stringify(filters));    }, [filters]);
+  useEffect(() => { localStorage.setItem('mobTracker_mode',    variantMode);               }, [variantMode]);
 
   useEffect(() => {
     if (selectedFolder === 'all') return;
@@ -115,13 +115,10 @@ const MobTracker = () => {
 
   const normalFolderBtns = useMemo(() => {
     const set = new Set();
-    allMobs.forEach(m => {
-      if (m.folder !== 'root' && !m.folder.startsWith('special:')) set.add(m.folder);
-    });
+    allMobs.forEach(m => { if (m.folder !== 'root' && !m.folder.startsWith('special:')) set.add(m.folder); });
     return Array.from(set).sort().filter(f => {
       const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${f}/`));
-      if (linked) return filters[linked.id];
-      return true;
+      return linked ? filters[linked.id] : true;
     });
   }, [allMobs, filters]);
 
@@ -131,55 +128,56 @@ const MobTracker = () => {
   }, [selectedFolder, specialBtns]);
 
   const getMobSearchString = (mob) => {
-    const shortLabels = mob.activeSuffixes
-      .map(id => SuffixConfig[id]?.shortLabel)
-      .filter(Boolean);
-    const unique = [...new Set(shortLabels)];
-    return [mob.name, ...unique].join(' ').toLowerCase();
+    const shortLabels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))];
+    return [mob.name, ...shortLabels].join(' ').toLowerCase();
   };
 
   const displayedMobs = useMemo(() => {
     return allMobs.filter(mob => {
       if (searchQuery) {
-        const searchStr = getMobSearchString(mob);
         const words = searchQuery.toLowerCase().trim().split(/\s+/);
-        if (!words.every(w => searchStr.includes(w))) return false;
+        if (!words.every(w => getMobSearchString(mob).includes(w))) return false;
       }
-
       if (selectedFolder !== 'all') {
         if (selectedSpecialSuffixId) {
-          const inFolder = mob.folder === selectedFolder;
-          const hasSuffix = mob.activeSuffixes.includes(selectedSpecialSuffixId);
-          const isSpecialMob = mob.specialSuffixId === selectedSpecialSuffixId;
-          if (!inFolder && !hasSuffix && !isSpecialMob) return false;
+          if (!mob.folder === selectedFolder && !mob.activeSuffixes.includes(selectedSpecialSuffixId) && mob.specialSuffixId !== selectedSpecialSuffixId) return false;
         } else {
           if (mob.folder !== selectedFolder) return false;
         }
       }
-
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
-
-      for (const suffix of mob.activeSuffixes) {
-        if (!filters[suffix]) return false;
-      }
-
+      for (const suffix of mob.activeSuffixes) { if (!filters[suffix]) return false; }
       if (mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }
-
       if (variantMode === 'none') {
         if (mob.num1 > 1 || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       } else if (variantMode === 'main') {
         if ((mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
       }
-
       return true;
     });
   }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId]);
 
-  const trackedCount = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
-  const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
+  // Filtra pesci per ricerca testo
+  const displayedFish = useMemo(() => {
+    if (!showFish) return [];
+    if (!searchQuery) return ALL_FISH;
+    const COLOR_NAMES_LC = ['white','orange','magenta','light blue','yellow','lime','pink','gray','light gray','cyan','purple','blue','brown','green','red','black'];
+    const words = searchQuery.toLowerCase().trim().split(/\s+/);
+    return ALL_FISH.filter(f => {
+      const str = `${FISH_TYPES[f.typeIndex].name} ${COLOR_NAMES_LC[f.bodyColor]} ${COLOR_NAMES_LC[f.patternColor]} tropical`.toLowerCase();
+      return words.every(w => str.includes(w));
+    });
+  }, [showFish, searchQuery]);
+
+  const mobTrackedCount  = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
+  const fishTrackedCount = useMemo(() => ALL_FISH.filter(f => trackedMobs[f.id]).length, [trackedMobs]);
+  const totalTracked     = mobTrackedCount + (showFish ? displayedFish.filter(f => trackedMobs[f.id]).length : fishTrackedCount);
+  const totalDisplayed   = displayedMobs.length + ALL_FISH.length;
+
+  const toggleMob  = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
   const hasFilters = specialBtns.length > 0 || normalFolderBtns.length > 0;
 
   return (
@@ -192,9 +190,7 @@ const MobTracker = () => {
           onClose={() => setShowSettings(false)}
         />
       )}
-      {showStats && (
-        <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />
-      )}
+      {showStats && <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />}
 
       <div className="max-w-[1600px] mx-auto">
         <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
@@ -215,7 +211,7 @@ const MobTracker = () => {
                 )}
               </div>
               <div className="flex gap-4 shrink-0">
-                <button onClick={() => setShowStats(true)} className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
+                <button onClick={() => setShowStats(true)}    className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
                 <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
               </div>
             </div>
@@ -223,50 +219,76 @@ const MobTracker = () => {
 
           {hasFilters && (
             <div className="mb-4 flex flex-wrap gap-2 items-center">
-              <button
-                onClick={() => setSelectedFolder('all')}
+              <button onClick={() => setSelectedFolder('all')}
                 className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
               >Tutti</button>
-
               {specialBtns.length > 0 && (
-                <>
-                  <span className="text-stone-600 select-none">|</span>
-                  {specialBtns.map(b => (
-                    <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
-                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
-                    >✦ {b.label}</button>
-                  ))}
-                </>
+                <><span className="text-stone-600 select-none">|</span>
+                {specialBtns.map(b => (
+                  <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
+                    className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
+                  >✦ {b.label}</button>
+                ))}</>
               )}
-
               {normalFolderBtns.length > 0 && (
-                <>
-                  <span className="text-stone-600 select-none">|</span>
-                  {normalFolderBtns.map(f => (
-                    <button key={f} onClick={() => setSelectedFolder(f)}
-                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-                    >{f}</button>
-                  ))}
-                </>
+                <><span className="text-stone-600 select-none">|</span>
+                {normalFolderBtns.map(f => (
+                  <button key={f} onClick={() => setSelectedFolder(f)}
+                    className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                  >{f}</button>
+                ))}</>
               )}
             </div>
           )}
 
-          <div className="bg-black/50 p-4 border-4 border-stone-700 relative overflow-hidden">
+          {/* Progress bar globale (include pesci) */}
+          <div className="bg-black/50 p-4 border-4 border-stone-700">
             <div className="flex justify-between mb-2 text-xl uppercase">
               <span>Progress</span>
-              <span>{trackedCount} / {displayedMobs.length} ({displayedMobs.length > 0 ? Math.round((trackedCount / displayedMobs.length) * 100) : 0}%)</span>
+              <span>{totalTracked} / {totalDisplayed} ({totalDisplayed > 0 ? Math.round((totalTracked / totalDisplayed) * 100) : 0}%)</span>
             </div>
             <div className="h-6 bg-stone-900 border-2 border-stone-700 p-1">
-              <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${displayedMobs.length > 0 ? (trackedCount / displayedMobs.length) * 100 : 0}%` }} />
+              <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${totalDisplayed > 0 ? (totalTracked / totalDisplayed) * 100 : 0}%` }} />
             </div>
           </div>
         </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+        {/* Mob normali */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
           {displayedMobs.map(mob => (
             <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
           ))}
+        </div>
+
+        {/* Sezione Tropical Fish collassabile */}
+        <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setShowFish(v => !v)}
+            className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl text-cyan-400 uppercase font-bold">🐠 Tropical Fish</span>
+              <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
+                {fishTrackedCount} / {ALL_FISH.length}
+              </span>
+            </div>
+            <span className="text-stone-400 text-xl">{showFish ? '▲' : '▼'}</span>
+          </button>
+
+          {showFish && (
+            <div className="p-4 border-t-4 border-cyan-900">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2">
+                {displayedFish.map(fish => (
+                  <TropicalFishCard
+                    key={fish.id}
+                    fish={fish}
+                    isTracked={trackedMobs[fish.id]}
+                    onToggle={() => toggleMob(fish.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
