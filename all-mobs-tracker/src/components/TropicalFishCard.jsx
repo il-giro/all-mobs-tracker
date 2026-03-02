@@ -8,50 +8,34 @@ const COLOR_BADGES = [
   'bg-amber-900', 'bg-green-800', 'bg-red-700', 'bg-stone-900',
 ];
 
-// 22 varianti con nome proprio — typeIndex_bodyColor_patternColor
-const NAMED_VARIANTS = {
-  '0_0_0':   'Kob',
-  '0_1_0':   'Sunstreak',  // Kob Orange/Orange ma convenzionalmente
-  '1_15_15': 'Blockfish',
-  '1_7_7':   'Betty',
-  '0_14_1':  'Brinely',
-  '1_14_1':  'Clayfish',
-  '1_3_3':   'Dasher',
-  '0_0_6':   'Flopper',
-  '1_4_5':   'Glitter',
-  '0_7_8':   'Kob',
-  '1_0_0':   'Spotty',
-  '1_1_2':   'Snooper',
-  '0_5_4':   'Stripey',
-  // Nomi ufficiali Minecraft per le 22 varianti named
-  // typeIndex(shape0=small,shape1=large) _ bodyColor _ patternColor
-};
-
-// Mappa ufficiale: variant_id → nome
-// Dalla wiki: https://minecraft.wiki/w/Tropical_fish#Named_varieties
-const OFFICIAL_NAMES = new Map([
-  ['0_0_1',   'Anemone'],
-  ['0_7_7',   'Black Tang'],
-  ['1_14_1',  'Blue Tang'],      // Dasher shape=1
-  ['0_7_0',   'Butterfly Fish'],
-  ['1_15_15', 'Cichlid'],
-  ['1_0_0',   'Clownfish'],
-  ['0_3_3',   'Cotton Candy Betta'],
-  ['1_7_8',   'Dottyback'],
-  ['1_5_5',   'Emperor Red Snapper'],
-  ['0_14_14', 'Goatfish'],
-  ['0_0_0',   'Kob'],
-  ['1_1_2',   'Ornate Butterflyfish'],
-  ['0_5_4',   'Parrotfish'],
-  ['1_3_3',   'Queen Angelfish'],
-  ['0_14_1',  'Red Cichlid'],
-  ['0_1_14',  'Red Lipped Blenny'],
-  ['1_14_14', 'Red Snapper'],
-  ['1_0_5',   'Threadfin'],
-  ['0_0_6',   'Tomato Clownfish'],
-  ['1_15_1',  'Triggerfish'],
-  ['0_7_8',   'Yellowtail Parrotfish'],
-  ['1_4_5',   'Yellow Tang'],
+// Mappa ufficiale Minecraft JE: typeIndex_bodyColor_patternColor → nome
+// typeIndex: 0=Kob,1=Sunstreak,2=Snooper,3=Dasher,4=Brinely,5=Spotty,
+//            6=Flopper,7=Stripey,8=Glitter,9=Blockfish,10=Betty,11=Clayfish
+// Colori: 0=White,1=Orange,2=Magenta,3=LightBlue,4=Yellow,5=Lime,6=Pink,
+//         7=Gray,8=LightGray,9=Cyan,10=Purple,11=Blue,12=Brown,13=Green,14=Red,15=Black
+export const OFFICIAL_NAMES = new Map([
+  ['7_1_7',   'Anemone'],           // Orange-Gray Stripey
+  ['6_7_15',  'Black Tang'],        // Gray Flopper (gray body, black pattern)
+  ['6_7_11',  'Blue Tang'],         // Gray-Blue Flopper
+  ['11_0_7',  'Butterflyfish'],     // White-Gray Clayfish
+  ['9_11_7',  'Cichlid'],           // Blue-Gray Blockfish  (JE: Blue-Gray Sunstreak → shape1)
+  ['0_1_0',   'Clownfish'],         // Orange-White Kob
+  ['5_6_3',   'Cotton Candy Betta'],// Pink-LightBlue Spotty
+  ['9_10_4',  'Dottyback'],         // Purple-Yellow Blockfish
+  ['11_0_14', 'Emperor Red Snapper'],// White-Red Clayfish
+  ['5_0_4',   'Goatfish'],          // White-Yellow Spotty
+  ['8_0_7',   'Moorish Idol'],      // White-Gray Glitter
+  ['0_1_14',  'Kob'],               // base Kob (il "Kob" con nome proprio)
+  ['11_0_1',  'Ornate Butterflyfish'],// White-Orange Clayfish
+  ['3_9_6',   'Parrotfish'],        // Cyan-Pink Dasher
+  ['4_5_3',   'Queen Angelfish'],   // Lime-LightBlue Brinely
+  ['10_14_0', 'Red Cichlid'],       // Red-White Betty
+  ['9_14_0',  'Red Snapper'],       // Red-White Blockfish
+  ['6_0_4',   'Threadfin'],         // White-Yellow Flopper
+  ['0_14_0',  'Tomato Clownfish'],  // Red-White Kob
+  ['1_7_0',   'Triggerfish'],       // Gray-White Sunstreak
+  ['3_9_4',   'Yellowtail Parrotfish'], // Cyan-Yellow Dasher
+  ['7_4_4',   'Yellow Tang'],       // Yellow Stripey (JE: Yellow Flopper → Flopper=shape 0 idx 6... ma wiki dice Stripey)
 ]);
 
 if (typeof window !== 'undefined') {
@@ -71,13 +55,13 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
   const isMounted  = useRef(true);
 
   const { typeIndex, bodyColor, patternColor } = fish;
-  const fishType   = FISH_TYPES[typeIndex];
-  const key        = `${typeIndex}_${bodyColor}_${patternColor}`;
+  const fishType     = FISH_TYPES[typeIndex];
+  const key          = `${typeIndex}_${bodyColor}_${patternColor}`;
   const officialName = OFFICIAL_NAMES.get(key);
-  const fishName   = officialName
+  const fishName     = officialName
     ? officialName
     : `${fishType.name} ${COLOR_NAMES[bodyColor]}/${COLOR_NAMES[patternColor]}`;
-  const shapeLabel = fishType.shape === 0 ? 'Small' : 'Large';
+  const shapeLabel   = fishType.shape === 0 ? 'Small' : 'Large';
 
   useEffect(() => {
     isMounted.current = true;
@@ -103,7 +87,7 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
     window.dispatchEvent(new CustomEvent(TOOLTIP_EVENT, { detail: { id: instanceId.current } }));
     if (tooltipSide !== null) { setTooltipSide(null); return; }
     const rect = cardRef.current.getBoundingClientRect();
-    setTooltipSide(rect.right + 260 < window.innerWidth ? 'right' : 'left');
+    setTooltipSide(rect.right + 270 < window.innerWidth ? 'right' : 'left');
   };
 
   useEffect(() => {
@@ -134,11 +118,10 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
         )}
         {error && <span className="text-red-500 text-lg">✕</span>}
 
-        {/* Badge nome ufficiale o TROPICAL */}
         {!isTracked && (
           <div className="absolute top-1 right-1 z-20">
-            <div className={`text-[9px] px-1 py-0.5 border-2 border-stone-900 leading-none ${officialName ? 'bg-amber-600' : 'bg-cyan-600'}`}>
-              {officialName ? '★' : 'TROPICAL'}
+            <div className={`text-[9px] px-1 py-0.5 border-2 border-stone-900 leading-none ${officialName ? 'bg-amber-600' : 'bg-cyan-700'}`}>
+              {officialName ? '★' : 'T'}
             </div>
           </div>
         )}
@@ -156,7 +139,6 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
         </p>
       </div>
 
-      {/* Tooltip */}
       {tooltipSide && (
         <div
           onClick={e => e.stopPropagation()}
@@ -166,31 +148,32 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
             [tooltipSide === 'right' ? 'left' : 'right']: '100%',
             [tooltipSide === 'right' ? 'marginLeft' : 'marginRight']: '6px',
           }}
-          className="bg-stone-800 border-4 border-cyan-700 shadow-2xl p-3 min-w-[240px]"
+          className="bg-stone-800 border-4 border-cyan-700 shadow-2xl p-3 min-w-[250px]"
         >
-          {/* Preview grande */}
-          <div className="flex justify-center mb-3 bg-[#181818] p-2 border-2 border-stone-700">
+          {/* Preview grande con zoom */}
+          <div className="flex justify-center mb-3 bg-[#181818] p-3 border-2 border-stone-700">
             {imgSrc
-              ? <img src={imgSrc} alt={fishName} className="w-36 h-36 object-contain" style={{ imageRendering: 'pixelated' }} />
-              : <div className="w-36 h-36 flex items-center justify-center">
+              ? <img src={imgSrc} alt={fishName} className="w-44 h-44 object-contain" style={{ imageRendering: 'auto' }} />
+              : <div className="w-44 h-44 flex items-center justify-center">
                   <div className="w-6 h-6 border-2 border-cyan-700 border-t-cyan-400 rounded-full animate-spin" />
                 </div>
             }
           </div>
 
-          {/* Nome */}
           <div className="mb-3 border-b-2 border-stone-600 pb-2">
             <p className="text-sm text-cyan-300 uppercase font-bold leading-tight">{fishName}</p>
             {officialName && (
-              <p className="text-[10px] text-amber-400 mt-0.5">{fishType.name} variant</p>
+              <p className="text-[10px] text-amber-400 mt-0.5 uppercase">{fishType.name} • {shapeLabel}</p>
             )}
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Shape</span>
-              <div className="bg-stone-700 text-xs px-2 py-1 border-2 border-stone-900 text-stone-200 leading-none">{shapeLabel}</div>
-            </div>
+            {!officialName && (
+              <div className="flex items-center gap-2">
+                <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Shape</span>
+                <div className="bg-stone-700 text-xs px-2 py-1 border-2 border-stone-900 text-stone-200 leading-none">{shapeLabel}</div>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Body</span>
               <div className={`${COLOR_BADGES[bodyColor]} text-xs px-2 py-1 border-2 border-stone-900 leading-none font-bold`}>{COLOR_NAMES[bodyColor]}</div>
@@ -201,7 +184,7 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
             </div>
             <div className="flex items-center gap-2 mt-1 pt-2 border-t-2 border-stone-700">
               <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Cat.</span>
-              <div className={`text-xs px-2 py-1 border-2 border-stone-900 leading-none font-bold ${officialName ? 'bg-amber-600' : 'bg-cyan-600'}`}>
+              <div className={`text-xs px-2 py-1 border-2 border-stone-900 leading-none font-bold ${officialName ? 'bg-amber-600' : 'bg-cyan-700'}`}>
                 {officialName ? '★ NAMED' : 'TROPICAL'}
               </div>
             </div>
