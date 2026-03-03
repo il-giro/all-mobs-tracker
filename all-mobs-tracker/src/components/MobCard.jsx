@@ -53,8 +53,17 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
     e._handledByMobCard = true;
     window.dispatchEvent(new CustomEvent(TOOLTIP_EVENT, { detail: { id: instanceId.current } }));
     if (tooltipSide !== null) { setTooltipSide(null); return; }
-    const rect = cardRef.current.getBoundingClientRect();
-    setTooltipSide(rect.right + 220 < window.innerWidth ? 'right' : 'left');
+    const rect        = cardRef.current.getBoundingClientRect();
+    const side        = rect.right + 220 < window.innerWidth ? 'right' : 'left';
+    // Calcola offset verticale — evita uscita sia in basso che in alto
+    const tooltipH   = 380;
+    const spaceBelow = window.innerHeight - rect.top;
+    let offsetY = 0;
+    if (spaceBelow < tooltipH) {
+      offsetY = -(tooltipH - spaceBelow) - 40;
+      if (rect.top + offsetY < 8) offsetY = -rect.top + 8;
+    }
+    setTooltipSide({ side, offsetY });
   };
 
   useEffect(() => {
@@ -152,9 +161,11 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
           onClick={e => e.stopPropagation()}
           onContextMenu={e => { e.preventDefault(); e.stopPropagation(); e._handledByMobCard = true; setTooltipSide(null); }}
           style={{
-            position: 'absolute', top: 0, zIndex: 999,
-            [tooltipSide === 'right' ? 'left' : 'right']: '100%',
-            [tooltipSide === 'right' ? 'marginLeft' : 'marginRight']: '6px',
+            position: 'absolute',
+            top: tooltipSide.offsetY,
+            zIndex: 999,
+            [tooltipSide.side === 'right' ? 'left' : 'right']: '100%',
+            [tooltipSide.side === 'right' ? 'marginLeft' : 'marginRight']: '6px',
           }}
           className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3 min-w-[200px]"
         >

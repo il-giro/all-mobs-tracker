@@ -18,16 +18,16 @@ const MC_COLORS = MC_COLOR_VALUES.map(toColor);
 
 export const FISH_TYPES = [
   { name: 'Kob',       shape: 0, pattern: 0 },
-  { name: 'Sunstreak', shape: 1, pattern: 0 },
-  { name: 'Snooper',   shape: 0, pattern: 1 },
-  { name: 'Dasher',    shape: 1, pattern: 1 },
-  { name: 'Brinely',   shape: 0, pattern: 2 },
-  { name: 'Spotty',    shape: 1, pattern: 2 },
-  { name: 'Flopper',   shape: 0, pattern: 3 },
-  { name: 'Stripey',   shape: 1, pattern: 3 },
-  { name: 'Glitter',   shape: 0, pattern: 4 },
-  { name: 'Blockfish', shape: 1, pattern: 4 },
-  { name: 'Betty',     shape: 0, pattern: 5 },
+  { name: 'Sunstreak', shape: 0, pattern: 1 },
+  { name: 'Snooper',   shape: 0, pattern: 2 },
+  { name: 'Dasher',    shape: 0, pattern: 3 },
+  { name: 'Brinely',   shape: 0, pattern: 4 },
+  { name: 'Spotty',    shape: 0, pattern: 5 },
+  { name: 'Flopper',   shape: 1, pattern: 0 },
+  { name: 'Stripey',   shape: 1, pattern: 1 },
+  { name: 'Glitter',   shape: 1, pattern: 2 },
+  { name: 'Blockfish', shape: 1, pattern: 3 },
+  { name: 'Betty',     shape: 1, pattern: 4 },
   { name: 'Clayfish',  shape: 1, pattern: 5 },
 ];
 

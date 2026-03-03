@@ -1,7 +1,7 @@
 import React from 'react';
 import { SuffixConfig, ComplexConfig } from '../config/mobConfig';
 
-const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, fishMode, setFishMode, resetAll, onClose }) => {
+const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, showAllFish, setShowAllFish, resetAll, onClose }) => {
   const ToggleBtn = ({ label, active, onClick }) => (
     <div
       onClick={onClick}
@@ -15,6 +15,9 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, fishMode
       </div>
     </div>
   );
+
+  // Mostra quanti pesci verranno mostrati in base alle impostazioni correnti
+  const fishCount = variantMode === 'none' ? 1 : variantMode === 'main' ? 22 : showAllFish ? 3072 : 22;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -40,18 +43,28 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, fishMode
             </select>
           </section>
 
-          {/* Tropical Fish */}
-          <section className="bg-stone-900/40 p-4 border-2 border-cyan-800">
-            <label className="block text-2xl text-cyan-400 mb-4 uppercase">🐠 Tropical Fish</label>
-            <select
-              value={fishMode}
-              onChange={(e) => setFishMode(e.target.value)}
-              className="w-full bg-black text-white border-4 border-stone-600 p-3 outline-none uppercase focus:border-cyan-500 cursor-pointer"
-            >
-              <option value="none">Nessun pesce tropicale</option>
-              <option value="named">Solo varianti con nome (22)</option>
-              <option value="all">Tutte le varianti (3072)</option>
-            </select>
+          {/* Tropical Fish — toggle solo visibile se variantMode === 'all' */}
+          <section className="bg-stone-900/40 p-4 border-2 border-cyan-900">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-2xl text-cyan-400 uppercase">🐠 Tropical Fish</label>
+              <span className="text-stone-500 text-sm uppercase border-2 border-stone-700 px-2 py-1">
+                {fishCount === 1 ? '1 variante' : `${fishCount} varianti`}
+              </span>
+            </div>
+
+            <p className="text-stone-500 text-sm mb-4 leading-tight">
+              {variantMode === 'none' && 'Con "Niente varianti" viene mostrato solo 1 pesce base.'}
+              {variantMode === 'main' && 'Con "Varianti principali" vengono mostrate le 22 varianti con nome.'}
+              {variantMode === 'all'  && 'Con "Tutte le varianti" puoi scegliere se mostrare tutte le 3072 combinazioni.'}
+            </p>
+
+            {variantMode === 'all' && (
+              <ToggleBtn
+                label="Mostra tutte le 3072 varianti"
+                active={showAllFish}
+                onClick={() => setShowAllFish(v => !v)}
+              />
+            )}
           </section>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
