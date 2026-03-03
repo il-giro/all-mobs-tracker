@@ -14,7 +14,7 @@ export const OFFICIAL_NAMES = new Map([
   ['6_7_7',   'Black Tang'],
   ['6_7_11',  'Blue Tang'],
   ['11_0_7',  'Butterflyfish'],
-  ['1_11_7', 'Cichlid'],
+  ['1_11_7',  'Cichlid'],
   ['0_1_0',   'Clownfish'],
   ['5_6_3',   'Cotton Candy Betta'],
   ['9_10_4',  'Dottyback'],
@@ -44,13 +44,26 @@ const TOOLTIP_EVENT = 'mobcard:tooltip';
 const TOOLTIP_W = 260;
 const TOOLTIP_H = 420;
 
+const calcPos = (rect) => {
+  let x = rect.right + 8 + TOOLTIP_W < window.innerWidth
+    ? rect.right + 8
+    : rect.left - TOOLTIP_W - 8;
+  let y = rect.top + window.scrollY;
+  const yFixed = rect.top;
+  if (yFixed + TOOLTIP_H > window.innerHeight - 8) y = window.scrollY + window.innerHeight - TOOLTIP_H - 8;
+  if (yFixed < 8) y = window.scrollY + 8;
+  x = x + window.scrollX;
+  return { x, y };
+};
+
 const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
   const [imgSrc, setImgSrc]         = useState(null);
   const [error, setError]           = useState(null);
-  const [tooltipPos, setTooltipPos] = useState(null); // { x, y } fixed coords
+  const [tooltipPos, setTooltipPos] = useState(null);
   const cardRef    = useRef(null);
   const instanceId = useRef(Math.random());
   const isMounted  = useRef(true);
+  const isOpen     = useRef(false);
 
   const { typeIndex, bodyColor, patternColor } = fish;
   const fishType     = FISH_TYPES[typeIndex];
@@ -70,53 +83,60 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
     return () => { isMounted.current = false; };
   }, [typeIndex, bodyColor, patternColor]);
 
+  // Chiudi quando un'altra card apre il suo tooltip
   useEffect(() => {
     const handler = (e) => {
-      if (e.detail.id !== instanceId.current) setTooltipPos(null);
+      if (e.detail.id !== instanceId.current) { setTooltipPos(null); isOpen.current = false; }
     };
     window.addEventListener(TOOLTIP_EVENT, handler);
     return () => window.removeEventListener(TOOLTIP_EVENT, handler);
   }, []);
+
+
+
+  // Chiudi con click sinistro fuori o tasto destro ovunque
+  useEffect(() => {
+    if (!tooltipPos) return;
+    const onMouseDown = (e) => {
+      if (cardRef.current && cardRef.current.contains(e.target)) return;
+      setTooltipPos(null);
+      isOpen.current = false;
+    };
+    const onContextMenuGlobal = (e) => {
+      // tasto destro ovunque chiude (a meno che non sia sulla card stessa, gestito da handleContextMenu)
+      if (cardRef.current && cardRef.current.contains(e.target)) return;
+      e.preventDefault();
+      setTooltipPos(null);
+      isOpen.current = false;
+    };
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('contextmenu', onContextMenuGlobal, { capture: true });
+    return () => {
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('contextmenu', onContextMenuGlobal, { capture: true });
+    };
+  }, [!!tooltipPos]);
 
   const handleContextMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e._handledByMobCard = true;
     window.dispatchEvent(new CustomEvent(TOOLTIP_EVENT, { detail: { id: instanceId.current } }));
-    if (tooltipPos !== null) { setTooltipPos(null); return; }
-
-    const rect = cardRef.current.getBoundingClientRect();
-
-    // Posizione X: a destra della card se c'è spazio, altrimenti a sinistra
-    let x = rect.right + 8 < window.innerWidth - TOOLTIP_W
-      ? rect.right + 8
-      : rect.left - TOOLTIP_W - 8;
-
-    // Posizione Y: allineato al top della card, ma clampato nel viewport
-    let y = rect.top;
-    if (y + TOOLTIP_H > window.innerHeight - 8) {
-      y = window.innerHeight - TOOLTIP_H - 8;
+    if (isOpen.current) {
+      setTooltipPos(null);
+      isOpen.current = false;
+      return;
     }
-    if (y < 8) y = 8;
-
-    setTooltipPos({ x, y });
+    isOpen.current = true;
+    setTooltipPos(calcPos(cardRef.current.getBoundingClientRect()));
   };
-
-  useEffect(() => {
-    if (!tooltipPos) return;
-    const close = (e) => {
-      if (cardRef.current && !cardRef.current.contains(e.target)) setTooltipPos(null);
-    };
-    window.addEventListener('click', close);
-    return () => window.removeEventListener('click', close);
-  }, [tooltipPos]);
 
   const tooltip = tooltipPos && createPortal(
     <div
       onClick={e => e.stopPropagation()}
-      onContextMenu={e => { e.preventDefault(); e.stopPropagation(); e._handledByMobCard = true; setTooltipPos(null); }}
+      onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setTooltipPos(null); isOpen.current = false; }}
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: tooltipPos.y,
         left: tooltipPos.x,
         width: TOOLTIP_W,
@@ -124,7 +144,6 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
       }}
       className="bg-stone-800 border-4 border-cyan-700 shadow-2xl p-3"
     >
-      {/* Preview con zoom */}
       <div className="flex justify-center mb-3 bg-[#181818] border-2 border-stone-700 overflow-hidden" style={{ height: '140px', paddingTop: '15px' }}>
         {imgSrc
           ? <img src={imgSrc} alt={fishName} className="object-contain"
@@ -195,7 +214,6 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
               </div>
             </div>
           )}
-
           {isTracked && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <span className="text-green-500 text-5xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">✔</span>

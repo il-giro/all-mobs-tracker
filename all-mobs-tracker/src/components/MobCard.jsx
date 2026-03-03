@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { SuffixConfig, SuffixPriority, ComplexConfig, VillagerBiomes, VillagerJobs } from '../config/mobConfig';
 
 if (typeof window !== 'undefined') {
@@ -8,6 +9,8 @@ if (typeof window !== 'undefined') {
 }
 
 const TOOLTIP_EVENT = 'mobcard:tooltip';
+const TOOLTIP_W = 220;
+const TOOLTIP_H = 380;
 
 const getVillagerIcons = (mob) => {
   if (!mob.complexId) return null;
@@ -15,16 +18,26 @@ const getVillagerIcons = (mob) => {
   if (!config?.useVillagerIcons) return null;
   const biomeData = VillagerBiomes[mob.num1] ?? null;
   const jobData   = VillagerJobs[mob.num2]   ?? null;
-  return {
-    biome: biomeData ?? null,  // biomeData ha già .icon e .label dal config
-    job:   jobData   ?? null,
-  };
+  return { biome: biomeData ?? null, job: jobData ?? null };
+};
+
+const calcPos = (rect) => {
+  let x = rect.right + 8 + TOOLTIP_W < window.innerWidth
+    ? rect.right + 8
+    : rect.left - TOOLTIP_W - 8;
+  let y = rect.top + window.scrollY;
+  const yFixed = rect.top; // per il clamping usiamo le coord viewport
+  if (yFixed + TOOLTIP_H > window.innerHeight - 8) y = window.scrollY + window.innerHeight - TOOLTIP_H - 8;
+  if (yFixed < 8) y = window.scrollY + 8;
+  x = x + window.scrollX;
+  return { x, y };
 };
 
 const MobCard = ({ mob, isTracked, onToggle }) => {
-  const [tooltipSide, setTooltipSide] = useState(null);
-  const cardRef = useRef(null);
+  const [tooltipPos, setTooltipPos] = useState(null);
+  const cardRef    = useRef(null);
   const instanceId = useRef(Math.random());
+  const isOpen     = useRef(false);
 
   const topSuffixId    = SuffixPriority.find(id => mob.activeSuffixes.includes(id));
   const topSuffixBadge = topSuffixId ? SuffixConfig[topSuffixId] : null;
@@ -39,48 +52,59 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
       })()
     : '';
 
+  // Chiudi quando un'altra card apre il tooltip
   useEffect(() => {
     const handler = (e) => {
-      if (e.detail.id !== instanceId.current) setTooltipSide(null);
+      if (e.detail.id !== instanceId.current) { setTooltipPos(null); isOpen.current = false; }
     };
     window.addEventListener(TOOLTIP_EVENT, handler);
     return () => window.removeEventListener(TOOLTIP_EVENT, handler);
   }, []);
+
+
+
+  // Chiudi con click sinistro fuori o tasto destro ovunque
+  useEffect(() => {
+    if (!tooltipPos) return;
+    const onMouseDown = (e) => {
+      if (cardRef.current && cardRef.current.contains(e.target)) return;
+      setTooltipPos(null);
+      isOpen.current = false;
+    };
+    const onContextMenuGlobal = (e) => {
+      if (cardRef.current && cardRef.current.contains(e.target)) return;
+      e.preventDefault();
+      setTooltipPos(null);
+      isOpen.current = false;
+    };
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('contextmenu', onContextMenuGlobal, { capture: true });
+    return () => {
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('contextmenu', onContextMenuGlobal, { capture: true });
+    };
+  }, [!!tooltipPos]);
 
   const handleContextMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e._handledByMobCard = true;
     window.dispatchEvent(new CustomEvent(TOOLTIP_EVENT, { detail: { id: instanceId.current } }));
-    if (tooltipSide !== null) { setTooltipSide(null); return; }
-    const rect        = cardRef.current.getBoundingClientRect();
-    const side        = rect.right + 220 < window.innerWidth ? 'right' : 'left';
-    // Calcola offset verticale — evita uscita sia in basso che in alto
-    const tooltipH   = 380;
-    const spaceBelow = window.innerHeight - rect.top;
-    let offsetY = 0;
-    if (spaceBelow < tooltipH) {
-      offsetY = -(tooltipH - spaceBelow) - 40;
-      if (rect.top + offsetY < 8) offsetY = -rect.top + 8;
+    if (isOpen.current) {
+      setTooltipPos(null);
+      isOpen.current = false;
+      return;
     }
-    setTooltipSide({ side, offsetY });
+    isOpen.current = true;
+    setTooltipPos(calcPos(cardRef.current.getBoundingClientRect()));
   };
-
-  useEffect(() => {
-    if (!tooltipSide) return;
-    const close = (e) => {
-      if (cardRef.current && !cardRef.current.contains(e.target)) setTooltipSide(null);
-    };
-    window.addEventListener('click', close);
-    return () => window.removeEventListener('click', close);
-  }, [tooltipSide]);
 
   return (
     <div
       ref={cardRef}
       onClick={onToggle}
       onContextMenu={handleContextMenu}
-      style={{ position: 'relative', zIndex: tooltipSide ? 100 : 'auto' }}
+      style={{ position: 'relative' }}
       className={`group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible ${isTracked ? 'border-green-600' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1'}`}
     >
       <div className={`aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden ${isTracked ? 'opacity-40' : ''}`}>
@@ -94,7 +118,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
 
         {!isTracked && (
           <>
-            {/* complexBadge — top-left */}
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
@@ -102,8 +125,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                 </div>
               </div>
             )}
-
-            {/* suffix badge — top-right se no villagerIcons, bottom-center se villagerIcons */}
             {topSuffixBadge && !villagerIcons && (
               <div className="absolute top-1 right-1 z-20">
                 <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
@@ -118,8 +139,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                 </div>
               </div>
             )}
-
-            {/* Icona job — bottom-left (se no suffix) o top-right (se c'è suffix) */}
             {villagerIcons?.job?.icon && !topSuffixBadge && (
               <div className="absolute bottom-1 left-1 z-20">
                 <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} draggable={false}
@@ -132,8 +151,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                   className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]" />
               </div>
             )}
-
-            {/* Icona bioma — bottom-right */}
             {villagerIcons?.biome?.icon && (
               <div className="absolute bottom-1 right-1 z-20">
                 <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} draggable={false}
@@ -156,80 +173,82 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
         </p>
       </div>
 
-      {tooltipSide && (
-        <div
-          onClick={e => e.stopPropagation()}
-          onContextMenu={e => { e.preventDefault(); e.stopPropagation(); e._handledByMobCard = true; setTooltipSide(null); }}
-          style={{
-            position: 'absolute',
-            top: tooltipSide.offsetY,
-            zIndex: 999,
-            [tooltipSide.side === 'right' ? 'left' : 'right']: '100%',
-            [tooltipSide.side === 'right' ? 'marginLeft' : 'marginRight']: '6px',
-          }}
-          className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3 min-w-[200px]"
-        >
-          <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
-            {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
-          </p>
+      {/* Tooltip via portale — fuori da ogni stacking context */}
+      {tooltipPos && createPortal(
+          <div
+            onClick={e => e.stopPropagation()}
+            onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setTooltipPos(null); isOpen.current = false; }}
+            style={{
+              position: 'absolute',
+              top: tooltipPos.y,
+              left: tooltipPos.x,
+              width: TOOLTIP_W,
+              zIndex: 99999,
+            }}
+            className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3"
+          >
+            <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
+              {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
+            </p>
 
-          {villagerIcons && (
-            <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
-              {villagerIcons.biome && (
-                <div className="flex items-center gap-2">
-                  {villagerIcons.biome.icon
-                    ? <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} className="w-5 h-5 object-contain pixelated shrink-0" />
-                    : <div className="w-5 h-5 shrink-0" />
-                  }
-                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.biome.label}</span>
-                  <span className="text-stone-600 text-[9px] uppercase ml-auto">bioma</span>
-                </div>
-              )}
-              {villagerIcons.job && (
-                <div className="flex items-center gap-2">
-                  {villagerIcons.job.icon
-                    ? <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} className="w-5 h-5 object-contain pixelated shrink-0" />
-                    : <div className="w-5 h-5 shrink-0" />
-                  }
-                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.job.label}</span>
-                  <span className="text-stone-600 text-[9px] uppercase ml-auto">job</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {hasAnyBadge ? (
-            <div className="flex flex-col gap-2">
-              {mob.complexBadge && (
-                <div className="flex items-center gap-2">
-                  <span className="text-stone-400 text-xs uppercase w-12 shrink-0">Cat.</span>
-                  <div className={`${mob.complexBadge.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
-                    {mob.complexBadge.label}
+            {villagerIcons && (
+              <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
+                {villagerIcons.biome && (
+                  <div className="flex items-center gap-2">
+                    {villagerIcons.biome.icon
+                      ? <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} className="w-5 h-5 object-contain pixelated shrink-0" />
+                      : <div className="w-5 h-5 shrink-0" />
+                    }
+                    <span className="text-stone-300 text-xs uppercase">{villagerIcons.biome.label}</span>
+                    <span className="text-stone-600 text-[9px] uppercase ml-auto">bioma</span>
                   </div>
-                </div>
-              )}
-              {allBadges.length > 0 && (
-                <div className="flex flex-col gap-1">
-                  <span className="text-stone-400 text-xs uppercase mb-0.5">Categories</span>
-                  {allBadges.map((b, i) => (
-                    <div key={b.id} className="flex items-center gap-2">
-                      <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
-                        {i === 0 ? '★' : '·'}
-                      </span>
-                      <div className={`${b.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
-                        {b.label}
-                      </div>
-                      {i === 0 && <span className="text-yellow-500 text-[9px] uppercase">top</span>}
+                )}
+                {villagerIcons.job && (
+                  <div className="flex items-center gap-2">
+                    {villagerIcons.job.icon
+                      ? <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} className="w-5 h-5 object-contain pixelated shrink-0" />
+                      : <div className="w-5 h-5 shrink-0" />
+                    }
+                    <span className="text-stone-300 text-xs uppercase">{villagerIcons.job.label}</span>
+                    <span className="text-stone-600 text-[9px] uppercase ml-auto">job</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {hasAnyBadge ? (
+              <div className="flex flex-col gap-2">
+                {mob.complexBadge && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-stone-400 text-xs uppercase w-12 shrink-0">Cat.</span>
+                    <div className={`${mob.complexBadge.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
+                      {mob.complexBadge.label}
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
-          )}
-        </div>
-      )}
+                  </div>
+                )}
+                {allBadges.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-stone-400 text-xs uppercase mb-0.5">Categories</span>
+                    {allBadges.map((b, i) => (
+                      <div key={b.id} className="flex items-center gap-2">
+                        <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
+                          {i === 0 ? '★' : '·'}
+                        </span>
+                        <div className={`${b.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
+                          {b.label}
+                        </div>
+                        {i === 0 && <span className="text-yellow-500 text-[9px] uppercase">top</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
+            )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
