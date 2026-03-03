@@ -221,7 +221,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                 {mob.complexBadge && (
                   <div className="flex items-center gap-2">
                     <span className="text-stone-400 text-xs uppercase w-12 shrink-0">Cat.</span>
-                    <div className={`${mob.complexBadge.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
+                    <div className={`${mob.complexBadge.color} text-white text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
                       {mob.complexBadge.label}
                     </div>
                   </div>
@@ -234,7 +234,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
                         <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
                           {i === 0 ? '★' : '·'}
                         </span>
-                        <div className={`${b.color} text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
+                        <div className={`${b.color} text-white text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
                           {b.label}
                         </div>
                         {i === 0 && <span className="text-yellow-500 text-[9px] uppercase">top</span>}

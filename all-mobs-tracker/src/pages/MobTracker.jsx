@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import Settings from './Settings';
-import MobCard from './MobCard';
-import TropicalFishCard from './TropicalFishCard';
+import Settings from '../components/Settings';
+import MobCard from '../components/MobCard';
+import TropicalFishCard from '../components/TropicalFishCard';
 import { FISH_TYPES, COLOR_NAMES } from '../utils/FishRenderer';
-import { OFFICIAL_NAMES } from './TropicalFishCard';
-import Stats from './Stats';
+import { OFFICIAL_NAMES } from '../components/TropicalFishCard';
+import Stats from '../components/Stats';
 import { parseFileName } from '../utils/mobParser';
 import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
+import Footer from '../components/Footer';
 
 // Tutte le 3072 varianti
 const ALL_FISH = (() => {
@@ -166,18 +167,12 @@ const MobTracker = () => {
     });
   }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId]);
 
-  // Pool di pesci derivato da variantMode + showAllFish
-  // none  → 1 pesce base (Kob Orange/White = Clownfish)
-  // main  → 22 named
-  // all + showAllFish=false → 22 named
-  // all + showAllFish=true  → 3072
   const fishPool = useMemo(() => {
     if (variantMode === 'none')  return [ALL_FISH.find(f => `${f.typeIndex}_${f.bodyColor}_${f.patternColor}` === '0_1_0') ?? ALL_FISH[0]];
     if (variantMode === 'main')  return NAMED_FISH;
     return showAllFish ? ALL_FISH : NAMED_FISH;
   }, [variantMode, showAllFish]);
 
-  // Pesci filtrati per ricerca
   const displayedFish = useMemo(() => {
     if (!showFish || fishPool.length === 0) return [];
     if (!searchQuery) return fishPool;
@@ -199,7 +194,7 @@ const MobTracker = () => {
   const hasFilters = specialBtns.length > 0 || normalFolderBtns.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#111] text-stone-100 p-4 md:p-6">
+    <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
       {showSettings && (
         <Settings
           variantMode={variantMode} setVariantMode={setVariantMode}
@@ -211,107 +206,113 @@ const MobTracker = () => {
       )}
       {showStats && <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />}
 
-      <div className="max-w-[1600px] mx-auto">
-        <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl text-green-400 drop-shadow-md uppercase whitespace-nowrap">Mob Tracker</h1>
-            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-3/4 justify-end">
-              <div className="relative flex-grow max-w-2xl">
-                <input
-                  ref={searchRef}
-                  type="text"
-                  placeholder="Search… (premi Spazio)"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full bg-black border-4 border-stone-700 py-2 pl-3 pr-10 text-xl outline-none focus:border-green-500 transition-colors"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white text-xl pb-1">X</button>
+      {/* Contenuto principale */}
+      <div className="flex-1 p-4 md:p-6">
+        <div className="max-w-[1600px] mx-auto">
+          <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl text-green-400 drop-shadow-md uppercase whitespace-nowrap">Mob Tracker</h1>
+              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-3/4 justify-end">
+                <div className="relative flex-grow max-w-2xl">
+                  <input
+                    ref={searchRef}
+                    type="text"
+                    placeholder="Search… (premi Spazio)"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full bg-black border-4 border-stone-700 py-2 pl-3 pr-10 text-xl outline-none focus:border-green-500 transition-colors"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white text-xl pb-1">X</button>
+                  )}
+                </div>
+                <div className="flex gap-4 shrink-0">
+                  <button onClick={() => setShowStats(true)}    className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
+                  <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
+                </div>
+              </div>
+            </div>
+
+            {hasFilters && (
+              <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <button onClick={() => setSelectedFolder('all')}
+                  className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                >Tutti</button>
+                {specialBtns.length > 0 && (
+                  <><span className="text-stone-600 select-none">|</span>
+                  {specialBtns.map(b => (
+                    <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
+                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
+                    >✦ {b.label}</button>
+                  ))}</>
+                )}
+                {normalFolderBtns.length > 0 && (
+                  <><span className="text-stone-600 select-none">|</span>
+                  {normalFolderBtns.map(f => (
+                    <button key={f} onClick={() => setSelectedFolder(f)}
+                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                    >{f}</button>
+                  ))}</>
                 )}
               </div>
-              <div className="flex gap-4 shrink-0">
-                <button onClick={() => setShowStats(true)}    className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
-                <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
+            )}
+
+            <div className="bg-black/50 p-4 border-4 border-stone-700">
+              <div className="flex justify-between mb-2 text-xl uppercase">
+                <span>Progress</span>
+                <span>{totalTracked} / {totalDisplayed} ({totalDisplayed > 0 ? Math.round((totalTracked / totalDisplayed) * 100) : 0}%)</span>
+              </div>
+              <div className="h-6 bg-stone-900 border-2 border-stone-700 p-1">
+                <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${totalDisplayed > 0 ? (totalTracked / totalDisplayed) * 100 : 0}%` }} />
               </div>
             </div>
+          </header>
+
+          {/* Mob normali */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
+            {displayedMobs.map(mob => (
+              <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
+            ))}
           </div>
 
-          {hasFilters && (
-            <div className="mb-4 flex flex-wrap gap-2 items-center">
-              <button onClick={() => setSelectedFolder('all')}
-                className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-              >Tutti</button>
-              {specialBtns.length > 0 && (
-                <><span className="text-stone-600 select-none">|</span>
-                {specialBtns.map(b => (
-                  <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
-                    className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
-                  >✦ {b.label}</button>
-                ))}</>
-              )}
-              {normalFolderBtns.length > 0 && (
-                <><span className="text-stone-600 select-none">|</span>
-                {normalFolderBtns.map(f => (
-                  <button key={f} onClick={() => setSelectedFolder(f)}
-                    className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-                  >{f}</button>
-                ))}</>
-              )}
-            </div>
-          )}
-
-          <div className="bg-black/50 p-4 border-4 border-stone-700">
-            <div className="flex justify-between mb-2 text-xl uppercase">
-              <span>Progress</span>
-              <span>{totalTracked} / {totalDisplayed} ({totalDisplayed > 0 ? Math.round((totalTracked / totalDisplayed) * 100) : 0}%)</span>
-            </div>
-            <div className="h-6 bg-stone-900 border-2 border-stone-700 p-1">
-              <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${totalDisplayed > 0 ? (totalTracked / totalDisplayed) * 100 : 0}%` }} />
-            </div>
-          </div>
-        </header>
-
-        {/* Mob normali */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
-          {displayedMobs.map(mob => (
-            <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
-          ))}
-        </div>
-
-        {/* Sezione Tropical Fish — sempre visibile */}
-        <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg">
-          <button
-            onClick={() => setShowFish(v => !v)}
-            className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl text-cyan-400 uppercase ">🐠 Tropical Fish</span>
-              <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
-                {fishTrackedCount} / {fishPool.length}
-              </span>
-              <span className="text-stone-500 text-sm uppercase">
-                {variantMode === 'none' ? '(1 base)' : variantMode === 'main' ? '(22 named)' : showAllFish ? '(3072 tutte)' : '(22 named)'}
-              </span>
-            </div>
-            <span className="text-stone-400 text-xl">{showFish ? '▲' : '▼'}</span>
-          </button>
-
-          {showFish && (
-            <div className="p-4 border-t-4 border-cyan-900">
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
-                {displayedFish.map(fish => (
-                  <TropicalFishCard
-                    key={fish.id}
-                    fish={fish}
-                    isTracked={trackedMobs[fish.id]}
-                    onToggle={() => toggleMob(fish.id)}
-                  />
-                ))}
+          {/* Sezione Tropical Fish */}
+          <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg mb-6">
+            <button
+              onClick={() => setShowFish(v => !v)}
+              className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl text-cyan-400 uppercase">🐠 Tropical Fish</span>
+                <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
+                  {fishTrackedCount} / {fishPool.length}
+                </span>
+                <span className="text-stone-500 text-sm uppercase">
+                  {variantMode === 'none' ? '(1 base)' : variantMode === 'main' ? '(22 named)' : showAllFish ? '(3072 tutte)' : '(22 named)'}
+                </span>
               </div>
-            </div>
-          )}
+              <span className="text-stone-400 text-xl">{showFish ? '▲' : '▼'}</span>
+            </button>
+
+            {showFish && (
+              <div className="p-4 border-t-4 border-cyan-900">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
+                  {displayedFish.map(fish => (
+                    <TropicalFishCard
+                      key={fish.id}
+                      fish={fish}
+                      isTracked={trackedMobs[fish.id]}
+                      onToggle={() => toggleMob(fish.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Analytics } from "@vercel/analytics/react"
-import MobTracker from './components/MobTracker'
+import MobTracker from './pages/MobTracker'
 import About from './pages/About'
+import FAQ from './pages/FAQ'
+import WhoAmI from './pages/WhoAmI'
 import './index.css'
 
 function App() {
@@ -10,6 +12,8 @@ function App() {
       <Routes>
         <Route path="/" element={<MobTracker />} />
         <Route path="/about" element={<About />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/whoami" element={<WhoAmI />} />
       </Routes>
       <Analytics />
     </BrowserRouter>
