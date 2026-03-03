@@ -285,7 +285,7 @@ const MobTracker = () => {
             className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl text-cyan-400 uppercase font-bold">🐠 Tropical Fish</span>
+              <span className="text-2xl text-cyan-400 uppercase ">🐠 Tropical Fish</span>
               <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
                 {fishTrackedCount} / {fishPool.length}
               </span>

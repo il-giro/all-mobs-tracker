@@ -155,7 +155,7 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
       </div>
 
       <div className="mb-3 border-b-2 border-stone-600 pb-2">
-        <p className="text-sm text-cyan-300 uppercase font-bold leading-tight">{fishName}</p>
+        <p className="text-sm text-cyan-300 uppercase  leading-tight">{fishName}</p>
         {officialName && (
           <p className="text-[10px] text-amber-400 mt-0.5 uppercase">{fishType.name} • {shapeLabel}</p>
         )}
@@ -170,15 +170,15 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
         )}
         <div className="flex items-center gap-2">
           <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Body</span>
-          <div className={`${COLOR_BADGES[bodyColor]} text-xs px-2 py-1 border-2 border-stone-900 leading-none font-bold`}>{COLOR_NAMES[bodyColor]}</div>
+          <div className={`${COLOR_BADGES[bodyColor]} text-xs px-2 py-1 border-2 border-stone-900 leading-none `}>{COLOR_NAMES[bodyColor]}</div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Pattern</span>
-          <div className={`${COLOR_BADGES[patternColor]} text-xs px-2 py-1 border-2 border-stone-900 leading-none font-bold`}>{COLOR_NAMES[patternColor]}</div>
+          <div className={`${COLOR_BADGES[patternColor]} text-xs px-2 py-1 border-2 border-stone-900 leading-none `}>{COLOR_NAMES[patternColor]}</div>
         </div>
         <div className="flex items-center gap-2 mt-1 pt-2 border-t-2 border-stone-700">
           <span className="text-stone-500 text-xs uppercase w-16 shrink-0">Cat.</span>
-          <div className={`text-xs px-2 py-1 border-2 border-stone-900 leading-none font-bold ${officialName ? 'bg-amber-600' : 'bg-cyan-700'}`}>
+          <div className={`text-xs px-2 py-1 border-2 border-stone-900 leading-none  ${officialName ? 'bg-amber-600' : 'bg-cyan-700'}`}>
             {officialName ? '★ NAMED' : 'TROPICAL'}
           </div>
         </div>
@@ -195,7 +195,7 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
         onContextMenu={handleContextMenu}
         style={{ position: 'relative' }}
         className={`group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible
-          ${isTracked ? 'border-green-600' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1'}`}
+          ${isTracked ? 'border-green-600' : officialName ? 'border-yellow-800 hover:border-yellow-600' : 'border-stone-700 hover:border-stone-400'}  hover:-translate-y-1`}
       >
         <div className={`aspect-square flex items-center justify-center bg-[#181818] relative overflow-hidden ${isTracked ? 'opacity-40' : ''}`}>
           {imgSrc && (
@@ -209,7 +209,7 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
 
           {!isTracked && (
             <div className="absolute top-1 right-1 z-20">
-              <div className={`text-[9px] px-1 py-0.5 border-2 border-stone-900 leading-none ${officialName ? 'bg-amber-600' : 'bg-cyan-700'}`}>
+              <div className={`text-[9px] px-1 py-0.5 border-2 border-stone-900 leading-none ${officialName ? 'bg-yellow-800' : 'bg-cyan-700'}`}>
                 {officialName ? '★' : 'T'}
               </div>
             </div>
@@ -221,7 +221,7 @@ const TropicalFishCard = ({ fish, isTracked, onToggle }) => {
           )}
         </div>
 
-        <div className={`p-1 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : 'bg-stone-800 border-stone-700'}`}>
+        <div className={`p-1 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : officialName ? 'bg-yellow-1100 border-yellow-800' : 'bg-stone-900 border-stone-700'}`}>
           <p className="text-[9px] leading-tight text-stone-200 uppercase truncate px-1" title={fishName}>
             {fishName}
           </p>
