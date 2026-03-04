@@ -167,7 +167,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
         )}
       </div>
 
-      <div className={`p-1 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : 'bg-stone-800 border-stone-700'}`}>
+      <div className={`p-2 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : 'bg-stone-800 border-stone-700'}`}>
         <p className="text-[10px] leading-tight text-stone-200 uppercase truncate px-1">
           {mob.name} {suffixDisplay}
         </p>

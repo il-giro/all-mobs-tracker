@@ -42,8 +42,8 @@ A list of things that could be added or improved:
 - [ ] Mobile swipe to mark as tracked
 - [ ] Dark/light theme toggle
 - [ ] Confetti or animation on 100% completion
-- [ ] Filter to show only untracked mobs
-- [ ] Filter to show only tracked mobs
+- [x] Filter to show only untracked mobs
+- [x] Filter to show only tracked mobs
 - [ ] Show total count per folder/category in filter buttons
 - [ ] Multiplayer / shared tracking (Supabase or similar)
 - [ ] Changelog or "recently added" section

@@ -89,6 +89,7 @@ const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
           ${isSpecial ? 'text-purple-200' : 'text-blue-200'}`}>
           {label}
         </p>
+        
         {/* Mini barra progress */}
         <div className="mt-1 h-1 bg-stone-900 mx-1">
           <div
