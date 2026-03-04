@@ -38,7 +38,7 @@ A list of things that could be added or improved:
 - [ ] Multiple save slots / profiles
 - [ ] Mob detail page with description and spawn info
 - [ ] Mark mobs as "seen but not tracked" (partial state)
-- [ ] Sort options (alphabetical, by completion, by category)
+- [x] Sort options (alphabetical, by completion, by category)
 - [ ] Mobile swipe to mark as tracked
 - [ ] Dark/light theme toggle
 - [ ] Confetti or animation on 100% completion

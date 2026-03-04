@@ -6,10 +6,9 @@ import { FISH_TYPES, COLOR_NAMES } from '../utils/FishRenderer';
 import { OFFICIAL_NAMES } from '../components/TropicalFishCard';
 import Stats from '../components/Stats';
 import { parseFileName } from '../utils/mobParser';
-import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
+import { SuffixConfig, ComplexConfig, SpecialFolderMap, VillagerBiomes, VillagerJobs } from '../config/mobConfig';
 import Footer from '../components/Footer';
 
-// Tutte le 3072 varianti
 const ALL_FISH = (() => {
   const fish = [];
   for (let typeIndex = 0; typeIndex < FISH_TYPES.length; typeIndex++)
@@ -19,8 +18,88 @@ const ALL_FISH = (() => {
   return fish;
 })();
 
-// Le 22 varianti named
 const NAMED_FISH = ALL_FISH.filter(f => OFFICIAL_NAMES.has(`${f.typeIndex}_${f.bodyColor}_${f.patternColor}`));
+
+const SORT_OPTIONS = [
+  { value: 'alpha-asc',  label: '↑ A→Z' },
+  { value: 'alpha-desc', label: '↓ Z→A' },
+  { value: 'untracked',  label: '◯ Da catturare' },
+  { value: 'tracked',    label: '✔ Catturati' },
+  { value: 'biome',      label: '🌿 Per bioma' },
+  { value: 'job',        label: '⚒ Per blocco/job' },
+];
+
+const folderLabel = (folder) => {
+  if (folder === 'root') return 'Generali';
+  if (folder.startsWith('special:')) return folder.replace('special:', '');
+  return folder.charAt(0).toUpperCase() + folder.slice(1);
+};
+
+// Card-cartella: stessa dimensione di MobCard, bordo blu, icona primo mob
+const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
+  const trackedCount = mobs.filter(m => trackedMobs[m.fileName]).length;
+  const total = mobs.length;
+  const pct = total > 0 ? Math.round((trackedCount / total) * 100) : 0;
+  const firstMob = mobs[0];
+  const isSpecial = folderKey.startsWith('special:');
+  const label = folderLabel(folderKey);
+
+  return (
+    <div
+      onClick={onToggle}
+      className={`group cursor-pointer border-4 transition-all select-none
+        ${isOpen
+          ? isSpecial
+            ? 'border-purple-400 bg-purple-950/80'
+            : 'border-blue-400 bg-blue-950/80'
+          : isSpecial
+            ? 'border-purple-700 bg-stone-800 hover:border-purple-400'
+            : 'border-blue-700 bg-stone-800 hover:border-blue-400'
+        }`}
+    >
+      {/* Immagine primo mob come icona */}
+      <div className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden">
+        {firstMob && (
+          <img
+            src={firstMob.image}
+            alt={label}
+            draggable={false}
+            className="max-w-full max-h-full object-contain pixelated opacity-60 group-hover:opacity-80 transition-opacity select-none"
+          />
+        )}
+        {/* Overlay scuro con icona cartella */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+          <span className={`text-2xl leading-none ${isSpecial ? 'text-purple-300' : 'text-blue-300'}`}>
+            {isOpen ? '▼' : '▶'}
+          </span>
+        </div>
+        {/* Badge contatore top-right */}
+        <div className={`absolute top-1 right-1 text-[9px] px-1.5 py-0.5 border-2 border-stone-900 leading-none
+          ${pct === 100 ? 'bg-green-700 text-green-200' : isSpecial ? 'bg-purple-900 text-purple-200' : 'bg-blue-900 text-blue-200'}`}>
+          {trackedCount}/{total}
+        </div>
+      </div>
+
+      {/* Label + mini progress */}
+      <div className={`p-1 border-t-4 ${isOpen
+        ? isSpecial ? 'bg-purple-900 border-purple-600' : 'bg-blue-900 border-blue-600'
+        : isSpecial ? 'bg-purple-950 border-purple-800' : 'bg-blue-950 border-blue-800'
+      }`}>
+        <p className={`text-[10px] leading-tight uppercase truncate px-1 text-center
+          ${isSpecial ? 'text-purple-200' : 'text-blue-200'}`}>
+          {label}
+        </p>
+        {/* Mini barra progress */}
+        <div className="mt-1 h-1 bg-stone-900 mx-1">
+          <div
+            className={`h-full transition-all duration-500 ${pct === 100 ? 'bg-green-400' : isSpecial ? 'bg-purple-500' : 'bg-blue-500'}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MobTracker = () => {
   const [allMobs, setAllMobs]           = useState([]);
@@ -32,7 +111,16 @@ const MobTracker = () => {
   const [showStats, setShowStats]       = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [showFish, setShowFish]         = useState(false);
+  const [sortBy, setSortBy]             = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
+  const [sortOpen, setSortOpen]         = useState(false);
+  const [groupByFolder, setGroupByFolder] = useState(() => localStorage.getItem('mobTracker_groupByFolder') === 'true');
+  const [openFolders, setOpenFolders]   = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('mobTracker_openFolders') || '[]')); }
+    catch { return new Set(); }
+  });
+
   const searchRef = useRef(null);
+  const sortRef   = useRef(null);
 
   const [filters, setFilters] = useState(() => {
     const saved = JSON.parse(localStorage.getItem('mobTracker_filters'));
@@ -47,9 +135,9 @@ const MobTracker = () => {
     const load = async () => {
       const modules = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
       const data = Object.keys(modules).map(path => {
-        const parts    = path.split('/');
-        const dataIdx  = parts.indexOf('data');
-        const fileName = parts[parts.length - 1];
+        const parts     = path.split('/');
+        const dataIdx   = parts.indexOf('data');
+        const fileName  = parts[parts.length - 1];
         const afterData = parts.slice(dataIdx + 1, -1);
         let folder = 'root';
         let specialSuffixId = null;
@@ -77,8 +165,18 @@ const MobTracker = () => {
   }, []);
 
   useEffect(() => {
+    if (!sortOpen) return;
+    const handler = (e) => {
+      if (sortRef.current && !sortRef.current.contains(e.target)) setSortOpen(false);
+    };
+    window.addEventListener('mousedown', handler);
+    return () => window.removeEventListener('mousedown', handler);
+  }, [sortOpen]);
+
+  useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') {
+        if (sortOpen)     { setSortOpen(false);     return; }
         if (showSettings) { setShowSettings(false); return; }
         if (showStats)    { setShowStats(false);    return; }
         if (searchQuery)  { setSearchQuery('');     return; }
@@ -91,12 +189,15 @@ const MobTracker = () => {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [showSettings, showStats, searchQuery, selectedFolder]);
+  }, [showSettings, showStats, searchQuery, selectedFolder, sortOpen]);
 
-  useEffect(() => { localStorage.setItem('mobTracker_saves',       JSON.stringify(trackedMobs)); }, [trackedMobs]);
-  useEffect(() => { localStorage.setItem('mobTracker_filters',     JSON.stringify(filters));     }, [filters]);
-  useEffect(() => { localStorage.setItem('mobTracker_mode',        variantMode);                 }, [variantMode]);
-  useEffect(() => { localStorage.setItem('mobTracker_showAllFish', String(showAllFish));          }, [showAllFish]);
+  useEffect(() => { localStorage.setItem('mobTracker_saves',         JSON.stringify(trackedMobs));       }, [trackedMobs]);
+  useEffect(() => { localStorage.setItem('mobTracker_filters',       JSON.stringify(filters));           }, [filters]);
+  useEffect(() => { localStorage.setItem('mobTracker_mode',          variantMode);                      }, [variantMode]);
+  useEffect(() => { localStorage.setItem('mobTracker_showAllFish',   String(showAllFish));               }, [showAllFish]);
+  useEffect(() => { localStorage.setItem('mobTracker_sort',          sortBy);                           }, [sortBy]);
+  useEffect(() => { localStorage.setItem('mobTracker_groupByFolder', String(groupByFolder));            }, [groupByFolder]);
+  useEffect(() => { localStorage.setItem('mobTracker_openFolders',   JSON.stringify([...openFolders])); }, [openFolders]);
 
   useEffect(() => {
     if (selectedFolder === 'all') return;
@@ -139,8 +240,50 @@ const MobTracker = () => {
     return [mob.name, ...shortLabels].join(' ').toLowerCase();
   };
 
+  const sortMobs = (mobs, sortKey, tracked) => {
+    const arr = [...mobs];
+    switch (sortKey) {
+      case 'alpha-asc':  return arr.sort((a, b) => a.name.localeCompare(b.name));
+      case 'alpha-desc': return arr.sort((a, b) => b.name.localeCompare(a.name));
+      case 'untracked':
+        return arr.sort((a, b) => {
+          const d = (tracked[a.fileName] ? 1 : 0) - (tracked[b.fileName] ? 1 : 0);
+          return d !== 0 ? d : a.name.localeCompare(b.name);
+        });
+      case 'tracked':
+        return arr.sort((a, b) => {
+          const d = (tracked[b.fileName] ? 1 : 0) - (tracked[a.fileName] ? 1 : 0);
+          return d !== 0 ? d : a.name.localeCompare(b.name);
+        });
+      case 'biome': {
+        const getLabel = (mob) => {
+          const config = ComplexConfig.find(c => c.id === mob.complexId);
+          return config?.useVillagerIcons && mob.num1 != null ? (VillagerBiomes?.[mob.num1]?.label ?? '') : '';
+        };
+        return arr.sort((a, b) => {
+          const ba = getLabel(a), bb = getLabel(b);
+          if (ba !== bb) { if (!ba) return 1; if (!bb) return -1; return ba.localeCompare(bb); }
+          return a.name.localeCompare(b.name);
+        });
+      }
+      case 'job': {
+        const getLabel = (mob) => {
+          const config = ComplexConfig.find(c => c.id === mob.complexId);
+          return config?.useVillagerIcons && mob.num2 != null ? (VillagerJobs?.[mob.num2]?.label ?? '') : '';
+        };
+        return arr.sort((a, b) => {
+          const ja = getLabel(a), jb = getLabel(b);
+          if (ja !== jb) { if (!ja) return 1; if (!jb) return -1; return ja.localeCompare(jb); }
+          return a.name.localeCompare(b.name);
+        });
+      }
+      default: return arr;
+    }
+  };
+
+  // Mob filtrati + ordinati
   const displayedMobs = useMemo(() => {
-    return allMobs.filter(mob => {
+    const filtered = allMobs.filter(mob => {
       if (searchQuery) {
         const words = searchQuery.toLowerCase().trim().split(/\s+/);
         if (!words.every(w => getMobSearchString(mob).includes(w))) return false;
@@ -165,11 +308,59 @@ const MobTracker = () => {
       }
       return true;
     });
-  }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId]);
+    return sortMobs(filtered, sortBy, trackedMobs);
+  }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId, sortBy, trackedMobs]);
+
+  // Mob raggruppati per cartella — ordine cartelle stabile (root, normali, special)
+  // Il sort interno a ogni cartella rispetta sortBy
+  const groupedMobs = useMemo(() => {
+    if (!groupByFolder) return null;
+    const map = new Map();
+    // Raccogli tutti i mob filtrati (con sort già applicato) per cartella
+    displayedMobs.forEach(mob => {
+      if (!map.has(mob.folder)) map.set(mob.folder, []);
+      map.get(mob.folder).push(mob);
+    });
+    // Ordine cartelle: root prima, normali alfabetiche, special in fondo
+    return Array.from(map.entries()).sort(([a], [b]) => {
+      if (a === 'root') return -1;
+      if (b === 'root') return 1;
+      const aSpec = a.startsWith('special:');
+      const bSpec = b.startsWith('special:');
+      if (aSpec && !bSpec) return 1;
+      if (!aSpec && bSpec) return -1;
+      return a.localeCompare(b);
+    });
+  }, [displayedMobs, groupByFolder]);
+
+  // Costruisce la lista flat di elementi da renderizzare nella griglia:
+  // ogni elemento è { type: 'folder', ... } oppure { type: 'mob', ... }
+  const gridItems = useMemo(() => {
+    if (!groupByFolder || !groupedMobs) return null;
+    const items = [];
+    for (const [folderKey, mobs] of groupedMobs) {
+      items.push({ type: 'folder', folderKey, mobs });
+      if (openFolders.has(folderKey)) {
+        for (const mob of mobs) {
+          items.push({ type: 'mob', mob });
+        }
+      }
+    }
+    return items;
+  }, [groupedMobs, openFolders]);
+
+  const toggleFolder = (folderKey) => {
+    setOpenFolders(prev => {
+      const next = new Set(prev);
+      if (next.has(folderKey)) next.delete(folderKey);
+      else next.add(folderKey);
+      return next;
+    });
+  };
 
   const fishPool = useMemo(() => {
-    if (variantMode === 'none')  return [ALL_FISH.find(f => `${f.typeIndex}_${f.bodyColor}_${f.patternColor}` === '0_1_0') ?? ALL_FISH[0]];
-    if (variantMode === 'main')  return NAMED_FISH;
+    if (variantMode === 'none') return [ALL_FISH.find(f => `${f.typeIndex}_${f.bodyColor}_${f.patternColor}` === '0_1_0') ?? ALL_FISH[0]];
+    if (variantMode === 'main') return NAMED_FISH;
     return showAllFish ? ALL_FISH : NAMED_FISH;
   }, [variantMode, showAllFish]);
 
@@ -185,13 +376,14 @@ const MobTracker = () => {
     });
   }, [showFish, fishPool, searchQuery]);
 
-  const fishTrackedCount  = useMemo(() => fishPool.filter(f => trackedMobs[f.id]).length, [fishPool, trackedMobs]);
-  const mobTrackedCount   = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
-  const totalTracked      = mobTrackedCount + fishTrackedCount;
-  const totalDisplayed    = displayedMobs.length + fishPool.length;
+  const fishTrackedCount = useMemo(() => fishPool.filter(f => trackedMobs[f.id]).length, [fishPool, trackedMobs]);
+  const mobTrackedCount  = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
+  const totalTracked     = mobTrackedCount + fishTrackedCount;
+  const totalDisplayed   = displayedMobs.length + fishPool.length;
 
-  const toggleMob  = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
+  const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
   const hasFilters = specialBtns.length > 0 || normalFolderBtns.length > 0;
+  const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
@@ -206,13 +398,58 @@ const MobTracker = () => {
       )}
       {showStats && <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />}
 
-      {/* Contenuto principale */}
       <div className="flex-1 p-4 md:p-6">
         <div className="max-w-[1600px] mx-auto">
           <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
             <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-6">
               <h1 className="text-4xl md:text-5xl lg:text-6xl text-green-400 drop-shadow-md uppercase whitespace-nowrap">Mob Tracker</h1>
-              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-3/4 justify-end">
+
+              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-3/4 justify-end items-stretch">
+
+                {/* Toggle raggruppamento cartelle */}
+                <button
+                  onClick={() => setGroupByFolder(v => !v)}
+                  title={groupByFolder ? 'Disattiva raggruppamento cartelle' : 'Raggruppa per cartella'}
+                  className={`shrink-0 flex items-center justify-center gap-2 px-3 py-2 border-4 text-sm uppercase transition-colors
+                    ${groupByFolder
+                      ? 'bg-blue-800 border-blue-500 text-blue-200 hover:bg-blue-700'
+                      : 'bg-stone-900 border-stone-700 text-stone-500 hover:border-stone-500 hover:text-stone-300'
+                    }`}
+                >
+                  <span className="text-base leading-none">▤</span>
+                  <span className="hidden sm:inline text-xs">Cartelle</span>
+                </button>
+
+                {/* Sort dropdown */}
+                <div ref={sortRef} className="relative shrink-0">
+                  <button
+                    onClick={() => setSortOpen(v => !v)}
+                    className="w-full h-full bg-black border-4 border-stone-700 px-4 py-2 text-sm uppercase text-stone-300 hover:border-stone-500 hover:text-white transition-colors flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <span className="text-stone-500 text-xs uppercase">Ordina</span>
+                    <span>{currentSortLabel}</span>
+                    <span className="text-stone-500 text-xs ml-1">{sortOpen ? '▲' : '▼'}</span>
+                  </button>
+                  {sortOpen && (
+                    <div className="absolute top-full left-0 mt-1 bg-stone-900 border-4 border-stone-600 z-50 min-w-full shadow-2xl">
+                      {SORT_OPTIONS.map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                          className={`w-full text-left px-4 py-2 text-sm uppercase whitespace-nowrap transition-colors
+                            ${sortBy === opt.value
+                              ? 'bg-green-800 text-green-200'
+                              : 'text-stone-300 hover:bg-stone-700 hover:text-white'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Search */}
                 <div className="relative flex-grow max-w-2xl">
                   <input
                     ref={searchRef}
@@ -226,7 +463,8 @@ const MobTracker = () => {
                     <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white text-xl pb-1">X</button>
                   )}
                 </div>
-                <div className="flex gap-4 shrink-0">
+
+                <div className="flex gap-3 shrink-0">
                   <button onClick={() => setShowStats(true)}    className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
                   <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
                 </div>
@@ -268,11 +506,29 @@ const MobTracker = () => {
             </div>
           </header>
 
-          {/* Mob normali */}
+          {/* Griglia mob — flat o con card-cartelle inline */}
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
-            {displayedMobs.map(mob => (
-              <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
-            ))}
+            {!groupByFolder
+              ? displayedMobs.map(mob => (
+                  <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
+                ))
+              : gridItems.map((item, i) =>
+                  item.type === 'folder'
+                    ? (
+                      <FolderCard
+                        key={`folder_${item.folderKey}`}
+                        folderKey={item.folderKey}
+                        mobs={item.mobs}
+                        trackedMobs={trackedMobs}
+                        isOpen={openFolders.has(item.folderKey)}
+                        onToggle={() => toggleFolder(item.folderKey)}
+                      />
+                    )
+                    : (
+                      <MobCard key={item.mob.fileName} mob={item.mob} isTracked={trackedMobs[item.mob.fileName]} onToggle={() => toggleMob(item.mob.fileName)} />
+                    )
+                )
+            }
           </div>
 
           {/* Sezione Tropical Fish */}
