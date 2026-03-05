@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SuffixConfig, ComplexConfig } from '../config/mobConfig';
 
 const PAGES = [
@@ -22,10 +22,24 @@ const ToggleBtn = ({ label, active, onClick }) => (
   </div>
 );
 
-const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, showAllFish, setShowAllFish, resetAll, onClose }) => {
+const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilters, showAllFish, setShowAllFish, folderList = [], resetAll, onClose }) => {
   const [activePage, setActivePage] = useState('principale');
 
   const fishCount = variantMode === 'none' ? 1 : variantMode === 'main' ? 22 : showAllFish ? 3072 : 22;
+
+  const allFoldersActive = useMemo(
+    () => folderList.every(f => filters[f.id] !== false),
+    [folderList, filters]
+  );
+
+  const toggleAllFolders = () => {
+    const next = !allFoldersActive;
+    setFilters(prev => {
+      const updated = { ...prev };
+      folderList.forEach(f => { updated[f.id] = next; });
+      return updated;
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -45,7 +59,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, showAllF
           </button>
         </div>
 
-        {/* Body: sidebar + contenuto */}
+        {/* Body */}
         <div className="flex flex-1 overflow-hidden">
 
           {/* Sidebar */}
@@ -112,13 +126,45 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, showAllF
 
             {/* VARIANTI MOB */}
             {activePage === 'varianti-mob' && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Varianti Mob</h3>
-                <div className="space-y-2">
-                  {ComplexConfig.map(c => (
-                    <ToggleBtn key={c.id} label={c.label} active={filters[c.id]} onClick={() => toggleFilter(c.id)} />
-                  ))}
-                </div>
+
+                {/* Cartelle normali con toggle globale */}
+                {folderList.length > 0 && (
+                  <section className="space-y-2">
+                    {/* Header sezione con toggle globale */}
+                    <div className="flex items-center justify-between mb-2 border-b border-stone-800 pb-2">
+                      <p className="text-xs text-stone-500 uppercase">Cartelle</p>
+                      <div
+                        onClick={toggleAllFolders}
+                        className={`relative w-14 h-7 border-2 shrink-0 transition-colors duration-300 cursor-pointer hover:opacity-80 ${allFoldersActive ? 'bg-green-500 border-green-700' : 'bg-stone-900 border-stone-600 hover:border-stone-400'}`}
+                        title={allFoldersActive ? 'Disattiva tutte le cartelle' : 'Attiva tutte le cartelle'}
+                      >
+                        <div className={`absolute top-0 bottom-0 w-1/2 flex items-center justify-center transition-transform duration-300 ease-in-out ${allFoldersActive ? 'translate-x-full' : 'translate-x-0'}`}>
+                          <div className={`w-4 h-4 border-2 transition-colors duration-300 ${allFoldersActive ? 'bg-white border-green-900' : 'bg-stone-400 border-stone-600'}`} />
+                        </div>
+                      </div>
+                    </div>
+                    {folderList.map(f => (
+                      <ToggleBtn
+                        key={f.id}
+                        label={f.label}
+                        active={filters[f.id] !== false}
+                        onClick={() => toggleFilter(f.id)}
+                      />
+                    ))}
+                  </section>
+                )}
+
+                {/* Categorie complesse da mobConfig */}
+                {ComplexConfig.length > 0 && (
+                  <section className="space-y-2">
+                    <p className="text-xs text-stone-500 uppercase mb-2 border-b border-stone-800 pb-1">Categorie Complesse</p>
+                    {ComplexConfig.map(c => (
+                      <ToggleBtn key={c.id} label={c.label} active={filters[c.id]} onClick={() => toggleFilter(c.id)} />
+                    ))}
+                  </section>
+                )}
               </div>
             )}
 

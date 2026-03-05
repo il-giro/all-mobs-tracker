@@ -29,13 +29,18 @@ const SORT_OPTIONS = [
   { value: 'job',        label: '⚒ Per blocco/job' },
 ];
 
+const FISH_FOLDER = '__fish__';
+
+export const FOLDER_FILTER_PREFIX = 'folder:';
+
 const folderLabel = (folder) => {
   if (folder === 'root') return 'Generali';
+  if (folder === FISH_FOLDER) return 'Tropical Fish';
   if (folder.startsWith('special:')) return folder.replace('special:', '');
   return folder.charAt(0).toUpperCase() + folder.slice(1);
 };
 
-// Card-cartella: stessa dimensione di MobCard, bordo blu, icona primo mob
+// Card-cartella
 const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
   const trackedCount = mobs.filter(m => trackedMobs[m.fileName]).length;
   const total = mobs.length;
@@ -49,53 +54,35 @@ const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
       onClick={onToggle}
       className={`group cursor-pointer border-4 transition-all select-none
         ${isOpen
-          ? isSpecial
-            ? 'border-purple-400 bg-purple-950/80'
-            : 'border-blue-400 bg-blue-950/80'
-          : isSpecial
-            ? 'border-purple-700 bg-stone-800 hover:border-purple-400'
-            : 'border-blue-700 bg-stone-800 hover:border-blue-400'
+          ? isSpecial ? 'border-purple-400 bg-purple-950/80' : 'border-blue-400 bg-blue-950/80'
+          : isSpecial ? 'border-purple-700 bg-stone-800 hover:border-purple-400' : 'border-blue-700 bg-stone-800 hover:border-blue-400'
         }`}
     >
-      {/* Immagine primo mob come icona */}
       <div className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden">
         {firstMob && (
-          <img
-            src={firstMob.image}
-            alt={label}
-            draggable={false}
-            className="max-w-full max-h-full object-contain pixelated opacity-60 group-hover:opacity-80 transition-opacity select-none"
-          />
+          <img src={firstMob.image} alt={label} draggable={false}
+            className="max-w-full max-h-full object-contain pixelated opacity-60 group-hover:opacity-80 transition-opacity select-none" />
         )}
-        {/* Overlay scuro con icona cartella */}
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
           <span className={`text-2xl leading-none ${isSpecial ? 'text-purple-300' : 'text-blue-300'}`}>
             {isOpen ? '▼' : '▶'}
           </span>
         </div>
-        {/* Badge contatore top-right */}
         <div className={`absolute top-1 right-1 text-[9px] px-1.5 py-0.5 border-2 border-stone-900 leading-none
           ${pct === 100 ? 'bg-green-700 text-green-200' : isSpecial ? 'bg-purple-900 text-purple-200' : 'bg-blue-900 text-blue-200'}`}>
           {trackedCount}/{total}
         </div>
       </div>
-
-      {/* Label + mini progress */}
       <div className={`p-1 border-t-4 ${isOpen
         ? isSpecial ? 'bg-purple-900 border-purple-600' : 'bg-blue-900 border-blue-600'
         : isSpecial ? 'bg-purple-950 border-purple-800' : 'bg-blue-950 border-blue-800'
       }`}>
-        <p className={`text-[10px] leading-tight uppercase truncate px-1 text-center
-          ${isSpecial ? 'text-purple-200' : 'text-blue-200'}`}>
+        <p className={`text-[10px] leading-tight uppercase truncate px-1 text-center ${isSpecial ? 'text-purple-200' : 'text-blue-200'}`}>
           {label}
         </p>
-        
-        {/* Mini barra progress */}
         <div className="mt-1 h-1 bg-stone-900 mx-1">
-          <div
-            className={`h-full transition-all duration-500 ${pct === 100 ? 'bg-green-400' : isSpecial ? 'bg-purple-500' : 'bg-blue-500'}`}
-            style={{ width: `${pct}%` }}
-          />
+          <div className={`h-full transition-all duration-500 ${pct === 100 ? 'bg-green-400' : isSpecial ? 'bg-purple-500' : 'bg-blue-500'}`}
+            style={{ width: `${pct}%` }} />
         </div>
       </div>
     </div>
@@ -103,19 +90,19 @@ const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
 };
 
 const MobTracker = () => {
-  const [allMobs, setAllMobs]           = useState([]);
-  const [trackedMobs, setTrackedMobs]   = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves') || '{}'));
-  const [variantMode, setVariantMode]   = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
-  const [showAllFish, setShowAllFish]   = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
-  const [searchQuery, setSearchQuery]   = useState('');
-  const [showSettings, setShowSettings] = useState(false);
-  const [showStats, setShowStats]       = useState(false);
+  const [allMobs, setAllMobs]               = useState([]);
+  const [trackedMobs, setTrackedMobs]       = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves') || '{}'));
+  const [variantMode, setVariantMode]       = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
+  const [showAllFish, setShowAllFish]       = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
+  const [searchQuery, setSearchQuery]       = useState('');
+  const [showSettings, setShowSettings]     = useState(false);
+  const [showStats, setShowStats]           = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('all');
-  const [showFish, setShowFish]         = useState(false);
-  const [sortBy, setSortBy]             = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
-  const [sortOpen, setSortOpen]         = useState(false);
-  const [groupByFolder, setGroupByFolder] = useState(() => localStorage.getItem('mobTracker_groupByFolder') === 'true');
-  const [openFolders, setOpenFolders]   = useState(() => {
+  const [showFish, setShowFish]             = useState(false);
+  const [sortBy, setSortBy]                 = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
+  const [sortOpen, setSortOpen]             = useState(false);
+  const [groupByFolder, setGroupByFolder]   = useState(() => localStorage.getItem('mobTracker_groupByFolder') === 'true');
+  const [openFolders, setOpenFolders]       = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem('mobTracker_openFolders') || '[]')); }
     catch { return new Set(); }
   });
@@ -166,10 +153,26 @@ const MobTracker = () => {
   }, []);
 
   useEffect(() => {
+    if (allMobs.length === 0) return;
+    setFilters(prev => {
+      const next = { ...prev };
+      allMobs.forEach(m => {
+        if (m.folder !== 'root' && !m.folder.startsWith('special:')) {
+          const key = `${FOLDER_FILTER_PREFIX}${m.folder}`;
+          if (next[key] === undefined) next[key] = true;
+        }
+      });
+      return next;
+    });
+  }, [allMobs]);
+
+  useEffect(() => {
+    if (selectedFolder === FISH_FOLDER) setShowFish(true);
+  }, [selectedFolder]);
+
+  useEffect(() => {
     if (!sortOpen) return;
-    const handler = (e) => {
-      if (sortRef.current && !sortRef.current.contains(e.target)) setSortOpen(false);
-    };
+    const handler = (e) => { if (sortRef.current && !sortRef.current.contains(e.target)) setSortOpen(false); };
     window.addEventListener('mousedown', handler);
     return () => window.removeEventListener('mousedown', handler);
   }, [sortOpen]);
@@ -177,11 +180,11 @@ const MobTracker = () => {
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') {
-        if (sortOpen)     { setSortOpen(false);     return; }
-        if (showSettings) { setShowSettings(false); return; }
-        if (showStats)    { setShowStats(false);    return; }
-        if (searchQuery)  { setSearchQuery('');     return; }
-        if (selectedFolder !== 'all') { setSelectedFolder('all'); return; }
+        if (sortOpen)                        { setSortOpen(false);     return; }
+        if (showSettings)                    { setShowSettings(false); return; }
+        if (showStats)                       { setShowStats(false);    return; }
+        if (searchQuery)                     { setSearchQuery('');     return; }
+        if (selectedFolder !== 'all')        { setSelectedFolder('all'); return; }
       }
       if (e.key === ' ' && !['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) {
         e.preventDefault();
@@ -201,15 +204,25 @@ const MobTracker = () => {
   useEffect(() => { localStorage.setItem('mobTracker_openFolders',   JSON.stringify([...openFolders])); }, [openFolders]);
 
   useEffect(() => {
-    if (selectedFolder === 'all') return;
+    if (selectedFolder === 'all' || selectedFolder === FISH_FOLDER) return;
     if (selectedFolder.startsWith('special:')) {
       const mob = allMobs.find(m => m.folder === selectedFolder);
       if (mob?.specialSuffixId && !filters[mob.specialSuffixId]) setSelectedFolder('all');
     } else {
-      const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${selectedFolder}/`));
-      if (linked && !filters[linked.id]) setSelectedFolder('all');
+      if (filters[`${FOLDER_FILTER_PREFIX}${selectedFolder}`] === false) setSelectedFolder('all');
     }
   }, [filters, selectedFolder, allMobs]);
+
+  const folderList = useMemo(() => {
+    const set = new Set();
+    allMobs.forEach(m => {
+      if (m.folder !== 'root' && !m.folder.startsWith('special:')) set.add(m.folder);
+    });
+    return Array.from(set).sort().map(f => ({
+      id: `${FOLDER_FILTER_PREFIX}${f}`,
+      label: f.charAt(0).toUpperCase() + f.slice(1),
+    }));
+  }, [allMobs]);
 
   const specialBtns = useMemo(() => {
     const map = new Map();
@@ -225,11 +238,15 @@ const MobTracker = () => {
   const normalFolderBtns = useMemo(() => {
     const set = new Set();
     allMobs.forEach(m => { if (m.folder !== 'root' && !m.folder.startsWith('special:')) set.add(m.folder); });
-    return Array.from(set).sort().filter(f => {
-      const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${f}/`));
-      return linked ? filters[linked.id] : true;
-    });
+    return Array.from(set).sort().filter(f => filters[`${FOLDER_FILTER_PREFIX}${f}`] !== false);
   }, [allMobs, filters]);
+
+  // Tutti i bottoni normali + fish, ordinati alfabeticamente insieme
+  const allFolderBtns = useMemo(() => {
+    const btns = normalFolderBtns.map(f => ({ key: f, label: f.charAt(0).toUpperCase() + f.slice(1), type: 'normal' }));
+    btns.push({ key: FISH_FOLDER, label: 'Tropical Fish', type: 'fish' });
+    return btns.sort((a, b) => a.label.localeCompare(b.label));
+  }, [normalFolderBtns]);
 
   const selectedSpecialSuffixId = useMemo(() => {
     if (!selectedFolder.startsWith('special:')) return null;
@@ -282,8 +299,10 @@ const MobTracker = () => {
     }
   };
 
-  // Mob filtrati + ordinati
+  const isFishOnly = selectedFolder === FISH_FOLDER;
+
   const displayedMobs = useMemo(() => {
+    if (isFishOnly) return [];
     const filtered = allMobs.filter(mob => {
       if (searchQuery) {
         const words = searchQuery.toLowerCase().trim().split(/\s+/);
@@ -291,7 +310,10 @@ const MobTracker = () => {
       }
       if (selectedFolder !== 'all') {
         if (selectedSpecialSuffixId) {
-          if (!mob.folder === selectedFolder && !mob.activeSuffixes.includes(selectedSpecialSuffixId) && mob.specialSuffixId !== selectedSpecialSuffixId) return false;
+          // FIX: la condizione era "!mob.folder === selectedFolder" che è sempre false
+          // Ora: mostra solo i mob che appartengono alla cartella speciale selezionata
+          // oppure che hanno il suffisso speciale attivo
+          if (mob.folder !== selectedFolder && !mob.activeSuffixes.includes(selectedSpecialSuffixId) && mob.specialSuffixId !== selectedSpecialSuffixId) return false;
         } else {
           if (mob.folder !== selectedFolder) return false;
         }
@@ -310,19 +332,26 @@ const MobTracker = () => {
       return true;
     });
     return sortMobs(filtered, sortBy, trackedMobs);
-  }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId, sortBy, trackedMobs]);
+  }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId, sortBy, trackedMobs, isFishOnly]);
 
-  // Mob raggruppati per cartella — ordine cartelle stabile (root, normali, special)
-  // Il sort interno a ogni cartella rispetta sortBy
+  const disabledFolders = useMemo(() => {
+    const set = new Set();
+    Object.entries(filters).forEach(([key, val]) => {
+      if (key.startsWith(FOLDER_FILTER_PREFIX) && val === false)
+        set.add(key.slice(FOLDER_FILTER_PREFIX.length));
+    });
+    return set;
+  }, [filters]);
+
   const groupedMobs = useMemo(() => {
     if (!groupByFolder) return null;
     const map = new Map();
-    // Raccogli tutti i mob filtrati (con sort già applicato) per cartella
     displayedMobs.forEach(mob => {
-      if (!map.has(mob.folder)) map.set(mob.folder, []);
-      map.get(mob.folder).push(mob);
+      const effectiveFolder = (!mob.folder.startsWith('special:') && disabledFolders.has(mob.folder))
+        ? 'root' : mob.folder;
+      if (!map.has(effectiveFolder)) map.set(effectiveFolder, []);
+      map.get(effectiveFolder).push(mob);
     });
-    // Ordine cartelle: root prima, normali alfabetiche, special in fondo
     return Array.from(map.entries()).sort(([a], [b]) => {
       if (a === 'root') return -1;
       if (b === 'root') return 1;
@@ -332,19 +361,15 @@ const MobTracker = () => {
       if (!aSpec && bSpec) return -1;
       return a.localeCompare(b);
     });
-  }, [displayedMobs, groupByFolder]);
+  }, [displayedMobs, groupByFolder, disabledFolders]);
 
-  // Costruisce la lista flat di elementi da renderizzare nella griglia:
-  // ogni elemento è { type: 'folder', ... } oppure { type: 'mob', ... }
   const gridItems = useMemo(() => {
     if (!groupByFolder || !groupedMobs) return null;
     const items = [];
     for (const [folderKey, mobs] of groupedMobs) {
       items.push({ type: 'folder', folderKey, mobs });
       if (openFolders.has(folderKey)) {
-        for (const mob of mobs) {
-          items.push({ type: 'mob', mob });
-        }
+        for (const mob of mobs) items.push({ type: 'mob', mob });
       }
     }
     return items;
@@ -379,20 +404,22 @@ const MobTracker = () => {
 
   const fishTrackedCount = useMemo(() => fishPool.filter(f => trackedMobs[f.id]).length, [fishPool, trackedMobs]);
   const mobTrackedCount  = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
-  const totalTracked     = mobTrackedCount + fishTrackedCount;
-  const totalDisplayed   = displayedMobs.length + fishPool.length;
+
+  const totalTracked   = isFishOnly ? fishTrackedCount : selectedFolder === 'all' ? mobTrackedCount + fishTrackedCount : mobTrackedCount;
+  const totalDisplayed = isFishOnly ? fishPool.length  : selectedFolder === 'all' ? displayedMobs.length + fishPool.length : displayedMobs.length;
 
   const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
-  const hasFilters = specialBtns.length > 0 || normalFolderBtns.length > 0;
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
+  const showFishSection = selectedFolder === 'all' || isFishOnly;
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
       {showSettings && (
         <Settings
           variantMode={variantMode} setVariantMode={setVariantMode}
-          filters={filters} toggleFilter={(id) => setFilters(p => ({ ...p, [id]: !p[id] }))}
+          filters={filters} toggleFilter={(id) => setFilters(p => ({ ...p, [id]: !p[id] }))} setFilters={setFilters}
           showAllFish={showAllFish} setShowAllFish={setShowAllFish}
+          folderList={folderList}
           resetAll={() => confirm('Sei sicuro di voler resettare tutti i progressi?') && setTrackedMobs({})}
           onClose={() => setShowSettings(false)}
         />
@@ -406,8 +433,6 @@ const MobTracker = () => {
               <h1 className="text-4xl md:text-5xl lg:text-6xl text-green-400 drop-shadow-md uppercase whitespace-nowrap">Mob Tracker</h1>
 
               <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-3/4 justify-end items-stretch">
-
-                {/* Toggle raggruppamento cartelle */}
                 <button
                   onClick={() => setGroupByFolder(v => !v)}
                   title={groupByFolder ? 'Disattiva raggruppamento cartelle' : 'Raggruppa per cartella'}
@@ -421,7 +446,6 @@ const MobTracker = () => {
                   <span className="hidden sm:inline text-xs">Cartelle</span>
                 </button>
 
-                {/* Sort dropdown */}
                 <div ref={sortRef} className="relative shrink-0">
                   <button
                     onClick={() => setSortOpen(v => !v)}
@@ -434,23 +458,16 @@ const MobTracker = () => {
                   {sortOpen && (
                     <div className="absolute top-full left-0 mt-1 bg-stone-900 border-4 border-stone-600 z-50 min-w-full shadow-2xl">
                       {SORT_OPTIONS.map(opt => (
-                        <button
-                          key={opt.value}
+                        <button key={opt.value}
                           onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
                           className={`w-full text-left px-4 py-2 text-sm uppercase whitespace-nowrap transition-colors
-                            ${sortBy === opt.value
-                              ? 'bg-green-800 text-green-200'
-                              : 'text-stone-300 hover:bg-stone-700 hover:text-white'
-                            }`}
-                        >
-                          {opt.label}
-                        </button>
+                            ${sortBy === opt.value ? 'bg-green-800 text-green-200' : 'text-stone-300 hover:bg-stone-700 hover:text-white'}`}
+                        >{opt.label}</button>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* Search */}
                 <div className="relative flex-grow max-w-2xl">
                   <input
                     ref={searchRef}
@@ -472,29 +489,46 @@ const MobTracker = () => {
               </div>
             </div>
 
-            {hasFilters && (
-              <div className="mb-4 flex flex-wrap gap-2 items-center">
-                <button onClick={() => setSelectedFolder('all')}
-                  className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-                >Tutti</button>
-                {specialBtns.length > 0 && (
-                  <><span className="text-stone-600 select-none">|</span>
-                  {specialBtns.map(b => (
-                    <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
-                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
-                    >✦ {b.label}</button>
-                  ))}</>
+            {/* Barra filtri */}
+            <div className="mb-4 flex flex-wrap gap-2 items-center">
+              {/* Tutti */}
+              <button onClick={() => setSelectedFolder('all')}
+                className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0
+                  ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+              >Tutti</button>
+
+              {/* Cartelle speciali (baby, jockey ecc.) */}
+              {specialBtns.length > 0 && (
+                <><span className="text-stone-600 select-none">|</span>
+                {specialBtns.map(b => (
+                  <button key={b.folderKey} onClick={() => setSelectedFolder(b.folderKey)}
+                    className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0
+                      ${selectedFolder === b.folderKey ? 'bg-purple-600 border-purple-900 text-white' : 'bg-purple-900 border-purple-950 text-purple-300 hover:bg-purple-800'}`}
+                  >✦ {b.label}</button>
+                ))}</>
+              )}
+
+              {/* Cartelle normali + fish in ordine alfabetico */}
+              {allFolderBtns.length > 0 && (
+                <><span className="text-stone-600 select-none">|</span>
+                {allFolderBtns.map(btn =>
+                  btn.type === 'fish'
+                    ? (
+                      <button key={btn.key} onClick={() => setSelectedFolder(FISH_FOLDER)}
+                        className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0
+                          ${selectedFolder === FISH_FOLDER ? 'bg-cyan-700 border-cyan-900 text-white' : 'bg-cyan-900 border-cyan-950 text-cyan-300 hover:bg-cyan-800'}`}
+                      >🐠 {btn.label}</button>
+                    )
+                    : (
+                      <button key={btn.key} onClick={() => setSelectedFolder(btn.key)}
+                        className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0
+                          ${selectedFolder === btn.key ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                      >{btn.label}</button>
+                    )
                 )}
-                {normalFolderBtns.length > 0 && (
-                  <><span className="text-stone-600 select-none">|</span>
-                  {normalFolderBtns.map(f => (
-                    <button key={f} onClick={() => setSelectedFolder(f)}
-                      className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0 ${selectedFolder === f ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
-                    >{f}</button>
-                  ))}</>
-                )}
-              </div>
-            )}
+                </>
+              )}
+            </div>
 
             <div className="bg-black/50 p-4 border-4 border-stone-700">
               <div className="flex justify-between mb-2 text-xl uppercase">
@@ -507,64 +541,51 @@ const MobTracker = () => {
             </div>
           </header>
 
-          {/* Griglia mob — flat o con card-cartelle inline */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
-            {!groupByFolder
-              ? displayedMobs.map(mob => (
-                  <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
-                ))
-              : gridItems.map((item, i) =>
-                  item.type === 'folder'
-                    ? (
-                      <FolderCard
-                        key={`folder_${item.folderKey}`}
-                        folderKey={item.folderKey}
-                        mobs={item.mobs}
-                        trackedMobs={trackedMobs}
-                        isOpen={openFolders.has(item.folderKey)}
-                        onToggle={() => toggleFolder(item.folderKey)}
-                      />
-                    )
-                    : (
-                      <MobCard key={item.mob.fileName} mob={item.mob} isTracked={trackedMobs[item.mob.fileName]} onToggle={() => toggleMob(item.mob.fileName)} />
-                    )
-                )
-            }
-          </div>
+          {/* Griglia mob */}
+          {!isFishOnly && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
+              {!groupByFolder
+                ? displayedMobs.map(mob => (
+                    <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
+                  ))
+                : gridItems.map((item, i) =>
+                    item.type === 'folder'
+                      ? <FolderCard key={`folder_${item.folderKey}`} folderKey={item.folderKey} mobs={item.mobs}
+                          trackedMobs={trackedMobs} isOpen={openFolders.has(item.folderKey)} onToggle={() => toggleFolder(item.folderKey)} />
+                      : <MobCard key={item.mob.fileName} mob={item.mob} isTracked={trackedMobs[item.mob.fileName]} onToggle={() => toggleMob(item.mob.fileName)} />
+                  )
+              }
+            </div>
+          )}
 
           {/* Sezione Tropical Fish */}
-          <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg mb-6">
-            <button
-              onClick={() => setShowFish(v => !v)}
-              className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl text-cyan-400 uppercase">🐠 Tropical Fish</span>
-                <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
-                  {fishTrackedCount} / {fishPool.length}
-                </span>
-                <span className="text-stone-500 text-sm uppercase">
-                  {variantMode === 'none' ? '(1 base)' : variantMode === 'main' ? '(22 named)' : showAllFish ? '(3072 tutte)' : '(22 named)'}
-                </span>
-              </div>
-              <span className="text-stone-400 text-xl">{showFish ? '▲' : '▼'}</span>
-            </button>
-
-            {showFish && (
-              <div className="p-4 border-t-4 border-cyan-900">
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
-                  {displayedFish.map(fish => (
-                    <TropicalFishCard
-                      key={fish.id}
-                      fish={fish}
-                      isTracked={trackedMobs[fish.id]}
-                      onToggle={() => toggleMob(fish.id)}
-                    />
-                  ))}
+          {showFishSection && (
+            <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg mb-6">
+              <button onClick={() => setShowFish(v => !v)}
+                className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl text-cyan-400 uppercase">🐠 Tropical Fish</span>
+                  <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
+                    {fishTrackedCount} / {fishPool.length}
+                  </span>
+                  <span className="text-stone-500 text-sm uppercase">
+                    {variantMode === 'none' ? '(1 base)' : variantMode === 'main' ? '(22 named)' : showAllFish ? '(3072 tutte)' : '(22 named)'}
+                  </span>
                 </div>
-              </div>
-            )}
-          </div>
+                <span className="text-stone-400 text-xl">{showFish ? '▲' : '▼'}</span>
+              </button>
+              {showFish && (
+                <div className="p-4 border-t-4 border-cyan-900">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
+                    {displayedFish.map(fish => (
+                      <TropicalFishCard key={fish.id} fish={fish} isTracked={trackedMobs[fish.id]} onToggle={() => toggleMob(fish.id)} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
       </div>

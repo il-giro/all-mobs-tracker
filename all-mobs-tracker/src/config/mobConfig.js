@@ -58,7 +58,7 @@ export const ComplexConfig = [
   {
     id: 'zombie villager',
     label: 'Varianti Zombie Villager',
-    pathIncludes: '/zombievillagers/',
+    pathIncludes: '/zombievillager/',
     regex: /^(\d+)\.(\d+)$/,
     type: 'complex_variant',
     badgeColor: 'bg-green-600',
@@ -77,7 +77,7 @@ export const ComplexConfig = [
   {
     id: 'villager',
     label: 'Varianti Villager',
-    pathIncludes: '/villagers/',
+    pathIncludes: '/villager/',
     regex: /^(\d+)\.(\d+)$/,
     type: 'complex_variant',
     badgeColor: 'bg-amber-600',
@@ -95,7 +95,7 @@ export const ComplexConfig = [
   {
     id: 'horse',
     label: 'Varianti Cavalli',
-    pathIncludes: '/horses/',
+    pathIncludes: '/horse/',
     regex: /^(\d+)\.(\d+)\.(\d+)$/,
     type: 'color_variant',
     badgeColor: 'bg-blue-600',
@@ -113,7 +113,7 @@ export const ComplexConfig = [
   {
     id: 'enderman',
     label: 'Varianti Enderman',
-    pathIncludes: '/endermans/',
+    pathIncludes: '/enderman/',
     regex: /^(\d+)(.+)$/,
     type: 'complex_variant',
     badgeColor: 'bg-purple-600',
@@ -129,7 +129,7 @@ export const ComplexConfig = [
   {
     id: 'llama',
     label: 'Varianti Llama',
-    pathIncludes: '/llamas/',
+    pathIncludes: '/llama/',
     regex: /^(\d+)\.(\d+)\.(\d+)/,
     type: 'color_variant',
     badgeColor: 'bg-yellow-600',
