@@ -158,8 +158,10 @@ const MobTracker = () => {
       const next = { ...prev };
       allMobs.forEach(m => {
         if (m.folder !== 'root' && !m.folder.startsWith('special:')) {
-          const key = `${FOLDER_FILTER_PREFIX}${m.folder}`;
-          if (next[key] === undefined) next[key] = true;
+          const folderKey   = `${FOLDER_FILTER_PREFIX}${m.folder}`;
+          const variantsKey = `variants:${m.folder}`;
+          if (next[folderKey]   === undefined) next[folderKey]   = true;
+          if (next[variantsKey] === undefined) next[variantsKey] = true;
         }
       });
       return next;
@@ -221,8 +223,9 @@ const MobTracker = () => {
     return Array.from(set).sort().map(f => {
       const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${f}/`));
       return {
-        id: `${FOLDER_FILTER_PREFIX}${f}`,
-        label: f.charAt(0).toUpperCase() + f.slice(1),
+        id:             `${FOLDER_FILTER_PREFIX}${f}`,
+        variantsId:     `variants:${f}`,
+        label:          f.charAt(0).toUpperCase() + f.slice(1),
         linkedComplexId: linked?.id ?? null,
       };
     });
@@ -321,13 +324,18 @@ const MobTracker = () => {
       }
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
       for (const suffix of mob.activeSuffixes) { if (!filters[suffix]) return false; }
-      // Cartella disattivata → mostra solo il mob completamente base (tutti i numeri = 1)
-      const folderDisabled = mob.folder !== 'root' && !mob.folder.startsWith('special:')
-        && filters[`${FOLDER_FILTER_PREFIX}${mob.folder}`] === false;
-      if (folderDisabled) {
-        if ((mob.num1 && mob.num1 > 1) || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
+
+      if (mob.folder !== 'root' && !mob.folder.startsWith('special:')) {
+        const variantsActive = filters[`variants:${mob.folder}`] !== false;
+
+        // Toggle varianti off → mostra solo la variante base, ignora variantMode
+        if (!variantsActive) {
+          if ((mob.num1 && mob.num1 > 1) || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
+          return mob.activeSuffixes.length === 0;
+        }
       }
-      if (!folderDisabled && mob.complexId && !filters[mob.complexId]) {
+
+      if (mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }

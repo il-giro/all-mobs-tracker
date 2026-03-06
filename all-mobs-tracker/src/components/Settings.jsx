@@ -60,21 +60,36 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
   const unlinkedComplex  = useMemo(() => ComplexConfig.filter(c => !linkedComplexIds.has(c.id)), [linkedComplexIds]);
 
   const allFoldersActive = useMemo(() =>
-    folderList.every(f =>
-      filters[f.id] !== false && (f.linkedComplexId ? !!filters[f.linkedComplexId] : true)
-    ) && unlinkedComplex.every(c => !!filters[c.id]),
+    folderList.every(f => filters[f.id] !== false) && unlinkedComplex.every(c => !!filters[c.id]),
     [folderList, unlinkedComplex, filters]
+  );
+
+  const allVariantsActive = useMemo(() =>
+    folderList.every(f =>
+      filters[f.variantsId] !== false &&
+      (f.linkedComplexId ? !!filters[f.linkedComplexId] : true)
+    ),
+    [folderList, filters]
   );
 
   const toggleAllFolders = () => {
     const next = !allFoldersActive;
     setFilters(prev => {
       const updated = { ...prev };
+      folderList.forEach(f => { updated[f.id] = next; });
+      unlinkedComplex.forEach(c => { updated[c.id] = next; });
+      return updated;
+    });
+  };
+
+  const toggleAllVariants = () => {
+    const next = !allVariantsActive;
+    setFilters(prev => {
+      const updated = { ...prev };
       folderList.forEach(f => {
-        updated[f.id] = next;
+        updated[f.variantsId] = next;
         if (f.linkedComplexId) updated[f.linkedComplexId] = next;
       });
-      unlinkedComplex.forEach(c => { updated[c.id] = next; });
       return updated;
     });
   };
@@ -179,46 +194,81 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
 
             {/* VARIANTI MOB */}
             {activePage === 'varianti-mob' && (() => {
-              // Cartelle con linkedComplexId assorbono il ComplexConfig corrispondente (niente duplicati)
               const linkedComplexIds = new Set(folderList.map(f => f.linkedComplexId).filter(Boolean));
               const merged = [
                 ...folderList.map(f => ({
-                  key: f.id,
-                  label: f.label,
-                  active: filters[f.id] !== false && (f.linkedComplexId ? !!filters[f.linkedComplexId] : true),
-                  onToggle: () => {
-                    const next = !(filters[f.id] !== false);
-                    setFilters(prev => {
-                      const u = { ...prev, [f.id]: next };
-                      if (f.linkedComplexId) u[f.linkedComplexId] = next;
-                      return u;
-                    });
-                  },
+                  key:          f.id,
+                  variantsKey:  f.variantsId,
+                  label:        f.label,
+                  visibile:     filters[f.id] !== false,
+                  varianti:     filters[f.variantsId] !== false,
+                  linkedComplexId: f.linkedComplexId,
                 })),
-                // Solo i ComplexConfig che NON hanno una cartella corrispondente
                 ...ComplexConfig
                   .filter(c => !linkedComplexIds.has(c.id))
                   .map(c => ({
-                    key: c.id,
-                    label: c.label,
-                    active: !!filters[c.id],
-                    onToggle: () => toggleFilter(c.id),
+                    key:         c.id,
+                    variantsKey: null,
+                    label:       c.label,
+                    visibile:    !!filters[c.id],
+                    varianti:    null, // nessun toggle varianti per ComplexConfig standalone
+                    linkedComplexId: null,
                   })),
               ].sort((a, b) => a.label.localeCompare(b.label));
+
+              const toggleVarianti = (item) => {
+                const next = !item.varianti;
+                setFilters(prev => {
+                  const u = { ...prev, [item.variantsKey]: next };
+                  if (item.linkedComplexId) u[item.linkedComplexId] = next;
+                  return u;
+                });
+              };
+
+              const toggleVisibile = (item) => {
+                setFilters(prev => ({ ...prev, [item.key]: !item.visibile }));
+              };
+
               return (
                 <div className="space-y-4">
                   <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Varianti Mob</h3>
                   <p className="text-stone-500 text-xs uppercase leading-relaxed border-2 border-stone-800 p-3">
-                    Toggle off → mostra solo la variante base, ignorando le impostazioni varianti generali.
-                    {variantMode === 'none' && <span className="block mt-1 text-amber-600">Varianti generali disattivate: questi toggle non hanno effetto.</span>}
+                    Varianti off → mostra solo il mob base. Disattiva anche la cartella.
+                    Cartella off → nasconde il pulsante cartella nella home, ma le varianti restano visibili.
+                    {variantMode === 'none' && <span className="block mt-1 text-amber-600">Varianti generali disattivate: il toggle varianti non ha effetto.</span>}
                   </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
-                      <p className="text-xs text-stone-500 uppercase">Tutti</p>
-                      <Toggle active={allFoldersActive} onClick={toggleAllFolders} />
+                  {/* Header colonne */}
+                  <div className="flex items-center border-b border-stone-800 pb-2 pr-1">
+                    <div className="flex-1" />
+                    <div className="flex gap-2 shrink-0">
+                      <span className="w-14 text-center text-[10px] text-stone-600 uppercase">Cartella</span>
+                      <span className="w-14 text-center text-[10px] text-stone-600 uppercase">Varianti</span>
                     </div>
+                  </div>
+                  {/* Toggle globali */}
+                  <div className="flex items-center border-b border-stone-800 pb-2">
+                    <p className="text-xs text-stone-500 uppercase flex-1">Tutti</p>
+                    <div className="flex gap-2 shrink-0">
+                      <Toggle active={allFoldersActive} onClick={toggleAllFolders} />
+                      <Toggle active={allVariantsActive} onClick={toggleAllVariants} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
                     {merged.map(item => (
-                      <ToggleBtn key={item.key} label={item.label} showIcon active={item.active} onClick={item.onToggle} />
+                      <div key={item.key} className="flex items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none gap-2">
+                        <FolderIcon label={item.label} />
+                        <span className="text-sm text-stone-300 uppercase truncate flex-1 pr-2">{item.label}</span>
+                        <div className="flex gap-2 shrink-0">
+                          <Toggle
+                            active={item.visibile}
+                            onClick={() => toggleVisibile(item)}
+                          />
+                          {item.variantsKey !== null
+                            ? <Toggle active={item.varianti} onClick={() => toggleVarianti(item)} />
+                            : <div className="w-14 h-7" />
+                          }
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>

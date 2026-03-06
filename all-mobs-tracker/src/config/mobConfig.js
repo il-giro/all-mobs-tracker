@@ -58,7 +58,7 @@ export const ComplexConfig = [
   {
     id: 'zombie villager',
     label: 'Varianti Zombie Villager',
-    pathIncludes: '/zombievillager/',
+    pathIncludes: '/zombie villager/',
     regex: /^(\d+)\.(\d+)$/,
     type: 'complex_variant',
     badgeColor: 'bg-green-600',
@@ -146,7 +146,7 @@ export const ComplexConfig = [
   {
     id: 'sheep',
     label: 'Varianti Sheep',
-    pathIncludes: '/sheeps/',
+    pathIncludes: '/sheep/',
     regex: /^(\d+)\.(\d+)\.(\d+)/,
     type: 'color_variant',
     badgeColor: 'bg-gray-600',
