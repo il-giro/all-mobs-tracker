@@ -10,7 +10,7 @@ if (typeof window !== 'undefined') {
 
 const TOOLTIP_EVENT = 'mobcard:tooltip';
 const TOOLTIP_W = 220;
-const TOOLTIP_H = 380;
+const TOOLTIP_H = 420;
 
 const getVillagerIcons = (mob) => {
   if (!mob.complexId) return null;
@@ -26,7 +26,7 @@ const calcPos = (rect) => {
     ? rect.right + 8
     : rect.left - TOOLTIP_W - 8;
   let y = rect.top + window.scrollY;
-  const yFixed = rect.top; // per il clamping usiamo le coord viewport
+  const yFixed = rect.top;
   if (yFixed + TOOLTIP_H > window.innerHeight - 8) y = window.scrollY + window.innerHeight - TOOLTIP_H - 8;
   if (yFixed < 8) y = window.scrollY + 8;
   x = x + window.scrollX;
@@ -52,7 +52,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
       })()
     : '';
 
-  // Chiudi quando un'altra card apre il tooltip
   useEffect(() => {
     const handler = (e) => {
       if (e.detail.id !== instanceId.current) { setTooltipPos(null); isOpen.current = false; }
@@ -61,9 +60,6 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
     return () => window.removeEventListener(TOOLTIP_EVENT, handler);
   }, []);
 
-
-
-  // Chiudi con click sinistro fuori o tasto destro ovunque
   useEffect(() => {
     if (!tooltipPos) return;
     const onMouseDown = (e) => {
@@ -173,82 +169,93 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
         </p>
       </div>
 
-      {/* Tooltip via portale — fuori da ogni stacking context */}
+      {/* Tooltip via portale */}
       {tooltipPos && createPortal(
-          <div
-            onClick={e => e.stopPropagation()}
-            onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setTooltipPos(null); isOpen.current = false; }}
-            style={{
-              position: 'absolute',
-              top: tooltipPos.y,
-              left: tooltipPos.x,
-              width: TOOLTIP_W,
-              zIndex: 99999,
-            }}
-            className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3"
-          >
-            <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
-              {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
-            </p>
+        <div
+          onClick={e => e.stopPropagation()}
+          onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setTooltipPos(null); isOpen.current = false; }}
+          style={{
+            position: 'absolute',
+            top: tooltipPos.y,
+            left: tooltipPos.x,
+            width: TOOLTIP_W,
+            zIndex: 99999,
+          }}
+          className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3"
+        >
+          {/* Preview immagine */}
+          <div className="flex justify-center mb-3 bg-[#181818] border-2 border-stone-700 overflow-hidden" style={{ height: '120px' }}>
+            <img
+              src={mob.image}
+              alt={mob.name}
+              draggable={false}
+              className="object-contain pixelated"
+              style={{ width: '100%', height: '100%', imageRendering: 'pixelated' }}
+            />
+          </div>
 
-            {villagerIcons && (
-              <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
-                {villagerIcons.biome && (
-                  <div className="flex items-center gap-2">
-                    {villagerIcons.biome.icon
-                      ? <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} className="w-5 h-5 object-contain pixelated shrink-0" />
-                      : <div className="w-5 h-5 shrink-0" />
-                    }
-                    <span className="text-stone-300 text-xs uppercase">{villagerIcons.biome.label}</span>
-                    <span className="text-stone-600 text-[9px] uppercase ml-auto">bioma</span>
-                  </div>
-                )}
-                {villagerIcons.job && (
-                  <div className="flex items-center gap-2">
-                    {villagerIcons.job.icon
-                      ? <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} className="w-5 h-5 object-contain pixelated shrink-0" />
-                      : <div className="w-5 h-5 shrink-0" />
-                    }
-                    <span className="text-stone-300 text-xs uppercase">{villagerIcons.job.label}</span>
-                    <span className="text-stone-600 text-[9px] uppercase ml-auto">job</span>
-                  </div>
-                )}
-              </div>
-            )}
+          <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
+            {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
+          </p>
 
-            {hasAnyBadge ? (
-              <div className="flex flex-col gap-2">
-                {mob.complexBadge && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-stone-400 text-xs uppercase w-12 shrink-0">Cat.</span>
-                    <div className={`${mob.complexBadge.color} text-white text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
-                      {mob.complexBadge.label}
-                    </div>
+          {villagerIcons && (
+            <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
+              {villagerIcons.biome && (
+                <div className="flex items-center gap-2">
+                  {villagerIcons.biome.icon
+                    ? <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} className="w-5 h-5 object-contain pixelated shrink-0" />
+                    : <div className="w-5 h-5 shrink-0" />
+                  }
+                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.biome.label}</span>
+                  <span className="text-stone-600 text-[9px] uppercase ml-auto">bioma</span>
+                </div>
+              )}
+              {villagerIcons.job && (
+                <div className="flex items-center gap-2">
+                  {villagerIcons.job.icon
+                    ? <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} className="w-5 h-5 object-contain pixelated shrink-0" />
+                    : <div className="w-5 h-5 shrink-0" />
+                  }
+                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.job.label}</span>
+                  <span className="text-stone-600 text-[9px] uppercase ml-auto">job</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {hasAnyBadge ? (
+            <div className="flex flex-col gap-2">
+              {mob.complexBadge && (
+                <div className="flex items-center gap-2">
+                  <span className="text-stone-400 text-xs uppercase w-12 shrink-0">Cat.</span>
+                  <div className={`${mob.complexBadge.color} text-white text-xs px-2 py-1 border-2 border-stone-900 leading-none`}>
+                    {mob.complexBadge.label}
                   </div>
-                )}
-                {allBadges.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-stone-400 text-xs uppercase mb-0.5">Categories</span>
-                    {allBadges.map((b, i) => (
-                      <div key={b.id} className="flex items-center gap-2">
-                        <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
-                          {i === 0 ? '★' : '·'}
-                        </span>
-                        <div className={`${b.color} text-white text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
-                          {b.label}
-                        </div>
-                        {i === 0 && <span className="text-yellow-500 text-[9px] uppercase">top</span>}
+                </div>
+              )}
+              {allBadges.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-stone-400 text-xs uppercase mb-0.5">Categories</span>
+                  {allBadges.map((b, i) => (
+                    <div key={b.id} className="flex items-center gap-2">
+                      <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
+                        {i === 0 ? '★' : '·'}
+                      </span>
+                      <div className={`${b.color} text-white text-xs px-2 py-1 border-2 border-stone-900 leading-none flex-grow`}>
+                        {b.label}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
-            )}
-          </div>,
-          document.body
-        )}
+                      {i === 0 && <span className="text-yellow-500 text-[9px] uppercase">top</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
+          )}
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

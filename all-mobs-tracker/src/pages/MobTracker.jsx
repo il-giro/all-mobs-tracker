@@ -218,10 +218,14 @@ const MobTracker = () => {
     allMobs.forEach(m => {
       if (m.folder !== 'root' && !m.folder.startsWith('special:')) set.add(m.folder);
     });
-    return Array.from(set).sort().map(f => ({
-      id: `${FOLDER_FILTER_PREFIX}${f}`,
-      label: f.charAt(0).toUpperCase() + f.slice(1),
-    }));
+    return Array.from(set).sort().map(f => {
+      const linked = ComplexConfig.find(c => c.pathIncludes?.includes(`/${f}/`));
+      return {
+        id: `${FOLDER_FILTER_PREFIX}${f}`,
+        label: f.charAt(0).toUpperCase() + f.slice(1),
+        linkedComplexId: linked?.id ?? null,
+      };
+    });
   }, [allMobs]);
 
   const specialBtns = useMemo(() => {
@@ -310,9 +314,6 @@ const MobTracker = () => {
       }
       if (selectedFolder !== 'all') {
         if (selectedSpecialSuffixId) {
-          // FIX: la condizione era "!mob.folder === selectedFolder" che è sempre false
-          // Ora: mostra solo i mob che appartengono alla cartella speciale selezionata
-          // oppure che hanno il suffisso speciale attivo
           if (mob.folder !== selectedFolder && !mob.activeSuffixes.includes(selectedSpecialSuffixId) && mob.specialSuffixId !== selectedSpecialSuffixId) return false;
         } else {
           if (mob.folder !== selectedFolder) return false;
@@ -320,7 +321,13 @@ const MobTracker = () => {
       }
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
       for (const suffix of mob.activeSuffixes) { if (!filters[suffix]) return false; }
-      if (mob.complexId && !filters[mob.complexId]) {
+      // Cartella disattivata → mostra solo il mob completamente base (tutti i numeri = 1)
+      const folderDisabled = mob.folder !== 'root' && !mob.folder.startsWith('special:')
+        && filters[`${FOLDER_FILTER_PREFIX}${mob.folder}`] === false;
+      if (folderDisabled) {
+        if ((mob.num1 && mob.num1 > 1) || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
+      }
+      if (!folderDisabled && mob.complexId && !filters[mob.complexId]) {
         const config = ComplexConfig.find(c => c.id === mob.complexId);
         if (!config.isBaseCondition(mob.num1, mob.num2, mob.num3) || mob.activeSuffixes.length > 0) return false;
       }
@@ -334,23 +341,12 @@ const MobTracker = () => {
     return sortMobs(filtered, sortBy, trackedMobs);
   }, [allMobs, filters, variantMode, searchQuery, selectedFolder, selectedSpecialSuffixId, sortBy, trackedMobs, isFishOnly]);
 
-  const disabledFolders = useMemo(() => {
-    const set = new Set();
-    Object.entries(filters).forEach(([key, val]) => {
-      if (key.startsWith(FOLDER_FILTER_PREFIX) && val === false)
-        set.add(key.slice(FOLDER_FILTER_PREFIX.length));
-    });
-    return set;
-  }, [filters]);
-
   const groupedMobs = useMemo(() => {
     if (!groupByFolder) return null;
     const map = new Map();
     displayedMobs.forEach(mob => {
-      const effectiveFolder = (!mob.folder.startsWith('special:') && disabledFolders.has(mob.folder))
-        ? 'root' : mob.folder;
-      if (!map.has(effectiveFolder)) map.set(effectiveFolder, []);
-      map.get(effectiveFolder).push(mob);
+      if (!map.has(mob.folder)) map.set(mob.folder, []);
+      map.get(mob.folder).push(mob);
     });
     return Array.from(map.entries()).sort(([a], [b]) => {
       if (a === 'root') return -1;
@@ -361,7 +357,7 @@ const MobTracker = () => {
       if (!aSpec && bSpec) return -1;
       return a.localeCompare(b);
     });
-  }, [displayedMobs, groupByFolder, disabledFolders]);
+  }, [displayedMobs, groupByFolder]);
 
   const gridItems = useMemo(() => {
     if (!groupByFolder || !groupedMobs) return null;
@@ -516,8 +512,8 @@ const MobTracker = () => {
                     ? (
                       <button key={btn.key} onClick={() => setSelectedFolder(FISH_FOLDER)}
                         className={`px-3 py-1 text-sm uppercase border-b-4 transition-all active:translate-y-1 active:border-b-0
-                          ${selectedFolder === FISH_FOLDER ? 'bg-cyan-700 border-cyan-900 text-white' : 'bg-cyan-900 border-cyan-950 text-cyan-300 hover:bg-cyan-800'}`}
-                      >🐠 {btn.label}</button>
+                          ${selectedFolder === FISH_FOLDER ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
+                      >{btn.label}</button>
                     )
                     : (
                       <button key={btn.key} onClick={() => setSelectedFolder(btn.key)}

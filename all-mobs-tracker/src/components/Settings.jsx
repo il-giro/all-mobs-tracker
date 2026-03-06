@@ -8,17 +8,46 @@ const PAGES = [
   { id: 'extra',             label: 'Extra',             icon: '◈' },
 ];
 
-const ToggleBtn = ({ label, active, onClick }) => (
-  <div className="flex justify-between items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none">
-    <span className="text-sm text-stone-300 uppercase truncate pr-2">{label}</span>
-    <div
-      onClick={onClick}
-      className={`relative w-14 h-7 border-2 shrink-0 transition-colors duration-300 cursor-pointer hover:opacity-80 ${active ? 'bg-green-500 border-green-700' : 'bg-stone-900 border-stone-600 hover:border-stone-400'}`}
-    >
-      <div className={`absolute top-0 bottom-0 w-1/2 flex items-center justify-center transition-transform duration-300 ease-in-out ${active ? 'translate-x-full' : 'translate-x-0'}`}>
-        <div className={`w-4 h-4 border-2 transition-colors duration-300 ${active ? 'bg-white border-green-900' : 'bg-stone-400 border-stone-600'}`} />
-      </div>
+// Converte il nome cartella in PascalCase per il path icona
+// es. "zombie villagers" → "ZombieVillagers", "wolves" → "Wolves"
+const toIconName = (label) =>
+  label.replace(/(?:^|\s)\w/g, c => c.trim().toUpperCase());
+
+const FolderIcon = ({ label }) => {
+  const [visible, setVisible] = React.useState(true);
+  const name = toIconName(label);
+  if (!visible) return <span className="w-5 h-5 shrink-0" />;
+  return (
+    <img
+      src={`/icons/mobs/${name}Face.png`}
+      alt={label}
+      onError={() => setVisible(false)}
+      className="w-5 h-5 object-contain pixelated shrink-0"
+      draggable={false}
+    />
+  );
+};
+
+// Toggle solo sul quadratino
+const Toggle = ({ active, onClick }) => (
+  <div
+    onClick={onClick}
+    className={`relative w-14 h-7 border-2 shrink-0 transition-colors duration-300 cursor-pointer hover:opacity-80
+      ${active ? 'bg-green-500 border-green-700' : 'bg-stone-900 border-stone-600 hover:border-stone-400'}`}
+  >
+    <div className={`absolute top-0 bottom-0 w-1/2 flex items-center justify-center transition-transform duration-300 ease-in-out ${active ? 'translate-x-full' : 'translate-x-0'}`}>
+      <div className={`w-4 h-4 border-2 transition-colors duration-300 ${active ? 'bg-white border-green-900' : 'bg-stone-400 border-stone-600'}`} />
     </div>
+  </div>
+);
+
+const ToggleBtn = ({ label, showIcon, active, onClick }) => (
+  <div className="flex justify-between items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none">
+    <div className="flex items-center gap-2 truncate pr-2">
+      {showIcon && <FolderIcon label={label} />}
+      <span className="text-sm text-stone-300 uppercase truncate">{label}</span>
+    </div>
+    <Toggle active={active} onClick={onClick} />
   </div>
 );
 
@@ -27,16 +56,41 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
 
   const fishCount = variantMode === 'none' ? 1 : variantMode === 'main' ? 22 : showAllFish ? 3072 : 22;
 
-  const allFoldersActive = useMemo(
-    () => folderList.every(f => filters[f.id] !== false),
-    [folderList, filters]
+  const linkedComplexIds = useMemo(() => new Set(folderList.map(f => f.linkedComplexId).filter(Boolean)), [folderList]);
+  const unlinkedComplex  = useMemo(() => ComplexConfig.filter(c => !linkedComplexIds.has(c.id)), [linkedComplexIds]);
+
+  const allFoldersActive = useMemo(() =>
+    folderList.every(f =>
+      filters[f.id] !== false && (f.linkedComplexId ? !!filters[f.linkedComplexId] : true)
+    ) && unlinkedComplex.every(c => !!filters[c.id]),
+    [folderList, unlinkedComplex, filters]
   );
 
   const toggleAllFolders = () => {
     const next = !allFoldersActive;
     setFilters(prev => {
       const updated = { ...prev };
-      folderList.forEach(f => { updated[f.id] = next; });
+      folderList.forEach(f => {
+        updated[f.id] = next;
+        if (f.linkedComplexId) updated[f.linkedComplexId] = next;
+      });
+      unlinkedComplex.forEach(c => { updated[c.id] = next; });
+      return updated;
+    });
+  };
+
+  const suffixList = Object.values(SuffixConfig);
+
+  const allSpecialsActive = useMemo(
+    () => suffixList.every(s => filters[s.id] !== false),
+    [suffixList, filters]
+  );
+
+  const toggleAllSpecials = () => {
+    const next = !allSpecialsActive;
+    setFilters(prev => {
+      const updated = { ...prev };
+      suffixList.forEach(s => { updated[s.id] = next; });
       return updated;
     });
   };
@@ -47,7 +101,6 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
         className="bg-stone-900 w-full max-w-5xl shadow-2xl border-4 border-stone-600 flex flex-col"
         style={{ height: '80vh' }}
       >
-
         {/* Header */}
         <div className="flex justify-between items-center px-8 py-5 border-b-4 border-stone-700 bg-stone-800 shrink-0">
           <h2 className="text-4xl text-green-400 uppercase tracking-widest">Settings</h2>
@@ -101,9 +154,9 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
                   </select>
                 </section>
 
-                <section className="bg-stone-800/50 p-5 border-2 border-cyan-900 space-y-3">
+                <section className="bg-stone-800/50 p-5 border-2 border-stone-700 space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm text-cyan-400 uppercase">🐠 Tropical Fish</label>
+                    <label className="text-sm text-stone-300 uppercase">Tropical Fish</label>
                     <span className="text-stone-500 text-xs uppercase border-2 border-stone-700 px-2 py-1">
                       {fishCount === 1 ? '1 variante' : `${fishCount} varianti`}
                     </span>
@@ -125,55 +178,64 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
             )}
 
             {/* VARIANTI MOB */}
-            {activePage === 'varianti-mob' && (
-              <div className="space-y-6">
-                <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Varianti Mob</h3>
-
-                {/* Cartelle normali con toggle globale */}
-                {folderList.length > 0 && (
-                  <section className="space-y-2">
-                    {/* Header sezione con toggle globale */}
-                    <div className="flex items-center justify-between mb-2 border-b border-stone-800 pb-2">
-                      <p className="text-xs text-stone-500 uppercase">Cartelle</p>
-                      <div
-                        onClick={toggleAllFolders}
-                        className={`relative w-14 h-7 border-2 shrink-0 transition-colors duration-300 cursor-pointer hover:opacity-80 ${allFoldersActive ? 'bg-green-500 border-green-700' : 'bg-stone-900 border-stone-600 hover:border-stone-400'}`}
-                        title={allFoldersActive ? 'Disattiva tutte le cartelle' : 'Attiva tutte le cartelle'}
-                      >
-                        <div className={`absolute top-0 bottom-0 w-1/2 flex items-center justify-center transition-transform duration-300 ease-in-out ${allFoldersActive ? 'translate-x-full' : 'translate-x-0'}`}>
-                          <div className={`w-4 h-4 border-2 transition-colors duration-300 ${allFoldersActive ? 'bg-white border-green-900' : 'bg-stone-400 border-stone-600'}`} />
-                        </div>
-                      </div>
+            {activePage === 'varianti-mob' && (() => {
+              // Cartelle con linkedComplexId assorbono il ComplexConfig corrispondente (niente duplicati)
+              const linkedComplexIds = new Set(folderList.map(f => f.linkedComplexId).filter(Boolean));
+              const merged = [
+                ...folderList.map(f => ({
+                  key: f.id,
+                  label: f.label,
+                  active: filters[f.id] !== false && (f.linkedComplexId ? !!filters[f.linkedComplexId] : true),
+                  onToggle: () => {
+                    const next = !(filters[f.id] !== false);
+                    setFilters(prev => {
+                      const u = { ...prev, [f.id]: next };
+                      if (f.linkedComplexId) u[f.linkedComplexId] = next;
+                      return u;
+                    });
+                  },
+                })),
+                // Solo i ComplexConfig che NON hanno una cartella corrispondente
+                ...ComplexConfig
+                  .filter(c => !linkedComplexIds.has(c.id))
+                  .map(c => ({
+                    key: c.id,
+                    label: c.label,
+                    active: !!filters[c.id],
+                    onToggle: () => toggleFilter(c.id),
+                  })),
+              ].sort((a, b) => a.label.localeCompare(b.label));
+              return (
+                <div className="space-y-4">
+                  <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Varianti Mob</h3>
+                  <p className="text-stone-500 text-xs uppercase leading-relaxed border-2 border-stone-800 p-3">
+                    Toggle off → mostra solo la variante base, ignorando le impostazioni varianti generali.
+                    {variantMode === 'none' && <span className="block mt-1 text-amber-600">Varianti generali disattivate: questi toggle non hanno effetto.</span>}
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                      <p className="text-xs text-stone-500 uppercase">Tutti</p>
+                      <Toggle active={allFoldersActive} onClick={toggleAllFolders} />
                     </div>
-                    {folderList.map(f => (
-                      <ToggleBtn
-                        key={f.id}
-                        label={f.label}
-                        active={filters[f.id] !== false}
-                        onClick={() => toggleFilter(f.id)}
-                      />
+                    {merged.map(item => (
+                      <ToggleBtn key={item.key} label={item.label} showIcon active={item.active} onClick={item.onToggle} />
                     ))}
-                  </section>
-                )}
-
-                {/* Categorie complesse da mobConfig */}
-                {ComplexConfig.length > 0 && (
-                  <section className="space-y-2">
-                    <p className="text-xs text-stone-500 uppercase mb-2 border-b border-stone-800 pb-1">Categorie Complesse</p>
-                    {ComplexConfig.map(c => (
-                      <ToggleBtn key={c.id} label={c.label} active={filters[c.id]} onClick={() => toggleFilter(c.id)} />
-                    ))}
-                  </section>
-                )}
-              </div>
-            )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* VARIANTI SPECIALI */}
             {activePage === 'varianti-speciali' && (
               <div className="space-y-4">
                 <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Varianti Speciali</h3>
                 <div className="space-y-2">
-                  {Object.values(SuffixConfig).map(s => (
+                  {/* Toggle globale speciali */}
+                  <div className="flex items-center justify-between mb-2 border-b border-stone-800 pb-2">
+                    <p className="text-xs text-stone-500 uppercase">Tutti</p>
+                    <Toggle active={allSpecialsActive} onClick={toggleAllSpecials} />
+                  </div>
+                  {suffixList.map(s => (
                     <ToggleBtn key={s.id} label={`Mostra ${s.label}`} active={filters[s.id]} onClick={() => toggleFilter(s.id)} />
                   ))}
                 </div>
@@ -195,7 +257,6 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
 
           </div>
         </div>
-
       </div>
     </div>
   );
