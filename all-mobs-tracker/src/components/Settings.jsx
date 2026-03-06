@@ -54,8 +54,6 @@ const ToggleBtn = ({ label, showIcon, active, onClick }) => (
 const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilters, showAllFish, setShowAllFish, folderList = [], resetAll, onClose }) => {
   const [activePage, setActivePage] = useState('principale');
 
-  const fishCount = variantMode === 'none' ? 1 : variantMode === 'main' ? 22 : showAllFish ? 3072 : 22;
-
   const linkedComplexIds = useMemo(() => new Set(folderList.map(f => f.linkedComplexId).filter(Boolean)), [folderList]);
   const unlinkedComplex  = useMemo(() => ComplexConfig.filter(c => !linkedComplexIds.has(c.id)), [linkedComplexIds]);
 
@@ -168,33 +166,14 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
                     <option value="all">Tutte le varianti esistenti</option>
                   </select>
                 </section>
-
-                <section className="bg-stone-800/50 p-5 border-2 border-stone-700 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm text-stone-300 uppercase">Tropical Fish</label>
-                    <span className="text-stone-500 text-xs uppercase border-2 border-stone-700 px-2 py-1">
-                      {fishCount === 1 ? '1 variante' : `${fishCount} varianti`}
-                    </span>
-                  </div>
-                  <p className="text-stone-400 text-sm leading-relaxed">
-                    {variantMode === 'none' && 'Con "Niente varianti" viene mostrato solo 1 pesce base.'}
-                    {variantMode === 'main' && 'Con "Varianti principali" vengono mostrate le 22 varianti con nome.'}
-                    {variantMode === 'all'  && 'Con "Tutte le varianti" puoi scegliere se mostrare tutte le 3072 combinazioni.'}
-                  </p>
-                  {variantMode === 'all' && (
-                    <ToggleBtn
-                      label="Mostra tutte le 3072 varianti"
-                      active={showAllFish}
-                      onClick={() => setShowAllFish(v => !v)}
-                    />
-                  )}
-                </section>
               </div>
             )}
 
             {/* VARIANTI MOB */}
             {activePage === 'varianti-mob' && (() => {
               const linkedComplexIds = new Set(folderList.map(f => f.linkedComplexId).filter(Boolean));
+              const FISH_KEY     = 'folder:__fish__';
+              const FISH_VAR_KEY = 'variants:__fish__';
               const merged = [
                 ...folderList.map(f => ({
                   key:          f.id,
@@ -203,6 +182,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
                   visibile:     filters[f.id] !== false,
                   varianti:     filters[f.variantsId] !== false,
                   linkedComplexId: f.linkedComplexId,
+                  isFish:       false,
                 })),
                 ...ComplexConfig
                   .filter(c => !linkedComplexIds.has(c.id))
@@ -211,9 +191,19 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
                     variantsKey: null,
                     label:       c.label,
                     visibile:    !!filters[c.id],
-                    varianti:    null, // nessun toggle varianti per ComplexConfig standalone
+                    varianti:    null,
                     linkedComplexId: null,
+                    isFish:      false,
                   })),
+                {
+                  key:         FISH_KEY,
+                  variantsKey: FISH_VAR_KEY,
+                  label:       'Tropical Fish',
+                  visibile:    filters[FISH_KEY] !== false,
+                  varianti:    filters[FISH_VAR_KEY] !== false,
+                  linkedComplexId: null,
+                  isFish:      true,
+                },
               ].sort((a, b) => a.label.localeCompare(b.label));
 
               const toggleVarianti = (item) => {
@@ -258,14 +248,27 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
                       <div key={item.key} className="flex items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none gap-2">
                         <FolderIcon label={item.label} />
                         <span className="text-sm text-stone-300 uppercase truncate flex-1 pr-2">{item.label}</span>
-                        <div className="flex gap-2 shrink-0">
-                          <Toggle
-                            active={item.visibile}
-                            onClick={() => toggleVisibile(item)}
-                          />
-                          {item.variantsKey !== null
-                            ? <Toggle active={item.varianti} onClick={() => toggleVarianti(item)} />
-                            : <div className="w-14 h-7" />
+                        <div className="flex gap-2 shrink-0 items-center">
+                          <Toggle active={item.visibile} onClick={() => toggleVisibile(item)} />
+                          {item.isFish
+                            ? <select
+                                value={showAllFish ? 'all' : (variantMode === 'none' ? 'none' : variantMode === 'main' ? 'main' : 'main')}
+                                onChange={e => {
+                                  const v = e.target.value;
+                                  if (v === 'none') { setVariantMode('none'); setShowAllFish(false); }
+                                  else if (v === 'main') { if (variantMode === 'none') setVariantMode('main'); setShowAllFish(false); }
+                                  else { setVariantMode('all'); setShowAllFish(true); }
+                                }}
+                                className="bg-black text-white border-2 border-stone-600 px-2 py-1 text-[10px] uppercase outline-none cursor-pointer"
+                                style={{ width: '7rem' }}
+                              >
+                                <option value="none">1 variante</option>
+                                <option value="main">22 principali</option>
+                                <option value="all">3072 varianti</option>
+                              </select>
+                            : item.variantsKey !== null
+                              ? <Toggle active={item.varianti} onClick={() => toggleVarianti(item)} />
+                              : <div className="w-14 h-7" />
                           }
                         </div>
                       </div>

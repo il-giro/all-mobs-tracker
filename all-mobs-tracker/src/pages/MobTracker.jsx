@@ -98,7 +98,6 @@ const MobTracker = () => {
   const [showSettings, setShowSettings]     = useState(false);
   const [showStats, setShowStats]           = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('all');
-  const [showFish, setShowFish]             = useState(false);
   const [sortBy, setSortBy]                 = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
   const [sortOpen, setSortOpen]             = useState(false);
   const [groupByFolder, setGroupByFolder]   = useState(() => localStorage.getItem('mobTracker_groupByFolder') === 'true');
@@ -116,6 +115,8 @@ const MobTracker = () => {
     const defaults = {};
     ComplexConfig.forEach(c => defaults[c.id] = c.defaultShow);
     Object.values(SuffixConfig).forEach(s => defaults[s.id] = s.defaultShow);
+    defaults[`${FOLDER_FILTER_PREFIX}${FISH_FOLDER}`] = true;
+    defaults[`variants:${FISH_FOLDER}`] = true;
     return defaults;
   });
 
@@ -167,10 +168,6 @@ const MobTracker = () => {
       return next;
     });
   }, [allMobs]);
-
-  useEffect(() => {
-    if (selectedFolder === FISH_FOLDER) setShowFish(true);
-  }, [selectedFolder]);
 
   useEffect(() => {
     if (!sortOpen) return;
@@ -388,14 +385,20 @@ const MobTracker = () => {
     });
   };
 
+  const fishVisible   = filters[`${FOLDER_FILTER_PREFIX}${FISH_FOLDER}`] !== false;
+  const fishVariants  = filters[`variants:${FISH_FOLDER}`] !== false;
+
   const fishPool = useMemo(() => {
-    if (variantMode === 'none') return [ALL_FISH.find(f => `${f.typeIndex}_${f.bodyColor}_${f.patternColor}` === '0_1_0') ?? ALL_FISH[0]];
+    // variants:__fish__ off → solo il clownfish base
+    if (!fishVariants || variantMode === 'none') return [ALL_FISH.find(f => `${f.typeIndex}_${f.bodyColor}_${f.patternColor}` === '0_1_0') ?? ALL_FISH[0]];
     if (variantMode === 'main') return NAMED_FISH;
     return showAllFish ? ALL_FISH : NAMED_FISH;
-  }, [variantMode, showAllFish]);
+  }, [variantMode, showAllFish, fishVariants]);
+
+  const showFishSection = selectedFolder === 'all' || isFishOnly;
 
   const displayedFish = useMemo(() => {
-    if (!showFish || fishPool.length === 0) return [];
+    if (!showFishSection || fishPool.length === 0) return [];
     if (!searchQuery) return fishPool;
     const words = searchQuery.toLowerCase().trim().split(/\s+/);
     return fishPool.filter(f => {
@@ -404,7 +407,7 @@ const MobTracker = () => {
       const str = `${FISH_TYPES[f.typeIndex].name} ${COLOR_NAMES[f.bodyColor]} ${COLOR_NAMES[f.patternColor]} tropical ${officialName}`.toLowerCase();
       return words.every(w => str.includes(w));
     });
-  }, [showFish, fishPool, searchQuery]);
+  }, [showFishSection, fishPool, searchQuery]);
 
   const fishTrackedCount = useMemo(() => fishPool.filter(f => trackedMobs[f.id]).length, [fishPool, trackedMobs]);
   const mobTrackedCount  = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
@@ -414,7 +417,6 @@ const MobTracker = () => {
 
   const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
-  const showFishSection = selectedFolder === 'all' || isFishOnly;
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
@@ -515,7 +517,7 @@ const MobTracker = () => {
               {/* Cartelle normali + fish in ordine alfabetico */}
               {allFolderBtns.length > 0 && (
                 <><span className="text-stone-600 select-none">|</span>
-                {allFolderBtns.map(btn =>
+                {allFolderBtns.filter(btn => btn.type !== 'fish' || fishVisible).map(btn =>
                   btn.type === 'fish'
                     ? (
                       <button key={btn.key} onClick={() => setSelectedFolder(FISH_FOLDER)}
@@ -565,9 +567,7 @@ const MobTracker = () => {
           {/* Sezione Tropical Fish */}
           {showFishSection && (
             <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg mb-6">
-              <button onClick={() => setShowFish(v => !v)}
-                className="w-full flex justify-between items-center px-6 py-4 hover:bg-stone-700 transition-colors"
-              >
+              <div className="w-full flex justify-between items-center px-6 py-4 border-b-4 border-cyan-900">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl text-cyan-400 uppercase">🐠 Tropical Fish</span>
                   <span className="bg-cyan-900 text-cyan-300 text-sm px-2 py-0.5 border-2 border-cyan-800">
@@ -577,17 +577,14 @@ const MobTracker = () => {
                     {variantMode === 'none' ? '(1 base)' : variantMode === 'main' ? '(22 named)' : showAllFish ? '(3072 tutte)' : '(22 named)'}
                   </span>
                 </div>
-                <span className="text-stone-400 text-xl">{showFish ? '▲' : '▼'}</span>
-              </button>
-              {showFish && (
-                <div className="p-4 border-t-4 border-cyan-900">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
-                    {displayedFish.map(fish => (
-                      <TropicalFishCard key={fish.id} fish={fish} isTracked={trackedMobs[fish.id]} onToggle={() => toggleMob(fish.id)} />
-                    ))}
-                  </div>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
+                  {displayedFish.map(fish => (
+                    <TropicalFishCard key={fish.id} fish={fish} isTracked={trackedMobs[fish.id]} onToggle={() => toggleMob(fish.id)} />
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
