@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority, ComplexConfig, VillagerBiomes, VillagerJobs } from '../config/mobConfig';
+import { getCategoriesForMob } from '../config/mobCategories';
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {
@@ -35,7 +37,8 @@ const calcPos = (rect) => {
 
 const MobCard = ({ mob, isTracked, onToggle }) => {
   const [tooltipPos, setTooltipPos] = useState(null);
-  const cardRef    = useRef(null);
+  const navigate    = useNavigate();
+  const cardRef     = useRef(null);
   const instanceId = useRef(Math.random());
   const isOpen     = useRef(false);
 
@@ -44,6 +47,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
   const allBadges      = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => SuffixConfig[id]);
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const villagerIcons  = getVillagerIcons(mob);
+  const mobCategories  = getCategoriesForMob(mob.name);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
@@ -252,6 +256,28 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
             </div>
           ) : (
             !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
+          )}
+
+          {mobCategories.length > 0 && (
+            <div className="mt-2 pt-2 border-t-2 border-stone-700 flex flex-col gap-1">
+              <span className="text-stone-500 text-[9px] uppercase">Categorie</span>
+              {mobCategories.map(cat => (
+                <button
+                  key={cat.id}
+                  onMouseDown={e => {
+                    e.stopPropagation();
+                    setTooltipPos(null);
+                    isOpen.current = false;
+                    navigate(`/category/${cat.id}`);
+                  }}
+                  className="flex items-center gap-2 bg-amber-900/40 border border-amber-800 px-2 py-1 hover:bg-amber-900/70 transition-colors w-full text-left"
+                >
+                  <span className="text-amber-400 text-sm">{cat.icon}</span>
+                  <span className="text-amber-300 text-xs uppercase">{cat.label}</span>
+                  <span className="text-stone-600 text-[9px] ml-auto">→</span>
+                </button>
+              ))}
+            </div>
           )}
         </div>,
         document.body

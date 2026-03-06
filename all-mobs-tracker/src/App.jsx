@@ -4,6 +4,7 @@ import MobTracker from './pages/MobTracker'
 import About from './pages/About'
 import FAQ from './pages/FAQ'
 import WhoAmI from './pages/WhoAmI'
+import ShearablePage from './pages/category/ShearablePage';
 import './index.css'
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/whoami" element={<WhoAmI />} />
+        <Route path="/category/shearable" element={<ShearablePage />} />
       </Routes>
       <Analytics />
     </BrowserRouter>
