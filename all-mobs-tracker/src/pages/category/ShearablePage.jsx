@@ -19,29 +19,53 @@ const useTrackedMobs = () => {
   return [tracked, toggle];
 };
 
-const useMobData = (mobNames) => {
+// Risolve ogni mob entry:
+// - stringa → cerca il file col glob (word match)
+// - oggetto { name, file } → usa file direttamente
+const useMobData = (mobs) => {
   const [data, setData] = useState({});
   useEffect(() => {
     const load = async () => {
       const modules = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
+      const allPaths = Object.keys(modules);
       const result = {};
-      for (const mobName of mobNames) {
-        const normalized = mobName.trim().replace(/\s+/g, '').toLowerCase();
-        const match = Object.keys(modules).find(path => {
-          const file = path.split('/').pop().replace(/[_\-\s]/g, '').toLowerCase();
-          return file.startsWith(normalized) || file.includes(normalized);
-        });
-        if (match) {
-          result[mobName] = {
-            image:    match.replace('/public', ''),
-            fileName: match.replace('/public/', ''),
-          };
+
+      for (const mob of mobs) {
+        const isObj   = typeof mob === 'object';
+        const display = isObj ? mob.name : mob;
+        const fileHint = isObj ? mob.file : null;
+
+        if (fileHint) {
+          // Path esplicito fornito — cerca il path che finisce con questo filename
+          const match = allPaths.find(p => p.endsWith(fileHint) || p.includes(fileHint));
+          if (match) {
+            result[display] = {
+              image:    match.replace('/public', ''),
+              fileName: match.replace('/public/', ''),
+            };
+          }
+        } else {
+          // Word match: cerca sia nel filename che nel path completo
+          const words = display.toLowerCase().replace(/[()_]/g, ' ').trim().split(/\s+/).filter(Boolean);
+          const matches = allPaths.filter(path => {
+            // Normalizza l'intero path (cartella + filename senza estensione)
+            const fullPath = path.toLowerCase().replace(/[_\-\/]/g, ' ').replace(/\.[^.]+$/, '');
+            const pathWords = fullPath.split(/\s+/).filter(Boolean);
+            return words.every(w => pathWords.includes(w));
+          });
+          const best = matches.sort((a, b) => a.split('/').pop().length - b.split('/').pop().length)[0];
+          if (best) {
+            result[display] = {
+              image:    best.replace('/public', ''),
+              fileName: best.replace('/public/', ''),
+            };
+          }
         }
       }
       setData(result);
     };
     load();
-  }, [mobNames.join(',')]);
+  }, [JSON.stringify(mobs)]);
   return data;
 };
 
@@ -91,8 +115,9 @@ const MobItem = ({ name, mobData, isTracked, onToggle }) => {
 
 const ShearablePage = () => {
   const category          = CategoryMap[CATEGORY_ID];
-  const mobNames          = useMemo(() => category?.mobs ?? [], []);
-  const mobData           = useMobData(mobNames);
+  // mobs può contenere stringhe o oggetti { name, file }
+  const mobs              = useMemo(() => category?.mobs ?? [], []);
+  const mobData           = useMobData(mobs);
   const [tracked, toggle] = useTrackedMobs();
 
   if (!category) {
@@ -103,7 +128,8 @@ const ShearablePage = () => {
     );
   }
 
-  const trackedCount = category.mobs.filter(n => mobData[n] && tracked[mobData[n].fileName]).length;
+  const displayNames  = mobs.map(m => typeof m === 'object' ? m.name : m);
+  const trackedCount  = displayNames.filter(n => mobData[n] && tracked[mobData[n].fileName]).length;
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
@@ -119,10 +145,10 @@ const ShearablePage = () => {
             <div>
               <h1 className="text-4xl uppercase text-amber-400 leading-none">Shearable</h1>
               <div className="flex items-center gap-3 mt-2">
-                <p className="text-stone-500 text-xs uppercase">{category.mobs.length} mobs</p>
+                <p className="text-stone-500 text-xs uppercase">{displayNames.length} mobs</p>
                 <span className="text-stone-700">·</span>
-                <p className={`text-xs uppercase ${trackedCount === category.mobs.length ? 'text-green-400' : 'text-stone-500'}`}>
-                  {trackedCount} / {category.mobs.length} caught
+                <p className={`text-xs uppercase ${trackedCount === displayNames.length ? 'text-green-400' : 'text-stone-500'}`}>
+                  {trackedCount} / {displayNames.length} caught
                 </p>
               </div>
             </div>
@@ -145,10 +171,10 @@ const ShearablePage = () => {
           <p className="text-xs uppercase text-stone-500 tracking-widest border-b-2 border-stone-800 pb-3 mb-4">
             Mobs in this category
           </p>
-          {category.mobs.length === 0
+          {displayNames.length === 0
             ? <p className="text-stone-600 uppercase text-sm">No mobs assigned.</p>
             : <div className="space-y-2">
-                {category.mobs.map(name => (
+                {displayNames.map(name => (
                   <MobItem
                     key={name}
                     name={name}

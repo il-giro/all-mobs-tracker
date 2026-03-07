@@ -47,7 +47,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
   const allBadges      = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => SuffixConfig[id]);
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const villagerIcons  = getVillagerIcons(mob);
-  const mobCategories  = getCategoriesForMob(mob.name);
+  const mobCategories  = getCategoriesForMob(mob.name, mob.activeSuffixes.map(id => SuffixConfig[id]?.label ?? ''));
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {

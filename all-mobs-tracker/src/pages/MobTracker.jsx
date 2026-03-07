@@ -409,11 +409,11 @@ const MobTracker = () => {
     });
   }, [showFishSection, fishPool, searchQuery]);
 
-  const fishTrackedCount = useMemo(() => fishPool.filter(f => trackedMobs[f.id]).length, [fishPool, trackedMobs]);
+  const fishTrackedCount = useMemo(() => displayedFish.filter(f => trackedMobs[f.id]).length, [displayedFish, trackedMobs]);
   const mobTrackedCount  = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
 
   const totalTracked   = isFishOnly ? fishTrackedCount : selectedFolder === 'all' ? mobTrackedCount + fishTrackedCount : mobTrackedCount;
-  const totalDisplayed = isFishOnly ? fishPool.length  : selectedFolder === 'all' ? displayedMobs.length + fishPool.length : displayedMobs.length;
+  const totalDisplayed = isFishOnly ? displayedFish.length : selectedFolder === 'all' ? displayedMobs.length + displayedFish.length : displayedMobs.length;
 
   const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
