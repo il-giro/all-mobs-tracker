@@ -35,7 +35,7 @@ const calcPos = (rect) => {
   return { x, y };
 };
 
-const MobCard = ({ mob, isTracked, onToggle }) => {
+const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectionMode, onToggle, 'data-mob-id': dataMobId }) => {
   const [tooltipPos, setTooltipPos] = useState(null);
   const navigate    = useNavigate();
   const cardRef     = useRef(null);
@@ -99,15 +99,27 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
     setTooltipPos(calcPos(cardRef.current.getBoundingClientRect()));
   };
 
+  // Colore bordo: selezione > catturato (verde) > avvistato (giallo) > normale
+  const borderClass = isSelected
+    ? 'border-green-300 shadow-[0_0_0_2px_#86efac]'
+    : isCaptured
+      ? 'border-green-600'
+      : isTracked
+        ? 'border-yellow-500'
+        : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1';
+
+  const imgOpacity = isCaptured ? 'opacity-40' : isTracked ? 'opacity-60' : '';
+
   return (
     <div
       ref={cardRef}
+      data-mob-id={dataMobId}
       onClick={onToggle}
       onContextMenu={handleContextMenu}
       style={{ position: 'relative' }}
-      className={`group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible ${isTracked ? 'border-green-600' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1'}`}
+      className={`group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible ${borderClass}`}
     >
-      <div className={`aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden ${isTracked ? 'opacity-40' : ''}`}>
+      <div className={`aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden ${imgOpacity}`}>
         <img
           src={mob.image}
           alt={mob.name}
@@ -116,7 +128,7 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
           className="max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform select-none"
         />
 
-        {!isTracked && (
+        {!isTracked && !isCaptured && (
           <>
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
@@ -160,14 +172,22 @@ const MobCard = ({ mob, isTracked, onToggle }) => {
           </>
         )}
 
-        {isTracked && (
+        {isCaptured && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <span className="text-green-500 text-7xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">✔</span>
           </div>
         )}
+        {!isCaptured && isTracked && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <span className="text-yellow-400 text-7xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">👁</span>
+          </div>
+        )}
       </div>
 
-      <div className={`p-2 text-center border-t-4 ${isTracked ? 'bg-green-900 border-green-700' : 'bg-stone-800 border-stone-700'}`}>
+      <div className={`p-2 text-center border-t-4
+        ${isCaptured ? 'bg-green-900 border-green-700'
+        : isTracked  ? 'bg-yellow-900 border-yellow-700'
+        : 'bg-stone-800 border-stone-700'}`}>
         <p className="text-[10px] leading-tight text-stone-200 uppercase truncate px-1">
           {mob.name} {suffixDisplay}
         </p>

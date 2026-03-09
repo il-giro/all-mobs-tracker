@@ -6,17 +6,36 @@ import Footer from '../../components/Footer';
 const CATEGORY_ID = 'shearable';
 
 const useTrackedMobs = () => {
-  const [tracked, setTracked] = useState(() =>
-    JSON.parse(localStorage.getItem('mobTracker_saves') || '{}')
-  );
+  const [tracked,  setTracked]  = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves')    || '{}'));
+  const [captured, setCaptured] = useState(() => JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'));
+  const captureMode = localStorage.getItem('mobTracker_captureMode') === 'true';
+
   const toggle = (fileName) => {
-    setTracked(prev => {
-      const next = { ...prev, [fileName]: !prev[fileName] };
-      localStorage.setItem('mobTracker_saves', JSON.stringify(next));
-      return next;
-    });
+    if (captureMode) {
+      const wasTracked  = !!tracked[fileName];
+      const wasCaptured = !!captured[fileName];
+      if (!wasTracked && !wasCaptured) {
+        setTracked(prev => { const n = { ...prev, [fileName]: true }; localStorage.setItem('mobTracker_saves', JSON.stringify(n)); return n; });
+      } else if (wasTracked && !wasCaptured) {
+        setCaptured(prev => { const n = { ...prev, [fileName]: true }; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      } else {
+        setTracked(prev  => { const n = { ...prev };  delete n[fileName]; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+        setCaptured(prev => { const n = { ...prev };  delete n[fileName]; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      }
+    } else {
+      // Senza captureMode: catturato diretto ↔ nessuno
+      const wasCaptured = !!captured[fileName];
+      if (wasCaptured) {
+        setTracked(prev  => { const n = { ...prev };  delete n[fileName]; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+        setCaptured(prev => { const n = { ...prev };  delete n[fileName]; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      } else {
+        setTracked(prev  => { const n = { ...prev, [fileName]: true }; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+        setCaptured(prev => { const n = { ...prev, [fileName]: true }; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      }
+    }
   };
-  return [tracked, toggle];
+
+  return [tracked, captured, captureMode, toggle];
 };
 
 // Risolve ogni mob entry:
@@ -69,25 +88,35 @@ const useMobData = (mobs) => {
   return data;
 };
 
-const MobItem = ({ name, mobData, isTracked, onToggle }) => {
+const MobItem = ({ name, mobData, isTracked, isCaptured, onToggle }) => {
   const image    = mobData?.image;
   const fileName = mobData?.fileName;
+
+  const borderClass = isCaptured
+    ? 'bg-green-950/40 border-green-700 hover:border-green-500'
+    : isTracked
+      ? 'bg-yellow-950/40 border-yellow-700 hover:border-yellow-500'
+      : 'bg-stone-900 border-stone-700 hover:border-amber-700';
+
+  const iconClass = isCaptured
+    ? 'border-green-600 bg-green-900/50 text-green-400'
+    : isTracked
+      ? 'border-yellow-600 bg-yellow-900/50 text-yellow-400'
+      : 'border-stone-700 bg-stone-800/50 text-stone-600';
+
+  const icon = isCaptured ? '✔' : isTracked ? '👁' : '✖';
+
+  const nameColor = isCaptured ? 'text-green-400' : isTracked ? 'text-yellow-400' : 'text-amber-400';
+  const statusText = isCaptured ? 'Caught' : isTracked ? 'Spotted' : 'Not caught';
+  const statusColor = isCaptured ? 'text-green-600' : isTracked ? 'text-yellow-600' : 'text-stone-700 group-hover:text-amber-800';
 
   return (
     <div
       onClick={() => fileName && onToggle(fileName)}
-      className={`flex items-center gap-4 p-4 border-2 transition-colors group cursor-pointer select-none
-        ${isTracked
-          ? 'bg-green-950/40 border-green-700 hover:border-green-500'
-          : 'bg-stone-900 border-stone-700 hover:border-amber-700'
-        }`}
+      className={`flex items-center gap-4 p-4 border-2 transition-colors group cursor-pointer select-none ${borderClass}`}
     >
-      <div className={`w-10 h-10 shrink-0 flex items-center justify-center border-2 text-2xl
-        ${isTracked
-          ? 'border-green-600 bg-green-900/50 text-green-400'
-          : 'border-stone-700 bg-stone-800/50 text-stone-600'
-        }`}>
-        {isTracked ? '✔' : '✖'}
+      <div className={`w-10 h-10 shrink-0 flex items-center justify-center border-2 text-2xl ${iconClass}`}>
+        {icon}
       </div>
 
       <div className="w-14 h-14 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-800"
@@ -100,25 +129,22 @@ const MobItem = ({ name, mobData, isTracked, onToggle }) => {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className={`uppercase text-sm tracking-wide truncate ${isTracked ? 'text-green-400' : 'text-amber-400'}`}>
-          {name}
-        </p>
+        <p className={`uppercase text-sm tracking-wide truncate ${nameColor}`}>{name}</p>
         <p className="text-stone-600 text-xs uppercase mt-1">✂ Shearable</p>
       </div>
 
-      <div className={`shrink-0 text-xs uppercase transition-colors ${isTracked ? 'text-green-600' : 'text-stone-700 group-hover:text-amber-800'}`}>
-        {isTracked ? 'Caught' : 'Not caught'}
+      <div className={`shrink-0 text-xs uppercase transition-colors ${statusColor}`}>
+        {statusText}
       </div>
     </div>
   );
 };
 
 const ShearablePage = () => {
-  const category          = CategoryMap[CATEGORY_ID];
-  // mobs può contenere stringhe o oggetti { name, file }
-  const mobs              = useMemo(() => category?.mobs ?? [], []);
-  const mobData           = useMobData(mobs);
-  const [tracked, toggle] = useTrackedMobs();
+  const category                          = CategoryMap[CATEGORY_ID];
+  const mobs                              = useMemo(() => category?.mobs ?? [], []);
+  const mobData                           = useMobData(mobs);
+  const [tracked, captured, captureMode, toggle] = useTrackedMobs();
 
   if (!category) {
     return (
@@ -129,7 +155,7 @@ const ShearablePage = () => {
   }
 
   const displayNames  = mobs.map(m => typeof m === 'object' ? m.name : m);
-  const trackedCount  = displayNames.filter(n => mobData[n] && tracked[mobData[n].fileName]).length;
+  const trackedCount  = displayNames.filter(n => mobData[n] && (captured[mobData[n].fileName] || (!captureMode && tracked[mobData[n].fileName]))).length;
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
@@ -180,6 +206,7 @@ const ShearablePage = () => {
                     name={name}
                     mobData={mobData[name]}
                     isTracked={!!(mobData[name] && tracked[mobData[name].fileName])}
+                    isCaptured={!!(mobData[name] && captured[mobData[name].fileName])}
                     onToggle={toggle}
                   />
                 ))}

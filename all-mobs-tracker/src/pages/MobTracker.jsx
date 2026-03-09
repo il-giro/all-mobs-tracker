@@ -92,6 +92,10 @@ const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
 const MobTracker = () => {
   const [allMobs, setAllMobs]               = useState([]);
   const [trackedMobs, setTrackedMobs]       = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves') || '{}'));
+  const [capturedMobs, setCapturedMobs]     = useState(() => JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'));
+  const [captureMode, setCaptureMode]       = useState(() => localStorage.getItem('mobTracker_captureMode') === 'true');
+  const [selectionMode, setSelectionMode]   = useState(() => localStorage.getItem('mobTracker_selectionMode') === 'true');
+  const [selectedMobs, setSelectedMobs]     = useState(new Set());
   const [variantMode, setVariantMode]       = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
   const [showAllFish, setShowAllFish]       = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
   const [searchQuery, setSearchQuery]       = useState('');
@@ -195,6 +199,9 @@ const MobTracker = () => {
   }, [showSettings, showStats, searchQuery, selectedFolder, sortOpen]);
 
   useEffect(() => { localStorage.setItem('mobTracker_saves',         JSON.stringify(trackedMobs));       }, [trackedMobs]);
+  useEffect(() => { localStorage.setItem('mobTracker_captured',      JSON.stringify(capturedMobs));      }, [capturedMobs]);
+  useEffect(() => { localStorage.setItem('mobTracker_captureMode',   String(captureMode));               }, [captureMode]);
+  useEffect(() => { localStorage.setItem('mobTracker_selectionMode', String(selectionMode));             }, [selectionMode]);
   useEffect(() => { localStorage.setItem('mobTracker_filters',       JSON.stringify(filters));           }, [filters]);
   useEffect(() => { localStorage.setItem('mobTracker_mode',          variantMode);                      }, [variantMode]);
   useEffect(() => { localStorage.setItem('mobTracker_showAllFish',   String(showAllFish));               }, [showAllFish]);
@@ -409,17 +416,144 @@ const MobTracker = () => {
     });
   }, [showFishSection, fishPool, searchQuery]);
 
-  const fishTrackedCount = useMemo(() => displayedFish.filter(f => trackedMobs[f.id]).length, [displayedFish, trackedMobs]);
-  const mobTrackedCount  = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length, [displayedMobs, trackedMobs]);
+  const fishTrackedCount   = useMemo(() => displayedFish.filter(f => trackedMobs[f.id]).length,   [displayedFish, trackedMobs]);
+  const fishCapturedCount  = useMemo(() => displayedFish.filter(f => capturedMobs[f.id]).length,  [displayedFish, capturedMobs]);
+  const mobTrackedCount    = useMemo(() => displayedMobs.filter(m => trackedMobs[m.fileName]).length,  [displayedMobs, trackedMobs]);
+  const mobCapturedCount   = useMemo(() => displayedMobs.filter(m => capturedMobs[m.fileName]).length, [displayedMobs, capturedMobs]);
 
-  const totalTracked   = isFishOnly ? fishTrackedCount : selectedFolder === 'all' ? mobTrackedCount + fishTrackedCount : mobTrackedCount;
+  const totalTracked   = isFishOnly ? fishTrackedCount  : selectedFolder === 'all' ? mobTrackedCount  + fishTrackedCount  : mobTrackedCount;
+  const totalCaptured  = isFishOnly ? fishCapturedCount : selectedFolder === 'all' ? mobCapturedCount + fishCapturedCount : mobCapturedCount;
   const totalDisplayed = isFishOnly ? displayedFish.length : selectedFolder === 'all' ? displayedMobs.length + displayedFish.length : displayedMobs.length;
 
-  const toggleMob = (id) => setTrackedMobs(p => ({ ...p, [id]: !p[id] }));
+  // captureMode ON:  nessuno → avvistato (giallo) → catturato (verde) → nessuno
+  // captureMode OFF: nessuno → catturato (verde) → nessuno
+  const toggleMob = (id) => {
+    if (captureMode) {
+      const wasTracked  = !!trackedMobs[id];
+      const wasCaptured = !!capturedMobs[id];
+      if (!wasTracked && !wasCaptured) {
+        setTrackedMobs(p => ({ ...p, [id]: true }));
+        setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+      } else if (wasTracked && !wasCaptured) {
+        setCapturedMobs(p => ({ ...p, [id]: true }));
+      } else {
+        setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+        setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+      }
+    } else {
+      // Diretto: catturato ↔ nessuno (pulisce anche avvistato se c'era)
+      const wasCaptured = !!capturedMobs[id];
+      if (wasCaptured) {
+        setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+        setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+      } else {
+        setTrackedMobs(p => ({ ...p, [id]: true }));
+        setCapturedMobs(p => ({ ...p, [id]: true }));
+      }
+    }
+  };
+
+  // Selezione drag — listener globali su window per non perdere il drag fuori dalla griglia
+  const gridRef          = useRef(null);
+  const isDragging       = useRef(false);
+  const dragStart        = useRef(null);
+  const dragStartedOnCard = useRef(false);
+  const DRAG_THRESHOLD   = 6; // px minimi prima di considerarlo un drag
+  const [selRect, setSelRect] = useState(null);
+
+  const getCardEls = () => gridRef.current ? Array.from(gridRef.current.querySelectorAll('[data-mob-id]')) : [];
+
+  const handleGridMouseDown = (e) => {
+    if (!selectionMode || e.button !== 0) return;
+    // Controlla se il click è partito su una card
+    const onCard = !!e.target.closest('[data-mob-id]');
+    dragStartedOnCard.current = onCard;
+    isDragging.current = true;
+    dragStart.current  = { x: e.clientX, y: e.clientY };
+    // Non inizia il rettangolo subito — aspetta che il drag superi la soglia
+    setSelectedMobs(new Set());
+    // Non preventDefault se siamo su una card — così il click funziona
+    if (!onCard) e.preventDefault();
+  };
+
+  useEffect(() => {
+    if (!selectionMode) {
+      setSelectedMobs(new Set());
+      setSelRect(null);
+      return;
+    }
+
+    const onMouseMove = (e) => {
+      if (!isDragging.current || !dragStart.current) return;
+      const dx = Math.abs(e.clientX - dragStart.current.x);
+      const dy = Math.abs(e.clientY - dragStart.current.y);
+      // Sotto la soglia: non mostrare ancora il rettangolo
+      if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) return;
+      // Se il drag è partito su una card ma ora si muove abbastanza, annulla il click sulla card
+      dragStartedOnCard.current = false;
+      const x = Math.min(e.clientX, dragStart.current.x);
+      const y = Math.min(e.clientY, dragStart.current.y);
+      const w = Math.abs(e.clientX - dragStart.current.x);
+      const h = Math.abs(e.clientY - dragStart.current.y);
+      setSelRect({ x, y, w, h });
+      const sel = new Set();
+      getCardEls().forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.left < x + w && r.right > x && r.top < y + h && r.bottom > y) sel.add(el.dataset.mobId);
+      });
+      setSelectedMobs(sel);
+    };
+
+    const onMouseUp = (e) => {
+      if (!isDragging.current) return;
+      const wasRealDrag = !!selRect;
+      const wasOnCard   = dragStartedOnCard.current;
+      isDragging.current        = false;
+      dragStart.current         = null;
+      dragStartedOnCard.current = false;
+      setSelRect(null);
+      if (wasRealDrag) {
+        // Drag reale → applica toggle alle card selezionate
+        setSelectedMobs(prev => {
+          prev.forEach(id => toggleMob(id));
+          return new Set();
+        });
+      } else if (wasOnCard) {
+        // Click su card → il click normale gestirà il toggle, non fare nulla
+        setSelectedMobs(new Set());
+      } else {
+        // Click su sfondo → annulla
+        setSelectedMobs(new Set());
+      }
+    };
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape' && isDragging.current) {
+        isDragging.current        = false;
+        dragStart.current         = null;
+        dragStartedOnCard.current = false;
+        setSelRect(null);
+        setSelectedMobs(new Set());
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup',   onMouseUp);
+    window.addEventListener('keydown',   onKeyDown);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup',   onMouseUp);
+      window.removeEventListener('keydown',   onKeyDown);
+    };
+  }, [selectionMode, selRect]);
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
 
   return (
-    <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
+    <div
+      className="min-h-screen bg-[#111] text-stone-100 flex flex-col"
+      onMouseDown={handleGridMouseDown}
+      style={{ cursor: selectionMode ? 'crosshair' : undefined }}
+    >
       {showSettings && (
         <Settings
           variantMode={variantMode} setVariantMode={setVariantMode}
@@ -428,6 +562,8 @@ const MobTracker = () => {
           folderList={folderList}
           resetAll={() => confirm('Sei sicuro di voler resettare tutti i progressi?') && setTrackedMobs({})}
           onClose={() => setShowSettings(false)}
+          captureMode={captureMode} setCaptureMode={setCaptureMode}
+          selectionMode={selectionMode} setSelectionMode={setSelectionMode}
         />
       )}
       {showStats && <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />}
@@ -539,29 +675,70 @@ const MobTracker = () => {
             <div className="bg-black/50 p-4 border-4 border-stone-700">
               <div className="flex justify-between mb-2 text-xl uppercase">
                 <span>Progress</span>
-                <span>{totalTracked} / {totalDisplayed} ({totalDisplayed > 0 ? Math.round((totalTracked / totalDisplayed) * 100) : 0}%)</span>
+                <span>
+                  {captureMode
+                    ? <>{totalCaptured}<span className="text-green-500">✔</span> {totalTracked - totalCaptured > 0 && <><span className="text-yellow-400">{totalTracked - totalCaptured}👁</span> </>}/ {totalDisplayed} ({totalDisplayed > 0 ? Math.round((totalCaptured / totalDisplayed) * 100) : 0}%)</>
+                    : <>{totalCaptured} / {totalDisplayed} ({totalDisplayed > 0 ? Math.round((totalCaptured / totalDisplayed) * 100) : 0}%)</>
+                  }
+                </span>
               </div>
-              <div className="h-6 bg-stone-900 border-2 border-stone-700 p-1">
-                <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${totalDisplayed > 0 ? (totalTracked / totalDisplayed) * 100 : 0}%` }} />
+              <div className="h-6 bg-stone-900 border-2 border-stone-700 p-1 overflow-hidden">
+                {captureMode ? (
+                  <div className="h-full flex">
+                    <div className="h-full bg-green-500 transition-all duration-500"
+                      style={{ width: `${totalDisplayed > 0 ? (totalCaptured / totalDisplayed) * 100 : 0}%` }} />
+                    <div className="h-full bg-yellow-500 transition-all duration-500"
+                      style={{ width: `${totalDisplayed > 0 ? ((totalTracked - totalCaptured) / totalDisplayed) * 100 : 0}%` }} />
+                  </div>
+                ) : (
+                  <div className="h-full bg-green-500 transition-all duration-500"
+                    style={{ width: `${totalDisplayed > 0 ? (totalCaptured / totalDisplayed) * 100 : 0}%` }} />
+                )}
               </div>
             </div>
           </header>
 
           {/* Griglia mob */}
           {!isFishOnly && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6">
+            <div
+              ref={gridRef}
+              className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 mb-6"
+              style={{ userSelect: selectionMode ? 'none' : undefined }}
+            >
               {!groupByFolder
                 ? displayedMobs.map(mob => (
-                    <MobCard key={mob.fileName} mob={mob} isTracked={trackedMobs[mob.fileName]} onToggle={() => toggleMob(mob.fileName)} />
+                    <MobCard key={mob.fileName} mob={mob}
+                      isTracked={trackedMobs[mob.fileName]}
+                      isCaptured={captureMode && capturedMobs[mob.fileName]}
+                      isSelected={selectedMobs.has(mob.fileName)}
+                      captureMode={captureMode}
+                      selectionMode={selectionMode}
+                      onToggle={() => toggleMob(mob.fileName)}
+                      data-mob-id={mob.fileName}
+                    />
                   ))
                 : gridItems.map((item, i) =>
                     item.type === 'folder'
                       ? <FolderCard key={`folder_${item.folderKey}`} folderKey={item.folderKey} mobs={item.mobs}
                           trackedMobs={trackedMobs} isOpen={openFolders.has(item.folderKey)} onToggle={() => toggleFolder(item.folderKey)} />
-                      : <MobCard key={item.mob.fileName} mob={item.mob} isTracked={trackedMobs[item.mob.fileName]} onToggle={() => toggleMob(item.mob.fileName)} />
+                      : <MobCard key={item.mob.fileName} mob={item.mob}
+                          isTracked={trackedMobs[item.mob.fileName]}
+                          isCaptured={captureMode && capturedMobs[item.mob.fileName]}
+                          isSelected={selectedMobs.has(item.mob.fileName)}
+                          captureMode={captureMode}
+                          selectionMode={selectionMode}
+                          onToggle={() => toggleMob(item.mob.fileName)}
+                          data-mob-id={item.mob.fileName}
+                        />
                   )
               }
             </div>
+          )}
+
+          {/* Rettangolo selezione */}
+          {selRect && selRect.w > 4 && selRect.h > 4 && (
+            <div className="fixed pointer-events-none z-50 border-2 border-green-400 bg-green-400/10"
+              style={{ left: selRect.x, top: selRect.y, width: selRect.w, height: selRect.h }} />
           )}
 
           {/* Sezione Tropical Fish */}
