@@ -441,7 +441,7 @@ const MobTracker = () => {
         setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
       }
     } else {
-      // Diretto: catturato ↔ nessuno (pulisce anche avvistato se c'era)
+      // Verde diretto ↔ nessuno
       const wasCaptured = !!capturedMobs[id];
       if (wasCaptured) {
         setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
@@ -449,6 +449,35 @@ const MobTracker = () => {
       } else {
         setTrackedMobs(p => ({ ...p, [id]: true }));
         setCapturedMobs(p => ({ ...p, [id]: true }));
+      }
+    }
+  };
+
+  const applyDragSelection = (ids) => {
+    if (ids.size === 0) return;
+    if (captureMode) {
+      const allTracked  = [...ids].every(id => !!trackedMobs[id]);
+      const allCaptured = [...ids].every(id => !!capturedMobs[id]);
+      if (allCaptured) {
+        // Tutti catturati → reset tutti
+        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+      } else if (allTracked) {
+        // Tutti almeno avvistati, ma non tutti catturati → cattura solo quelli non ancora catturati
+        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
+      } else {
+        // C'è almeno uno vuoto → avvista solo i vuoti, lascia catturati/avvistati invariati
+        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => { if (!n[id]) n[id] = true; }); return n; });
+        // Non toccare capturedMobs
+      }
+    } else {
+      const allCaptured = [...ids].every(id => !!capturedMobs[id]);
+      if (allCaptured) {
+        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+      } else {
+        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
+        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
       }
     }
   };
@@ -513,9 +542,8 @@ const MobTracker = () => {
       dragStartedOnCard.current = false;
       setSelRect(null);
       if (wasRealDrag) {
-        // Drag reale → applica toggle alle card selezionate
         setSelectedMobs(prev => {
-          prev.forEach(id => toggleMob(id));
+          applyDragSelection(prev);
           return new Set();
         });
       } else if (wasOnCard) {
@@ -709,7 +737,7 @@ const MobTracker = () => {
                 ? displayedMobs.map(mob => (
                     <MobCard key={mob.fileName} mob={mob}
                       isTracked={trackedMobs[mob.fileName]}
-                      isCaptured={captureMode && capturedMobs[mob.fileName]}
+                      isCaptured={!!capturedMobs[mob.fileName]}
                       isSelected={selectedMobs.has(mob.fileName)}
                       captureMode={captureMode}
                       selectionMode={selectionMode}
@@ -723,7 +751,7 @@ const MobTracker = () => {
                           trackedMobs={trackedMobs} isOpen={openFolders.has(item.folderKey)} onToggle={() => toggleFolder(item.folderKey)} />
                       : <MobCard key={item.mob.fileName} mob={item.mob}
                           isTracked={trackedMobs[item.mob.fileName]}
-                          isCaptured={captureMode && capturedMobs[item.mob.fileName]}
+                          isCaptured={!!capturedMobs[item.mob.fileName]}
                           isSelected={selectedMobs.has(item.mob.fileName)}
                           captureMode={captureMode}
                           selectionMode={selectionMode}

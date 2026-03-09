@@ -88,7 +88,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Squid
 - [ ] Strider
 - [x] Tadpole
-- [ ] Tropical Fish
+- [x] Tropical Fish
 - [x] Turtle
 - [ ] Villager (baby)
 - [ ] Wandering Trader
@@ -113,7 +113,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [ ] Spider (varaints)
 - [ ] Wolf
 - [x] Zombified Piglin
-- [ ] Zombie Nautilus jockey
+- [x] Zombie Nautilus
 
 ### Hostile
 
