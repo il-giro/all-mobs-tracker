@@ -37,7 +37,7 @@ A list of things that could be added or improved:
 - [ ] Export/import progress (JSON backup)
 - [ ] Multiple save slots / profiles
 - [ ] Mob detail page with description and spawn info
-- [ ] Mark mobs as "seen but not tracked" (partial state)
+- [x] Mark mobs as "seen but not tracked" (partial state)
 - [x] Sort options (alphabetical, by completion, by category)
 - [ ] Mobile swipe to mark as tracked
 - [ ] Dark/light theme toggle

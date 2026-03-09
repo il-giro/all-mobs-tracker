@@ -95,7 +95,13 @@ const MobTracker = () => {
   const [capturedMobs, setCapturedMobs]     = useState(() => JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'));
   const [captureMode, setCaptureMode]       = useState(() => localStorage.getItem('mobTracker_captureMode') === 'true');
   const [selectionMode, setSelectionMode]   = useState(() => localStorage.getItem('mobTracker_selectionMode') === 'true');
+  const [confirmAdd, setConfirmAdd]         = useState(() => localStorage.getItem('mobTracker_confirmAdd') === 'true');
+  const [confirmRemove, setConfirmRemove]   = useState(() => localStorage.getItem('mobTracker_confirmRemove') === 'true');
   const [selectedMobs, setSelectedMobs]     = useState(new Set());
+  const [pendingAction, setPendingAction]   = useState(null); // { type, execute }
+  // Undo/redo stacks — ogni entry è { trackedMobs, capturedMobs }
+  const undoStack = useRef([]);
+  const redoStack = useRef([]);
   const [variantMode, setVariantMode]       = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
   const [showAllFish, setShowAllFish]       = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
   const [searchQuery, setSearchQuery]       = useState('');
@@ -180,28 +186,62 @@ const MobTracker = () => {
     return () => window.removeEventListener('mousedown', handler);
   }, [sortOpen]);
 
+  // Salva snapshot prima di ogni modifica (per undo)
+  const commitAction = (fn) => {
+    undoStack.current.push({ trackedMobs: { ...trackedMobs }, capturedMobs: { ...capturedMobs } });
+    if (undoStack.current.length > 50) undoStack.current.shift();
+    redoStack.current = [];
+    fn();
+  };
+
+  const undo = () => {
+    if (undoStack.current.length === 0) return;
+    redoStack.current.push({ trackedMobs: { ...trackedMobs }, capturedMobs: { ...capturedMobs } });
+    const prev = undoStack.current.pop();
+    setTrackedMobs(prev.trackedMobs);
+    setCapturedMobs(prev.capturedMobs);
+  };
+
+  const redo = () => {
+    if (redoStack.current.length === 0) return;
+    undoStack.current.push({ trackedMobs: { ...trackedMobs }, capturedMobs: { ...capturedMobs } });
+    const next = redoStack.current.pop();
+    setTrackedMobs(next.trackedMobs);
+    setCapturedMobs(next.capturedMobs);
+  };
+
   useEffect(() => {
     const handleKey = (e) => {
+      const tag = document.activeElement.tagName;
       if (e.key === 'Escape') {
         if (sortOpen)                        { setSortOpen(false);     return; }
         if (showSettings)                    { setShowSettings(false); return; }
         if (showStats)                       { setShowStats(false);    return; }
+        if (pendingAction)                   { setPendingAction(null); return; }
         if (searchQuery)                     { setSearchQuery('');     return; }
         if (selectedFolder !== 'all')        { setSelectedFolder('all'); return; }
       }
-      if (e.key === ' ' && !['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) {
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey && !['INPUT','SELECT','TEXTAREA'].includes(tag)) {
+        e.preventDefault(); undo(); return;
+      }
+      if ((e.key === 'y' && (e.ctrlKey || e.metaKey) || e.key === 'z' && (e.ctrlKey || e.metaKey) && e.shiftKey) && !['INPUT','SELECT','TEXTAREA'].includes(tag)) {
+        e.preventDefault(); redo(); return;
+      }
+      if (e.key === ' ' && !['INPUT','SELECT','TEXTAREA'].includes(tag)) {
         e.preventDefault();
         searchRef.current?.focus();
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [showSettings, showStats, searchQuery, selectedFolder, sortOpen]);
+  }, [showSettings, showStats, searchQuery, selectedFolder, sortOpen, pendingAction, trackedMobs, capturedMobs]);
 
   useEffect(() => { localStorage.setItem('mobTracker_saves',         JSON.stringify(trackedMobs));       }, [trackedMobs]);
   useEffect(() => { localStorage.setItem('mobTracker_captured',      JSON.stringify(capturedMobs));      }, [capturedMobs]);
   useEffect(() => { localStorage.setItem('mobTracker_captureMode',   String(captureMode));               }, [captureMode]);
   useEffect(() => { localStorage.setItem('mobTracker_selectionMode', String(selectionMode));             }, [selectionMode]);
+  useEffect(() => { localStorage.setItem('mobTracker_confirmAdd',    String(confirmAdd));                }, [confirmAdd]);
+  useEffect(() => { localStorage.setItem('mobTracker_confirmRemove', String(confirmRemove));             }, [confirmRemove]);
   useEffect(() => { localStorage.setItem('mobTracker_filters',       JSON.stringify(filters));           }, [filters]);
   useEffect(() => { localStorage.setItem('mobTracker_mode',          variantMode);                      }, [variantMode]);
   useEffect(() => { localStorage.setItem('mobTracker_showAllFish',   String(showAllFish));               }, [showAllFish]);
@@ -425,61 +465,104 @@ const MobTracker = () => {
   const totalCaptured  = isFishOnly ? fishCapturedCount : selectedFolder === 'all' ? mobCapturedCount + fishCapturedCount : mobCapturedCount;
   const totalDisplayed = isFishOnly ? displayedFish.length : selectedFolder === 'all' ? displayedMobs.length + displayedFish.length : displayedMobs.length;
 
-  // captureMode ON:  nessuno → avvistato (giallo) → catturato (verde) → nessuno
-  // captureMode OFF: nessuno → catturato (verde) → nessuno
-  const toggleMob = (id) => {
+  // Determina se un'azione è un'aggiunta o rimozione
+  const getMobName = (id) => {
+    const mob = allMobs.find(m => m.fileName === id);
+    if (mob) return mob.name;
+    // fish id: fish_typeIndex_bodyColor_patternColor
+    return id;
+  };
+
+  const isAddAction = (id) => {
     if (captureMode) {
       const wasTracked  = !!trackedMobs[id];
       const wasCaptured = !!capturedMobs[id];
-      if (!wasTracked && !wasCaptured) {
-        setTrackedMobs(p => ({ ...p, [id]: true }));
-        setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
-      } else if (wasTracked && !wasCaptured) {
-        setCapturedMobs(p => ({ ...p, [id]: true }));
-      } else {
-        setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
-        setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
-      }
-    } else {
-      // Verde diretto ↔ nessuno
-      const wasCaptured = !!capturedMobs[id];
-      if (wasCaptured) {
-        setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
-        setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
-      } else {
-        setTrackedMobs(p => ({ ...p, [id]: true }));
-        setCapturedMobs(p => ({ ...p, [id]: true }));
-      }
+      return !wasTracked && !wasCaptured; // nessuno → avvistato = aggiunta
     }
+    return !capturedMobs[id]; // nessuno → catturato = aggiunta
+  };
+
+  const executeToggle = (id) => {
+    commitAction(() => {
+      if (captureMode) {
+        const wasTracked  = !!trackedMobs[id];
+        const wasCaptured = !!capturedMobs[id];
+        if (!wasTracked && !wasCaptured) {
+          setTrackedMobs(p => ({ ...p, [id]: true }));
+          setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+        } else if (wasTracked && !wasCaptured) {
+          setCapturedMobs(p => ({ ...p, [id]: true }));
+        } else {
+          setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+          setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+        }
+      } else {
+        if (!!capturedMobs[id]) {
+          setTrackedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+          setCapturedMobs(p => { const n = { ...p }; delete n[id]; return n; });
+        } else {
+          setTrackedMobs(p => ({ ...p, [id]: true }));
+          setCapturedMobs(p => ({ ...p, [id]: true }));
+        }
+      }
+    });
+  };
+
+  // captureMode ON:  nessuno → avvistato (giallo) → catturato (verde) → nessuno
+  // captureMode OFF: nessuno → catturato (verde) → nessuno
+  const toggleMob = (id) => {
+    const adding   = isAddAction(id);
+    const removing = !adding && (captureMode ? !!capturedMobs[id] : !!capturedMobs[id]);
+    if (adding && confirmAdd) {
+      setPendingAction({ type: 'add', label: getMobName(id), execute: () => executeToggle(id) });
+      return;
+    }
+    if (removing && confirmRemove) {
+      setPendingAction({ type: 'remove', label: getMobName(id), execute: () => executeToggle(id) });
+      return;
+    }
+    executeToggle(id);
+  };
+
+  const executeApplyDrag = (ids) => {
+    commitAction(() => {
+      if (captureMode) {
+        const allTracked  = [...ids].every(id => !!trackedMobs[id]);
+        const allCaptured = [...ids].every(id => !!capturedMobs[id]);
+        if (allCaptured) {
+          setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+          setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+        } else if (allTracked) {
+          setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
+        } else {
+          setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => { if (!n[id]) n[id] = true; }); return n; });
+        }
+      } else {
+        const allCaptured = [...ids].every(id => !!capturedMobs[id]);
+        if (allCaptured) {
+          setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+          setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
+        } else {
+          setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
+          setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
+        }
+      }
+    });
   };
 
   const applyDragSelection = (ids) => {
     if (ids.size === 0) return;
-    if (captureMode) {
-      const allTracked  = [...ids].every(id => !!trackedMobs[id]);
-      const allCaptured = [...ids].every(id => !!capturedMobs[id]);
-      if (allCaptured) {
-        // Tutti catturati → reset tutti
-        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
-        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
-      } else if (allTracked) {
-        // Tutti almeno avvistati, ma non tutti catturati → cattura solo quelli non ancora catturati
-        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
-      } else {
-        // C'è almeno uno vuoto → avvista solo i vuoti, lascia catturati/avvistati invariati
-        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => { if (!n[id]) n[id] = true; }); return n; });
-        // Non toccare capturedMobs
-      }
-    } else {
-      const allCaptured = [...ids].every(id => !!capturedMobs[id]);
-      if (allCaptured) {
-        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
-        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => delete n[id]); return n; });
-      } else {
-        setTrackedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
-        setCapturedMobs(p => { const n = { ...p }; ids.forEach(id => { n[id] = true; }); return n; });
-      }
+    const allCaptured = [...ids].every(id => !!capturedMobs[id]);
+    const isRemoving  = allCaptured;
+    if (isRemoving && confirmRemove) {
+      setPendingAction({ type: 'remove', label: `${ids.size} mob`, execute: () => executeApplyDrag(ids) });
+      return;
     }
+    if (!isRemoving && confirmAdd) {
+      setPendingAction({ type: 'add', label: `${ids.size} mob`, execute: () => executeApplyDrag(ids) });
+      return;
+    }
+    executeApplyDrag(ids);
   };
 
   // Selezione drag — listener globali su window per non perdere il drag fuori dalla griglia
@@ -582,6 +665,32 @@ const MobTracker = () => {
       onMouseDown={handleGridMouseDown}
       style={{ cursor: selectionMode ? 'crosshair' : undefined }}
     >
+      {/* Dialog conferma */}
+      {pendingAction && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-stone-900 border-4 border-stone-600 shadow-2xl p-8 max-w-sm w-full mx-4">
+            <p className="text-xl uppercase text-stone-200 mb-2">
+              {pendingAction.type === 'add' ? '➕ Conferma aggiunta' : '🗑 Conferma rimozione'}
+            </p>
+            <p className="text-stone-400 text-sm uppercase mb-6">
+              {pendingAction.type === 'add'
+                ? `Aggiungere ${pendingAction.label}?`
+                : `Rimuovere ${pendingAction.label}?`}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { pendingAction.execute(); setPendingAction(null); }}
+                className={`flex-1 py-3 border-b-4 border-black uppercase text-sm transition-transform active:translate-y-1 active:border-b-0
+                  ${pendingAction.type === 'add' ? 'bg-green-700 hover:bg-green-600' : 'bg-red-800 hover:bg-red-700'}`}
+              >Conferma</button>
+              <button
+                onClick={() => setPendingAction(null)}
+                className="flex-1 py-3 bg-stone-700 hover:bg-stone-600 border-b-4 border-black uppercase text-sm transition-transform active:translate-y-1 active:border-b-0"
+              >Annulla</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showSettings && (
         <Settings
           variantMode={variantMode} setVariantMode={setVariantMode}
@@ -592,6 +701,8 @@ const MobTracker = () => {
           onClose={() => setShowSettings(false)}
           captureMode={captureMode} setCaptureMode={setCaptureMode}
           selectionMode={selectionMode} setSelectionMode={setSelectionMode}
+          confirmAdd={confirmAdd} setConfirmAdd={setConfirmAdd}
+          confirmRemove={confirmRemove} setConfirmRemove={setConfirmRemove}
         />
       )}
       {showStats && <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />}

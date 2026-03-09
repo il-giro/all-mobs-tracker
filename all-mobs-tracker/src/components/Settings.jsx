@@ -52,7 +52,8 @@ const ToggleBtn = ({ label, showIcon, active, onClick }) => (
 );
 
 const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilters, showAllFish, setShowAllFish, folderList = [], resetAll, onClose,
-  captureMode, setCaptureMode, selectionMode, setSelectionMode }) => {
+  captureMode, setCaptureMode, selectionMode, setSelectionMode,
+  confirmAdd, setConfirmAdd, confirmRemove, setConfirmRemove }) => {
   const [activePage, setActivePage] = useState('principale');
 
   const linkedComplexIds = useMemo(() => new Set(folderList.map(f => f.linkedComplexId).filter(Boolean)), [folderList]);
@@ -191,6 +192,30 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
                       </p>
                     </div>
                     <Toggle active={selectionMode} onClick={() => setSelectionMode(v => !v)} />
+                  </div>
+                </section>
+
+                <section className="bg-stone-800/50 p-5 border-2 border-stone-700 space-y-4">
+                  <label className="block text-sm text-amber-400 uppercase mb-1">Conferme</label>
+
+                  <div className="flex justify-between items-start gap-4 py-3 border-b-2 border-stone-700">
+                    <div className="flex-1">
+                      <p className="text-sm text-stone-200 uppercase">Conferma Aggiunta</p>
+                      <p className="text-xs text-stone-500 mt-1">
+                        Mostra una finestra di conferma prima di segnare un mob come avvistato o catturato
+                      </p>
+                    </div>
+                    <Toggle active={confirmAdd} onClick={() => setConfirmAdd(v => !v)} />
+                  </div>
+
+                  <div className="flex justify-between items-start gap-4 py-3">
+                    <div className="flex-1">
+                      <p className="text-sm text-stone-200 uppercase">Conferma Rimozione</p>
+                      <p className="text-xs text-stone-500 mt-1">
+                        Mostra una finestra di conferma prima di rimuovere un mob dai catturati
+                      </p>
+                    </div>
+                    <Toggle active={confirmRemove} onClick={() => setConfirmRemove(v => !v)} />
                   </div>
                 </section>
               </div>
