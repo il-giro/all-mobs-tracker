@@ -99,14 +99,12 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
     setTooltipPos(calcPos(cardRef.current.getBoundingClientRect()));
   };
 
-  // Colore bordo: selezione > catturato (verde) > avvistato (giallo) > normale
-  const borderClass = isSelected
-    ? 'border-green-300 shadow-[0_0_0_2px_#86efac]'
-    : isCaptured
-      ? 'border-green-600'
-      : isTracked
-        ? 'border-yellow-500'
-        : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1';
+  // Colore bordo via className — isSelected viene ignorato durante drag (usa data-selected CSS)
+  const borderClass = isCaptured
+    ? 'border-green-600'
+    : isTracked
+      ? 'border-yellow-500'
+      : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1';
 
   const imgOpacity = isCaptured ? 'opacity-40' : isTracked ? 'opacity-60' : '';
 
@@ -117,7 +115,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
       onClick={onToggle}
       onContextMenu={handleContextMenu}
       style={{ position: 'relative' }}
-      className={`group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible ${borderClass}`}
+      className={`mob-card group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible ${borderClass}`}
     >
       <div className={`aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden ${imgOpacity}`}>
         <img

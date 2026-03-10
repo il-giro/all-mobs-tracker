@@ -34,7 +34,7 @@ A personal tracker to keep track of every mob (and mob variant) in Minecraft. Cl
 
 A list of things that could be added or improved:
 
-- [ ] Export/import progress (JSON backup)
+- [x] Export/import progress (JSON backup)
 - [ ] Multiple save slots / profiles
 - [ ] Mob detail page with description and spawn info
 - [x] Mark mobs as "seen but not tracked" (partial state)
@@ -86,7 +86,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Sniffer
 - [x] Snow Golem
 - [x] Squid
-- [ ] Strider
+- [x] Strider
 - [x] Tadpole
 - [x] Tropical Fish
 - [x] Turtle

@@ -1,11 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SuffixConfig, ComplexConfig } from '../config/mobConfig';
+
+const SCROLLBAR_STYLE = `
+  .settings-scroll::-webkit-scrollbar { width: 6px; }
+  .settings-scroll::-webkit-scrollbar-track { background: #0c0c0c; }
+  .settings-scroll::-webkit-scrollbar-thumb { background: #44403c; border-radius: 0; }
+  .settings-scroll::-webkit-scrollbar-thumb:hover { background: #78716c; }
+`;
 
 const PAGES = [
   { id: 'principale',        label: 'Principale',       icon: '⚙' },
   { id: 'varianti-mob',      label: 'Varianti Mob',      icon: '🐾' },
   { id: 'varianti-speciali', label: 'Varianti Speciali', icon: '✦' },
-  { id: 'extra',             label: 'Extra',             icon: '◈' },
+  { id: 'data',              label: 'Data',              icon: '💾' },
 ];
 
 // Converte il nome cartella in PascalCase per il path icona
@@ -59,8 +66,12 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
   const linkedComplexIds = useMemo(() => new Set(folderList.map(f => f.linkedComplexId).filter(Boolean)), [folderList]);
   const unlinkedComplex  = useMemo(() => ComplexConfig.filter(c => !linkedComplexIds.has(c.id)), [linkedComplexIds]);
 
+  const FISH_FOLDER_KEY = 'folder:__fish__';
+
   const allFoldersActive = useMemo(() =>
-    folderList.every(f => filters[f.id] !== false) && unlinkedComplex.every(c => !!filters[c.id]),
+    folderList.every(f => filters[f.id] !== false) &&
+    unlinkedComplex.every(c => !!filters[c.id]) &&
+    filters[FISH_FOLDER_KEY] !== false,
     [folderList, unlinkedComplex, filters]
   );
 
@@ -78,6 +89,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
       const updated = { ...prev };
       folderList.forEach(f => { updated[f.id] = next; });
       unlinkedComplex.forEach(c => { updated[c.id] = next; });
+      updated[FISH_FOLDER_KEY] = next;
       return updated;
     });
   };
@@ -112,6 +124,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <style>{SCROLLBAR_STYLE}</style>
       <div
         className="bg-stone-900 w-full max-w-5xl shadow-2xl border-4 border-stone-600 flex flex-col"
         style={{ height: '80vh' }}
@@ -149,7 +162,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
           </nav>
 
           {/* Contenuto */}
-          <div className="flex-1 overflow-y-auto p-8 overscroll-contain">
+          <div className="settings-scroll flex-1 overflow-y-auto p-8 overscroll-contain">
 
             {/* PRINCIPALE */}
             {activePage === 'principale' && (
@@ -347,18 +360,108 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
               </div>
             )}
 
-            {/* EXTRA */}
-            {activePage === 'extra' && (
-              <div className="space-y-6">
-                <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Extra</h3>
-                <button
-                  onClick={resetAll}
-                  className="w-full bg-red-900 hover:bg-red-800 text-red-200 text-sm py-4 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 border-2 border-red-700"
-                >
-                  ⚠ Reset Progressi
-                </button>
-              </div>
-            )}
+            {/* DATA */}
+            {activePage === 'data' && (() => {
+              const handleExport = () => {
+                const data = {
+                  version: 1,
+                  exportedAt: new Date().toISOString(),
+                  progress: {
+                    saves:    JSON.parse(localStorage.getItem('mobTracker_saves')    || '{}'),
+                    captured: JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'),
+                  },
+                  settings: {
+                    filters:        JSON.parse(localStorage.getItem('mobTracker_filters')       || '{}'),
+                    mode:           localStorage.getItem('mobTracker_mode')           || 'main',
+                    showAllFish:    localStorage.getItem('mobTracker_showAllFish')    || 'false',
+                    sort:           localStorage.getItem('mobTracker_sort')           || 'alpha-asc',
+                    groupByFolder:  localStorage.getItem('mobTracker_groupByFolder')  || 'false',
+                    captureMode:    localStorage.getItem('mobTracker_captureMode')    || 'false',
+                    selectionMode:  localStorage.getItem('mobTracker_selectionMode')  || 'false',
+                    confirmAdd:     localStorage.getItem('mobTracker_confirmAdd')     || 'false',
+                    confirmRemove:  localStorage.getItem('mobTracker_confirmRemove')  || 'false',
+                  },
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement('a');
+                a.href     = url;
+                a.download = `mobtracker-backup-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+              };
+
+              const handleImport = (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  try {
+                    const data = JSON.parse(ev.target.result);
+                    if (data.progress) {
+                      if (data.progress.saves)    localStorage.setItem('mobTracker_saves',    JSON.stringify(data.progress.saves));
+                      if (data.progress.captured) localStorage.setItem('mobTracker_captured', JSON.stringify(data.progress.captured));
+                    }
+                    if (data.settings) {
+                      const s = data.settings;
+                      if (s.filters)       localStorage.setItem('mobTracker_filters',       JSON.stringify(s.filters));
+                      if (s.mode)          localStorage.setItem('mobTracker_mode',           s.mode);
+                      if (s.showAllFish)   localStorage.setItem('mobTracker_showAllFish',    s.showAllFish);
+                      if (s.sort)          localStorage.setItem('mobTracker_sort',           s.sort);
+                      if (s.groupByFolder) localStorage.setItem('mobTracker_groupByFolder',  s.groupByFolder);
+                      if (s.captureMode)   localStorage.setItem('mobTracker_captureMode',    s.captureMode);
+                      if (s.selectionMode) localStorage.setItem('mobTracker_selectionMode',  s.selectionMode);
+                      if (s.confirmAdd)    localStorage.setItem('mobTracker_confirmAdd',     s.confirmAdd);
+                      if (s.confirmRemove) localStorage.setItem('mobTracker_confirmRemove',  s.confirmRemove);
+                    }
+                    window.location.reload();
+                  } catch {
+                    alert('File non valido.');
+                  }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+              };
+
+              return (
+                <div className="space-y-6">
+                  <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Data</h3>
+
+                  <section className="bg-stone-800/50 p-5 border-2 border-stone-700 space-y-3">
+                    <p className="text-sm text-amber-400 uppercase">Importa</p>
+                    <p className="text-xs text-stone-500">Carica un backup precedente. La pagina verrà ricaricata.</p>
+                    <label className="block w-full mt-2">
+                      <span className="block w-full text-center bg-stone-700 hover:bg-stone-600 text-stone-200 text-sm py-3 border-b-4 border-black uppercase transition-transform cursor-pointer border-2 border-stone-600">
+                        ⬆ Importa backup
+                      </span>
+                      <input type="file" accept=".json" className="hidden" onChange={handleImport} />
+                    </label>
+                  </section>
+
+                  <section className="bg-stone-800/50 p-5 border-2 border-stone-700 space-y-3">
+                    <p className="text-sm text-amber-400 uppercase">Esporta</p>
+                    <p className="text-xs text-stone-500">Salva progressi e impostazioni in un file JSON.</p>
+                    <button
+                      onClick={handleExport}
+                      className="w-full bg-stone-700 hover:bg-stone-600 text-stone-200 text-sm py-3 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 border-2 border-stone-600 mt-2"
+                    >
+                      ⬇ Esporta backup
+                    </button>
+                  </section>
+
+                  <section className="bg-stone-800/50 p-5 border-2 border-red-900 space-y-3">
+                    <p className="text-sm text-red-400 uppercase">Pericoloso</p>
+                    <p className="text-xs text-stone-500">Rimuove tutti i progressi. Non reversibile.</p>
+                    <button
+                      onClick={resetAll}
+                      className="w-full bg-red-900 hover:bg-red-800 text-red-200 text-sm py-3 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 border-2 border-red-700 mt-2"
+                    >
+                      ⚠ Reset Progressi
+                    </button>
+                  </section>
+                </div>
+              );
+            })()}
 
           </div>
         </div>

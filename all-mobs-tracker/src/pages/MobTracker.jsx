@@ -98,10 +98,19 @@ const MobTracker = () => {
   const [confirmAdd, setConfirmAdd]         = useState(() => localStorage.getItem('mobTracker_confirmAdd') === 'true');
   const [confirmRemove, setConfirmRemove]   = useState(() => localStorage.getItem('mobTracker_confirmRemove') === 'true');
   const [selectedMobs, setSelectedMobs]     = useState(new Set());
-  const [pendingAction, setPendingAction]   = useState(null); // { type, execute }
-  // Undo/redo stacks — ogni entry è { trackedMobs, capturedMobs }
+  const [pendingAction, setPendingAction]   = useState(null);
   const undoStack = useRef([]);
   const redoStack = useRef([]);
+  // Ref always-fresh per evitare stale closure nel drag handler
+  const applyDragRef    = useRef(null);
+  const capturedMobsRef = useRef(capturedMobs);
+  const trackedMobsRef  = useRef(trackedMobs);
+  const captureModeRef  = useRef(captureMode);
+
+  // Aggiorna ref ad ogni render
+  useEffect(() => { capturedMobsRef.current = capturedMobs; }, [capturedMobs]);
+  useEffect(() => { trackedMobsRef.current  = trackedMobs;  }, [trackedMobs]);
+  useEffect(() => { captureModeRef.current  = captureMode;  }, [captureMode]);
   const [variantMode, setVariantMode]       = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
   const [showAllFish, setShowAllFish]       = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
   const [searchQuery, setSearchQuery]       = useState('');
@@ -564,78 +573,102 @@ const MobTracker = () => {
     }
     executeApplyDrag(ids);
   };
+  // Ref sempre aggiornata usata nell'effect drag (evita stale closure)
+  applyDragRef.current = applyDragSelection;
 
-  // Selezione drag — listener globali su window per non perdere il drag fuori dalla griglia
-  const gridRef          = useRef(null);
-  const isDragging       = useRef(false);
-  const dragStart        = useRef(null);
+  // Selezione drag — tutto su ref per evitare re-render durante il drag
+  const gridRef           = useRef(null);
+  const selBoxRef         = useRef(null);
+  const isDragging        = useRef(false);
+  const dragStart         = useRef(null); // { x, y } in coordinate pagina (pageX/pageY)
   const dragStartedOnCard = useRef(false);
-  const DRAG_THRESHOLD   = 6; // px minimi prima di considerarlo un drag
-  const [selRect, setSelRect] = useState(null);
+  const selRectRef        = useRef(null);
+  const selectedMobsRef   = useRef(new Set());
+  const DRAG_THRESHOLD    = 6;
+  const [selRect, setSelRect] = useState(null); // non più usato per render, solo per compatibilità
 
-  const getCardEls = () => gridRef.current ? Array.from(gridRef.current.querySelectorAll('[data-mob-id]')) : [];
+  const getCardEls = () => Array.from(document.querySelectorAll('[data-mob-id]'));
 
   const handleGridMouseDown = (e) => {
     if (!selectionMode || e.button !== 0) return;
-    // Controlla se il click è partito su una card
+    if (showSettings || showStats) return;
     const onCard = !!e.target.closest('[data-mob-id]');
     dragStartedOnCard.current = onCard;
     isDragging.current = true;
-    dragStart.current  = { x: e.clientX, y: e.clientY };
-    // Non inizia il rettangolo subito — aspetta che il drag superi la soglia
-    setSelectedMobs(new Set());
-    // Non preventDefault se siamo su una card — così il click funziona
+    // pageX/pageY: coordinate assolute documento, non cambiano con lo scroll
+    dragStart.current  = { x: e.pageX, y: e.pageY };
+    selectedMobsRef.current = new Set();
     if (!onCard) e.preventDefault();
   };
 
   useEffect(() => {
     if (!selectionMode) {
       setSelectedMobs(new Set());
-      setSelRect(null);
+      if (selBoxRef.current) selBoxRef.current.style.display = 'none';
       return;
     }
 
     const onMouseMove = (e) => {
       if (!isDragging.current || !dragStart.current) return;
-      const dx = Math.abs(e.clientX - dragStart.current.x);
-      const dy = Math.abs(e.clientY - dragStart.current.y);
-      // Sotto la soglia: non mostrare ancora il rettangolo
+      const px = e.pageX, py = e.pageY;
+      const dx = Math.abs(px - dragStart.current.x);
+      const dy = Math.abs(py - dragStart.current.y);
       if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) return;
-      // Se il drag è partito su una card ma ora si muove abbastanza, annulla il click sulla card
+
       dragStartedOnCard.current = false;
-      const x = Math.min(e.clientX, dragStart.current.x);
-      const y = Math.min(e.clientY, dragStart.current.y);
-      const w = Math.abs(e.clientX - dragStart.current.x);
-      const h = Math.abs(e.clientY - dragStart.current.y);
-      setSelRect({ x, y, w, h });
+
+      // Rettangolo in coordinate pagina (assolute) → position: absolute nel document
+      const x = Math.min(px, dragStart.current.x);
+      const y = Math.min(py, dragStart.current.y);
+      const w = Math.abs(px - dragStart.current.x);
+      const h = Math.abs(py - dragStart.current.y);
+
+      selRectRef.current = { x, y, w, h };
+
+      if (selBoxRef.current) {
+        selBoxRef.current.style.display = 'block';
+        selBoxRef.current.style.left    = `${x}px`;
+        selBoxRef.current.style.top     = `${y}px`;
+        selBoxRef.current.style.width   = `${w}px`;
+        selBoxRef.current.style.height  = `${h}px`;
+      }
+
+      // Hit-test: getBoundingClientRect è viewport, aggiungi scroll per confronto con pageX/Y
+      const scrollX = window.scrollX, scrollY = window.scrollY;
       const sel = new Set();
       getCardEls().forEach(el => {
         const r = el.getBoundingClientRect();
-        if (r.left < x + w && r.right > x && r.top < y + h && r.bottom > y) sel.add(el.dataset.mobId);
+        const ex = r.left + scrollX, ey = r.top + scrollY;
+        const ew = r.width,          eh = r.height;
+        if (ex < x + w && ex + ew > x && ey < y + h && ey + eh > y) {
+          sel.add(el.dataset.mobId);
+          el.dataset.selected = 'true';
+        } else {
+          delete el.dataset.selected;
+        }
       });
-      setSelectedMobs(sel);
+      selectedMobsRef.current = sel;
     };
 
-    const onMouseUp = (e) => {
+    const onMouseUp = () => {
       if (!isDragging.current) return;
-      const wasRealDrag = !!selRect;
-      const wasOnCard   = dragStartedOnCard.current;
+      const wasRealDrag = !!selRectRef.current;
       isDragging.current        = false;
       dragStart.current         = null;
       dragStartedOnCard.current = false;
-      setSelRect(null);
-      if (wasRealDrag) {
-        setSelectedMobs(prev => {
-          applyDragSelection(prev);
-          return new Set();
-        });
-      } else if (wasOnCard) {
-        // Click su card → il click normale gestirà il toggle, non fare nulla
-        setSelectedMobs(new Set());
+      selRectRef.current        = null;
+
+      if (selBoxRef.current) selBoxRef.current.style.display = 'none';
+      getCardEls().forEach(el => delete el.dataset.selected);
+
+      if (wasRealDrag && selectedMobsRef.current.size > 0) {
+        const ids = new Set(selectedMobsRef.current);
+        selectedMobsRef.current = new Set();
+        applyDragRef.current(ids);
       } else {
-        // Click su sfondo → annulla
-        setSelectedMobs(new Set());
+        selectedMobsRef.current = new Set();
       }
+      setSelectedMobs(new Set());
     };
 
     const onKeyDown = (e) => {
@@ -643,12 +676,15 @@ const MobTracker = () => {
         isDragging.current        = false;
         dragStart.current         = null;
         dragStartedOnCard.current = false;
-        setSelRect(null);
+        selRectRef.current        = null;
+        if (selBoxRef.current) selBoxRef.current.style.display = 'none';
+        getCardEls().forEach(el => delete el.dataset.selected);
+        selectedMobsRef.current = new Set();
         setSelectedMobs(new Set());
       }
     };
 
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseup',   onMouseUp);
     window.addEventListener('keydown',   onKeyDown);
     return () => {
@@ -656,15 +692,22 @@ const MobTracker = () => {
       window.removeEventListener('mouseup',   onMouseUp);
       window.removeEventListener('keydown',   onKeyDown);
     };
-  }, [selectionMode, selRect]);
+  }, [selectionMode]);
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
 
   return (
     <div
       className="min-h-screen bg-[#111] text-stone-100 flex flex-col"
       onMouseDown={handleGridMouseDown}
-      style={{ cursor: selectionMode ? 'crosshair' : undefined }}
+      style={{ cursor: selectionMode ? 'crosshair' : undefined, position: 'relative' }}
     >
+      <style>{`
+        [data-mob-id][data-selected="true"] { border-color: #86efac !important; box-shadow: 0 0 0 2px #86efac; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0c0c0c; }
+        ::-webkit-scrollbar-thumb { background: #44403c; }
+        ::-webkit-scrollbar-thumb:hover { background: #78716c; }
+      `}</style>
       {/* Dialog conferma */}
       {pendingAction && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -697,7 +740,7 @@ const MobTracker = () => {
           filters={filters} toggleFilter={(id) => setFilters(p => ({ ...p, [id]: !p[id] }))} setFilters={setFilters}
           showAllFish={showAllFish} setShowAllFish={setShowAllFish}
           folderList={folderList}
-          resetAll={() => confirm('Sei sicuro di voler resettare tutti i progressi?') && setTrackedMobs({})}
+          resetAll={() => { if (confirm('Sei sicuro di voler resettare tutti i progressi?')) { setTrackedMobs({}); setCapturedMobs({}); } }}
           onClose={() => setShowSettings(false)}
           captureMode={captureMode} setCaptureMode={setCaptureMode}
           selectionMode={selectionMode} setSelectionMode={setSelectionMode}
@@ -849,7 +892,6 @@ const MobTracker = () => {
                     <MobCard key={mob.fileName} mob={mob}
                       isTracked={trackedMobs[mob.fileName]}
                       isCaptured={!!capturedMobs[mob.fileName]}
-                      isSelected={selectedMobs.has(mob.fileName)}
                       captureMode={captureMode}
                       selectionMode={selectionMode}
                       onToggle={() => toggleMob(mob.fileName)}
@@ -863,7 +905,6 @@ const MobTracker = () => {
                       : <MobCard key={item.mob.fileName} mob={item.mob}
                           isTracked={trackedMobs[item.mob.fileName]}
                           isCaptured={!!capturedMobs[item.mob.fileName]}
-                          isSelected={selectedMobs.has(item.mob.fileName)}
                           captureMode={captureMode}
                           selectionMode={selectionMode}
                           onToggle={() => toggleMob(item.mob.fileName)}
@@ -874,11 +915,12 @@ const MobTracker = () => {
             </div>
           )}
 
-          {/* Rettangolo selezione */}
-          {selRect && selRect.w > 4 && selRect.h > 4 && (
-            <div className="fixed pointer-events-none z-50 border-2 border-green-400 bg-green-400/10"
-              style={{ left: selRect.x, top: selRect.y, width: selRect.w, height: selRect.h }} />
-          )}
+          {/* Rettangolo selezione — position absolute nel documento, segue lo scroll */}
+          <div
+            ref={selBoxRef}
+            className="pointer-events-none z-50 border-2 border-green-400 bg-green-400/10"
+            style={{ display: 'none', position: 'absolute' }}
+          />
 
           {/* Sezione Tropical Fish */}
           {showFishSection && (
@@ -897,7 +939,9 @@ const MobTracker = () => {
               <div className="p-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{ position: 'relative', zIndex: 1 }}>
                   {displayedFish.map(fish => (
-                    <TropicalFishCard key={fish.id} fish={fish} isTracked={trackedMobs[fish.id]} onToggle={() => toggleMob(fish.id)} />
+                    <div key={fish.id} data-mob-id={fish.id}>
+                      <TropicalFishCard fish={fish} isTracked={trackedMobs[fish.id]} onToggle={() => toggleMob(fish.id)} />
+                    </div>
                   ))}
                 </div>
               </div>
