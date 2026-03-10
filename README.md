@@ -59,7 +59,7 @@ Use this to track which mobs have all their variants properly added to the track
 
 - [x] Allay
 - [x] Armadillo
-- [ ] Axolotl (missing green)
+- [x] Axolotl
 - [x] Bat
 - [x] Bat
 - [ ] Cat (baby)
@@ -110,7 +110,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Piglin
 - [x] Pufferfish
 - [x] Polar Bear
-- [ ] Spider (varaints)
+- [x] Spider + Jockeys
 - [ ] Wolf
 - [x] Zombified Piglin
 - [x] Zombie Nautilus

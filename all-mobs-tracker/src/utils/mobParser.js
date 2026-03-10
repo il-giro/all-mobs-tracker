@@ -41,7 +41,7 @@ export const parseFileName = (fileName, path) => {
 
           if (config.useFileName) {
             const rawName = cleanName
-              .replace(/^\d+\.\d+(\.\d+)?/, '')
+              .replace(/^\d+(\.\d+)*/, '')  // rimuove "6" o "1.2" o "1.2.3"
               .replace(/-/g, ' ')
               .replace(/([A-Z])/g, ' $1')
               .trim();

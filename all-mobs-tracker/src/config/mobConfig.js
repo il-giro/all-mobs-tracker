@@ -111,22 +111,6 @@ export const ComplexConfig = [
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
   },
   {
-    id: 'enderman',
-    label: 'Varianti Enderman',
-    pathIncludes: '/enderman/',
-    regex: /^(\d+)(.+)$/,
-    type: 'complex_variant',
-    badgeColor: 'bg-purple-600',
-    defaultShow: false,
-    isBaseCondition: (n1) => n1 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]);
-      const block = { 1: '', 2: 'Sand', 3: 'Cactus', 4: 'Tnt', 5: 'Grass' };
-      return `Enderman ${block[n1] || ''}`;
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]) })
-  },
-  {
     id: 'llama',
     label: 'Varianti Llama',
     pathIncludes: '/llama/',

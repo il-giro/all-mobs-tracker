@@ -49,6 +49,10 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const villagerIcons  = getVillagerIcons(mob);
   const mobCategories  = getCategoriesForMob(mob.name, mob.activeSuffixes.map(id => SuffixConfig[id]?.label ?? ''));
 
+  // Estrae item tenuto dall'enderman dal path immagine (es. "Holding-Dandelion" → "dandelion")
+  const holdingItemMatch = mob.image?.match(/[Hh]olding-([A-Za-z]+(?:-[A-Za-z]+)*)/);
+  const holdingItem = holdingItemMatch ? holdingItemMatch[1].toLowerCase().replace(/-/g, '_') : null;
+
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
         const labels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))];
@@ -170,6 +174,19 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
           </>
         )}
 
+        {/* Icona item tenuto — sempre visibile anche se tracciato/catturato */}
+        {holdingItem && (
+          <div className="absolute bottom-1 right-1 z-20">
+            <img
+              src={`/icons/items/${holdingItem}.png`}
+              alt={holdingItem}
+              draggable={false}
+              onError={e => { e.currentTarget.style.display = 'none'; }}
+              className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]"
+            />
+          </div>
+        )}
+
         {isCaptured && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <span className="text-green-500 text-7xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">✔</span>
@@ -219,6 +236,20 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
           <p className="text-sm text-white uppercase mb-2 border-b-2 border-stone-600 pb-2 leading-tight">
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
+
+          {holdingItem && (
+            <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-stone-700">
+              <img
+                src={`/icons/items/${holdingItem}.png`}
+                alt={holdingItem}
+                draggable={false}
+                onError={e => { e.currentTarget.style.display = 'none'; }}
+                className="w-5 h-5 object-contain pixelated shrink-0"
+              />
+              <span className="text-stone-300 text-xs uppercase">{holdingItem.replace(/_/g, ' ')}</span>
+              <span className="text-stone-600 text-[9px] uppercase ml-auto">holds</span>
+            </div>
+          )}
 
           {villagerIcons && (
             <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
