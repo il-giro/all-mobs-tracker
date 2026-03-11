@@ -156,4 +156,22 @@ export const ComplexConfig = [
     formatName: () => '',
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]) })
   },
+  {
+    id: 'wolf',
+    label: 'Varianti Wolf',
+    pathIncludes: '/wolf/',
+    regex: /^(\d+)\.(\d+)\.(\d+)/,
+    type: 'color_variant',
+    badgeColor: 'bg-gray-600',
+    defaultShow: false,
+    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
+    formatName: (match) => {
+      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
+      const type = { 1: 'Pale', 2: 'Ashen', 3: 'Black', 4: 'Chestnut', 5: 'Rusty', 6: 'Snowy', 7: 'Spotted', 8: 'Striped', 9: 'Woods' };
+      const armor = { 1: '', 2: 'Collar', 3: 'Armor' };
+      const collarColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
+      return `Wolf ${type[n1] || ''} ` + (n2 != 1 ? ' with ' + armor[n2] + ' (' : '') + ` ${collarColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 != 1 ? ')' : '');
+    },
+    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
+  },
 ];
