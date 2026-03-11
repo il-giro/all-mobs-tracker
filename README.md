@@ -55,7 +55,7 @@ A list of things that could be added or improved:
 
 Use this to track which mobs have all their variants properly added to the tracker.
 
-### Passive
+### Passive [ ]
 
 - [x] Allay
 - [x] Armadillo
@@ -94,7 +94,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [ ] Wandering Trader
 - [ ] Zombie Horse
 
-### Neutral
+### Neutral [ ]
 
 - [x] Bee
 - [x] Cave Spider
@@ -111,11 +111,12 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Pufferfish
 - [x] Polar Bear
 - [x] Spider + Jockeys
-- [ ] Wolf
+- [ ] Wandering Trader Llama
+- [x] Wolf
 - [x] Zombified Piglin
 - [x] Zombie Nautilus
 
-### Hostile
+### Hostile [x]
 
 - [x] Blaze
 - [x] Bogged
@@ -146,18 +147,19 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Zombie
 - [x] Zombie Villager
 
-### Bosses
+### Bosses [x]
 
 - [x] Ender Dragon
 - [x] Wither
 
-### Special / Variants
+### Special / Variants [ ]
 
 - [ ] All Baby variants (all breedable mobs)
 - [x] All Baby monster variants
 - [X] All Pumpkin variants (all mobs that can spawn with pumpkin)
 - [ ] All Jockey variants
 - [ ] Unobtainable variants
+- [ ] All color variants (wolf collars, happy ghasts...)
 
 ---
 
