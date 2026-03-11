@@ -51,7 +51,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
 
   // Estrae item tenuto dall'enderman dal path immagine (es. "Holding-Dandelion" → "dandelion")
   const holdingItemMatch = mob.image?.match(/[Hh]olding-([A-Za-z]+(?:-[A-Za-z]+)*)/);
-  const holdingItem = holdingItemMatch ? holdingItemMatch[1].toLowerCase().replace(/-/g, '_') : null;
+  const holdingItem = holdingItemMatch ? holdingItemMatch[1].toLowerCase() : null;
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
