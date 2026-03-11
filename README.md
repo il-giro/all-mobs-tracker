@@ -94,7 +94,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [ ] Wandering Trader
 - [ ] Zombie Horse
 
-### Neutral [ ]
+### Neutral [x]
 
 - [x] Bee
 - [x] Cave Spider
@@ -111,7 +111,7 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Pufferfish
 - [x] Polar Bear
 - [x] Spider + Jockeys
-- [ ] Wandering Trader Llama
+- [x] Trader Llama
 - [x] Wolf
 - [x] Zombified Piglin
 - [x] Zombie Nautilus
