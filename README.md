@@ -64,8 +64,8 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Bat
 - [ ] Cat (baby)
 - [x] Camel
-- [ ] Camel husk
-- [x] Chicken
+- [x] Camel husk
+- [ ] Chicken (jockey)
 - [x] Cod
 - [x] Copper Golem
 - [x] Cow
