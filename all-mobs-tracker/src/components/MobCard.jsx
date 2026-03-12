@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { SuffixConfig, SuffixPriority, ComplexConfig, VillagerBiomes, VillagerJobs } from '../config/mobConfig';
+import { SuffixConfig, SuffixPriority } from '../config/mobConfig';
 import { getCategoriesForMob } from '../config/mobCategories';
+import { resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {
@@ -13,15 +14,6 @@ if (typeof window !== 'undefined') {
 const TOOLTIP_EVENT = 'mobcard:tooltip';
 const TOOLTIP_W = 220;
 const TOOLTIP_H = 420;
-
-const getVillagerIcons = (mob) => {
-  if (!mob.complexId) return null;
-  const config = ComplexConfig.find(c => c.id === mob.complexId);
-  if (!config?.useVillagerIcons) return null;
-  const biomeData = VillagerBiomes[mob.num1] ?? null;
-  const jobData   = VillagerJobs[mob.num2]   ?? null;
-  return { biome: biomeData ?? null, job: jobData ?? null };
-};
 
 const calcPos = (rect) => {
   let x = rect.right + 8 + TOOLTIP_W < window.innerWidth
@@ -35,10 +27,27 @@ const calcPos = (rect) => {
   return { x, y };
 };
 
+// Renderizza una singola icona nella posizione configurata
+const MobIcon = ({ icon }) => {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <div className={`${POSITION_CLASSES[icon.position]} border border-white rounded-sm z-20`}>
+      <img
+        src={icon.src}
+        alt={icon.alt}
+        draggable={false}
+        onError={icon.fallbackHide ? () => setVisible(false) : undefined}
+        className={`${SIZE_CLASSES[icon.size ?? 'sm']} object-contain pixelated`}
+      />
+    </div>
+  );
+};
+
 const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectionMode, onToggle, 'data-mob-id': dataMobId }) => {
   const [tooltipPos, setTooltipPos] = useState(null);
-  const navigate    = useNavigate();
-  const cardRef     = useRef(null);
+  const navigate   = useNavigate();
+  const cardRef    = useRef(null);
   const instanceId = useRef(Math.random());
   const isOpen     = useRef(false);
 
@@ -46,12 +55,11 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const topSuffixBadge = topSuffixId ? SuffixConfig[topSuffixId] : null;
   const allBadges      = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => SuffixConfig[id]);
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
-  const villagerIcons  = getVillagerIcons(mob);
+  const isVillager     = hasVillagerIcons(mob);
   const mobCategories  = getCategoriesForMob(mob.name, mob.activeSuffixes.map(id => SuffixConfig[id]?.label ?? ''));
 
-  // Estrae item tenuto dall'enderman dal path immagine (es. "Holding-Dandelion" → "dandelion")
-  const holdingItemMatch = mob.image?.match(/[Hh]olding-([A-Za-z]+(?:-[A-Za-z]+)*)/);
-  const holdingItem = holdingItemMatch ? holdingItemMatch[1].toLowerCase() : null;
+  // Risolve tutte le icone da mostrare per questo mob
+  const iconMap = resolveIcons(mob);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
@@ -103,7 +111,6 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
     setTooltipPos(calcPos(cardRef.current.getBoundingClientRect()));
   };
 
-  // Colore bordo via className — isSelected viene ignorato durante drag (usa data-selected CSS)
   const borderClass = isCaptured
     ? 'border-green-600'
     : isTracked
@@ -130,8 +137,10 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
           className="max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform select-none"
         />
 
+        {/* Badge e icone — nascosti se già tracciato/catturato */}
         {!isTracked && !isCaptured && (
           <>
+            {/* Badge categoria complessa (es. Horse, Sheep) — top-left */}
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
@@ -139,53 +148,33 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
                 </div>
               </div>
             )}
-            {topSuffixBadge && !villagerIcons && (
-              <div className="absolute top-1 right-1 z-20">
-                <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
-                  {topSuffixBadge.label}
-                </div>
-              </div>
-            )}
-            {topSuffixBadge && villagerIcons && (
-              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-20">
+
+            {/* Suffix badge (Baby, Jockey, ecc.)
+                Se il mob è un villager va sotto al centro per non coprire bioma/job,
+                altrimenti va in alto a destra. */}
+            {topSuffixBadge && (
+              <div className={isVillager
+                ? 'absolute bottom-1 left-1/2 -translate-x-1/2 z-20'
+                : 'absolute top-1 right-1 z-20'
+              }>
                 <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md whitespace-nowrap`}>
                   {topSuffixBadge.label}
                 </div>
               </div>
             )}
-            {villagerIcons?.job?.icon && !topSuffixBadge && (
-              <div className="absolute bottom-1 left-1 z-20">
-                <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} draggable={false}
-                  className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]" />
-              </div>
-            )}
-            {villagerIcons?.job?.icon && topSuffixBadge && (
-              <div className="absolute top-1 right-1 z-20">
-                <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} draggable={false}
-                  className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]" />
-              </div>
-            )}
-            {villagerIcons?.biome?.icon && (
-              <div className="absolute bottom-1 right-1 z-20">
-                <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} draggable={false}
-                  className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]" />
-              </div>
-            )}
+
+            {/* Icone risolte da mobIcons.js */}
+            {[...iconMap.values()].map(icon => (
+              <MobIcon key={icon.resolverId} icon={icon} />
+            ))}
           </>
         )}
 
-        {/* Icona item tenuto — sempre visibile anche se tracciato/catturato */}
-        {holdingItem && (
-          <div className="absolute bottom-1 right-1 z-20">
-            <img
-              src={`/icons/items/${holdingItem}.png`}
-              alt={holdingItem}
-              draggable={false}
-              onError={e => { e.currentTarget.style.display = 'none'; }}
-              className="w-5 h-5 object-contain pixelated drop-shadow-[0_1px_2px_rgba(0,0,0,1)]"
-            />
-          </div>
-        )}
+        {/* Icone con alwaysVisible:true — mostrate anche quando tracciato/catturato */}
+        {[...iconMap.values()]
+          .filter(icon => icon.alwaysVisible)
+          .map(icon => <MobIcon key={`always_${icon.resolverId}`} icon={icon} />)
+        }
 
         {isCaptured && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
@@ -237,42 +226,24 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
 
-          {holdingItem && (
-            <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-stone-700">
-              <img
-                src={`/icons/items/${holdingItem}.png`}
-                alt={holdingItem}
-                draggable={false}
-                onError={e => { e.currentTarget.style.display = 'none'; }}
-                className="w-5 h-5 object-contain pixelated shrink-0"
-              />
-              <span className="text-stone-300 text-xs uppercase">{holdingItem.replace(/_/g, ' ')}</span>
-              <span className="text-stone-600 text-[9px] uppercase ml-auto">holds</span>
-            </div>
-          )}
-
-          {villagerIcons && (
+          {/* Righe icone nel tooltip — generate automaticamente dai resolver con label */}
+          {[...iconMap.values()].filter(icon => icon.label).length > 0 && (
             <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
-              {villagerIcons.biome && (
-                <div className="flex items-center gap-2">
-                  {villagerIcons.biome.icon
-                    ? <img src={villagerIcons.biome.icon} alt={villagerIcons.biome.label} className="w-5 h-5 object-contain pixelated shrink-0" />
-                    : <div className="w-5 h-5 shrink-0" />
-                  }
-                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.biome.label}</span>
-                  <span className="text-stone-600 text-[9px] uppercase ml-auto">bioma</span>
+              {[...iconMap.values()].filter(icon => icon.label).map(icon => (
+                <div key={icon.resolverId} className="flex items-center gap-2">
+                  <img
+                    src={icon.src}
+                    alt={icon.alt}
+                    draggable={false}
+                    onError={icon.fallbackHide ? (e) => { e.currentTarget.closest('.flex')?.remove(); } : undefined}
+                    className="w-5 h-5 object-contain pixelated shrink-0"
+                  />
+                  <span className="text-stone-300 text-xs uppercase">{icon.label}</span>
+                  {icon.labelRole && (
+                    <span className="text-stone-600 text-[9px] uppercase ml-auto">{icon.labelRole}</span>
+                  )}
                 </div>
-              )}
-              {villagerIcons.job && (
-                <div className="flex items-center gap-2">
-                  {villagerIcons.job.icon
-                    ? <img src={villagerIcons.job.icon} alt={villagerIcons.job.label} className="w-5 h-5 object-contain pixelated shrink-0" />
-                    : <div className="w-5 h-5 shrink-0" />
-                  }
-                  <span className="text-stone-300 text-xs uppercase">{villagerIcons.job.label}</span>
-                  <span className="text-stone-600 text-[9px] uppercase ml-auto">job</span>
-                </div>
-              )}
+              ))}
             </div>
           )}
 
@@ -304,7 +275,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
               )}
             </div>
           ) : (
-            !villagerIcons && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
+            !isVillager && iconMap.size === 0 && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
           )}
 
           {mobCategories.length > 0 && (

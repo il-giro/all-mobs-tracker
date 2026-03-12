@@ -6,7 +6,8 @@ import { FISH_TYPES, COLOR_NAMES } from '../utils/FishRenderer';
 import { OFFICIAL_NAMES } from '../components/TropicalFishCard';
 import Stats from '../components/Stats';
 import { parseFileName } from '../utils/mobParser';
-import { SuffixConfig, ComplexConfig, SpecialFolderMap, VillagerBiomes, VillagerJobs } from '../config/mobConfig';
+import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
+import { VillagerBiomes, VillagerJobs } from '../config/mobIcons';
 import Footer from '../components/Footer';
 
 const ALL_FISH = (() => {
