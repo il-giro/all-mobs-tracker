@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { SuffixConfig, ComplexConfig } from '../config/mobConfig';
+import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
 
 const SCROLLBAR_STYLE = `
   .settings-scroll::-webkit-scrollbar { width: 6px; }
@@ -15,8 +15,6 @@ const PAGES = [
   { id: 'data',              label: 'Data',              icon: '💾' },
 ];
 
-// Converte il nome cartella in PascalCase per il path icona
-// es. "zombie villagers" → "ZombieVillagers", "wolves" → "Wolves"
 const toIconName = (label) =>
   label.replace(/(?:^|\s)\w/g, c => c.trim().toUpperCase());
 
@@ -35,7 +33,6 @@ const FolderIcon = ({ label }) => {
   );
 };
 
-// Toggle solo sul quadratino
 const Toggle = ({ active, onClick }) => (
   <div
     onClick={onClick}
@@ -48,19 +45,17 @@ const Toggle = ({ active, onClick }) => (
   </div>
 );
 
-const ToggleBtn = ({ label, showIcon, active, onClick }) => (
-  <div className="flex justify-between items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none">
-    <div className="flex items-center gap-2 truncate pr-2">
-      {showIcon && <FolderIcon label={label} />}
-      <span className="text-sm text-stone-300 uppercase truncate">{label}</span>
-    </div>
-    <Toggle active={active} onClick={onClick} />
-  </div>
-);
-
-const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilters, showAllFish, setShowAllFish, folderList = [], resetAll, onClose,
-  captureMode, setCaptureMode, selectionMode, setSelectionMode,
-  confirmAdd, setConfirmAdd, confirmRemove, setConfirmRemove }) => {
+const Settings = ({
+  variantMode, setVariantMode,
+  filters, toggleFilter, setFilters,
+  showAllFish, setShowAllFish,
+  folderList = [],
+  resetAll, onClose,
+  captureMode, setCaptureMode,
+  selectionMode, setSelectionMode,
+  confirmAdd, setConfirmAdd,
+  confirmRemove, setConfirmRemove,
+}) => {
   const [activePage, setActivePage] = useState('principale');
 
   const linkedComplexIds = useMemo(() => new Set(folderList.map(f => f.linkedComplexId).filter(Boolean)), [folderList]);
@@ -68,6 +63,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
 
   const FISH_FOLDER_KEY = 'folder:__fish__';
 
+  // ── Varianti Mob ──────────────────────────────────────────────────────────
   const allFoldersActive = useMemo(() =>
     folderList.every(f => filters[f.id] !== false) &&
     unlinkedComplex.every(c => !!filters[c.id]) &&
@@ -106,21 +102,57 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
     });
   };
 
-  const suffixList = Object.values(SuffixConfig);
+  // ── Varianti Speciali ─────────────────────────────────────────────────────
+  // suffixList ordinata per label
+  const suffixList = useMemo(
+    () => Object.values(SuffixConfig).sort((a, b) => a.label.localeCompare(b.label)),
+    []
+  );
 
-  const allSpecialsActive = useMemo(
+  // Chiave per il toggle "mostra cartella" = suffixId (es. 'A', 'B', …)
+  // Chiave per il toggle "mostra varianti" = 'variants:special:<suffixId>'
+  const specialVariantsKey = (suffixId) => `variants:special:${suffixId}`;
+
+  const allSpecialFoldersActive = useMemo(
     () => suffixList.every(s => filters[s.id] !== false),
     [suffixList, filters]
   );
 
-  const toggleAllSpecials = () => {
-    const next = !allSpecialsActive;
+  const allSpecialVariantsActive = useMemo(
+    () => suffixList.every(s => filters[specialVariantsKey(s.id)] !== false),
+    [suffixList, filters]
+  );
+
+  const toggleAllSpecialFolders = () => {
+    const next = !allSpecialFoldersActive;
     setFilters(prev => {
       const updated = { ...prev };
       suffixList.forEach(s => { updated[s.id] = next; });
       return updated;
     });
   };
+
+  const toggleAllSpecialVariants = () => {
+    const next = !allSpecialVariantsActive;
+    setFilters(prev => {
+      const updated = { ...prev };
+      suffixList.forEach(s => { updated[specialVariantsKey(s.id)] = next; });
+      return updated;
+    });
+  };
+
+  // Inizializza le chiavi variants:special:* mancanti a true
+  useEffect(() => {
+    setFilters(prev => {
+      const updated = { ...prev };
+      let changed = false;
+      suffixList.forEach(s => {
+        const k = specialVariantsKey(s.id);
+        if (updated[k] === undefined) { updated[k] = true; changed = true; }
+      });
+      return changed ? updated : prev;
+    });
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -164,7 +196,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
           {/* Contenuto */}
           <div className="settings-scroll flex-1 overflow-y-auto p-8 overscroll-contain">
 
-            {/* PRINCIPALE */}
+            {/* ── PRINCIPALE ──────────────────────────────────────────────── */}
             {activePage === 'principale' && (
               <div className="space-y-6">
                 <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Principale</h3>
@@ -234,7 +266,7 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
               </div>
             )}
 
-            {/* VARIANTI MOB */}
+            {/* ── VARIANTI MOB ────────────────────────────────────────────── */}
             {activePage === 'varianti-mob' && (() => {
               const linkedComplexIds = new Set(folderList.map(f => f.linkedComplexId).filter(Boolean));
               const FISH_KEY     = 'folder:__fish__';
@@ -343,24 +375,69 @@ const Settings = ({ variantMode, setVariantMode, filters, toggleFilter, setFilte
               );
             })()}
 
-            {/* VARIANTI SPECIALI */}
+            {/* ── VARIANTI SPECIALI ────────────────────────────────────────── */}
             {activePage === 'varianti-speciali' && (
               <div className="space-y-4">
                 <h3 className="text-xl text-stone-300 uppercase border-b-2 border-stone-700 pb-3">Varianti Speciali</h3>
-                <div className="space-y-2">
-                  {/* Toggle globale speciali */}
-                  <div className="flex items-center justify-between mb-2 border-b border-stone-800 pb-2">
-                    <p className="text-xs text-stone-500 uppercase">Tutti</p>
-                    <Toggle active={allSpecialsActive} onClick={toggleAllSpecials} />
+                <p className="text-stone-500 text-xs uppercase leading-relaxed border-2 border-stone-800 p-3">
+                  Cartella off → nasconde il pulsante nella home e i mob di quella categoria.
+                  Varianti off → mostra solo il mob base di ogni categoria speciale (senza sub-varianti).
+                </p>
+
+                {/* Header colonne */}
+                <div className="flex items-center border-b border-stone-800 pb-2 pr-1">
+                  <div className="flex-1" />
+                  <div className="flex gap-2 shrink-0">
+                    <span className="w-14 text-center text-[10px] text-stone-600 uppercase">Cartella</span>
+                    <span className="w-14 text-center text-[10px] text-stone-600 uppercase">Varianti</span>
                   </div>
-                  {suffixList.map(s => (
-                    <ToggleBtn key={s.id} label={`Mostra ${s.label}`} active={filters[s.id]} onClick={() => toggleFilter(s.id)} />
-                  ))}
+                </div>
+
+                {/* Toggle globali */}
+                <div className="flex items-center border-b border-stone-800 pb-2">
+                  <p className="text-xs text-stone-500 uppercase flex-1">Tutti</p>
+                  <div className="flex gap-2 shrink-0">
+                    <Toggle active={allSpecialFoldersActive}  onClick={toggleAllSpecialFolders}  />
+                    <Toggle active={allSpecialVariantsActive} onClick={toggleAllSpecialVariants} />
+                  </div>
+                </div>
+
+                {/* Righe per ogni suffisso */}
+                <div className="space-y-2">
+                  {suffixList.map(s => {
+                    const varKey      = specialVariantsKey(s.id);
+                    const folderActive  = filters[s.id] !== false;
+                    const variantActive = filters[varKey] !== false;
+                    return (
+                      <div
+                        key={s.id}
+                        className="flex items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none gap-2"
+                      >
+                        {/* Pallino colore categoria */}
+                        <span className={`w-3 h-3 shrink-0 border border-stone-600 ${s.color}`} />
+                        <span className="text-sm text-stone-300 uppercase truncate flex-1 pr-2">
+                          {s.label}
+                        </span>
+                        <div className="flex gap-2 shrink-0">
+                          {/* Toggle cartella */}
+                          <Toggle
+                            active={folderActive}
+                            onClick={() => toggleFilter(s.id)}
+                          />
+                          {/* Toggle varianti */}
+                          <Toggle
+                            active={variantActive}
+                            onClick={() => setFilters(prev => ({ ...prev, [varKey]: !variantActive }))}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* DATA */}
+            {/* ── DATA ────────────────────────────────────────────────────── */}
             {activePage === 'data' && (() => {
               const handleExport = () => {
                 const data = {

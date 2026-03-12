@@ -40,6 +40,12 @@ const folderLabel = (folder) => {
   return folder.charAt(0).toUpperCase() + folder.slice(1);
 };
 
+// Mappa inversa SpecialFolderMap: suffixId → folderKey
+// es: 'A' → 'special:baby breed'
+const SUFFIX_TO_FOLDER = Object.fromEntries(
+  Object.entries(SpecialFolderMap).map(([folderName, suffixId]) => [suffixId, `special:${folderName}`])
+);
+
 // Card-cartella
 const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
   const trackedCount = mobs.filter(m => trackedMobs[m.fileName]).length;
@@ -101,16 +107,15 @@ const MobTracker = () => {
   const [pendingAction, setPendingAction]   = useState(null);
   const undoStack = useRef([]);
   const redoStack = useRef([]);
-  // Ref always-fresh per evitare stale closure nel drag handler
   const applyDragRef    = useRef(null);
   const capturedMobsRef = useRef(capturedMobs);
   const trackedMobsRef  = useRef(trackedMobs);
   const captureModeRef  = useRef(captureMode);
 
-  // Aggiorna ref ad ogni render
   useEffect(() => { capturedMobsRef.current = capturedMobs; }, [capturedMobs]);
   useEffect(() => { trackedMobsRef.current  = trackedMobs;  }, [trackedMobs]);
   useEffect(() => { captureModeRef.current  = captureMode;  }, [captureMode]);
+
   const [variantMode, setVariantMode]       = useState(() => localStorage.getItem('mobTracker_mode') || 'main');
   const [showAllFish, setShowAllFish]       = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
   const [searchQuery, setSearchQuery]       = useState('');
@@ -195,7 +200,6 @@ const MobTracker = () => {
     return () => window.removeEventListener('mousedown', handler);
   }, [sortOpen]);
 
-  // Salva snapshot prima di ogni modifica (per undo)
   const commitAction = (fn) => {
     undoStack.current.push({ trackedMobs: { ...trackedMobs }, capturedMobs: { ...capturedMobs } });
     if (undoStack.current.length > 50) undoStack.current.shift();
@@ -261,8 +265,10 @@ const MobTracker = () => {
   useEffect(() => {
     if (selectedFolder === 'all' || selectedFolder === FISH_FOLDER) return;
     if (selectedFolder.startsWith('special:')) {
-      const mob = allMobs.find(m => m.folder === selectedFolder);
-      if (mob?.specialSuffixId && !filters[mob.specialSuffixId]) setSelectedFolder('all');
+      // Ricava il suffixId dalla cartella selezionata usando SpecialFolderMap
+      const folderName = selectedFolder.replace('special:', '').toLowerCase();
+      const suffixId = SpecialFolderMap[folderName];
+      if (suffixId && !filters[suffixId]) setSelectedFolder('all');
     } else {
       if (filters[`${FOLDER_FILTER_PREFIX}${selectedFolder}`] === false) setSelectedFolder('all');
     }
@@ -284,16 +290,43 @@ const MobTracker = () => {
     });
   }, [allMobs]);
 
+  // ─── FIX PRINCIPALE ───────────────────────────────────────────────────────────
+  // specialBtns è costruito a partire da SpecialFolderMap (fonte di verità),
+  // così le cartelle speciali appaiono anche se sono vuote (nessun mob caricato),
+  // purché il loro toggle sia attivo nei filtri.
   const specialBtns = useMemo(() => {
+    // Mappa folderKey → dati del bottone
     const map = new Map();
+
+    // Prima aggiungi tutte le entry da SpecialFolderMap, indipendentemente da allMobs
+    Object.entries(SpecialFolderMap).forEach(([folderName, suffixId]) => {
+      const config = SuffixConfig[suffixId];
+      if (!config) return;
+      const folderKey = `special:${folderName}`;
+      map.set(folderKey, {
+        folderKey,
+        suffixId,
+        label: config.label ?? suffixId,
+      });
+    });
+
+    // Poi aggiusta con i dati reali di allMobs (per avere il folderKey esatto
+    // con la capitalizzazione reale della cartella su disco, es: "Baby Breed")
     allMobs.forEach(m => {
       if (m.specialSuffixId && !map.has(m.folder)) {
         const config = SuffixConfig[m.specialSuffixId];
-        map.set(m.folder, { folderKey: m.folder, suffixId: m.specialSuffixId, label: config?.label ?? m.specialSuffixId });
+        map.set(m.folder, {
+          folderKey: m.folder,
+          suffixId: m.specialSuffixId,
+          label: config?.label ?? m.specialSuffixId,
+        });
       }
     });
+
+    // Mostra solo le cartelle il cui toggle è attivo
     return Array.from(map.values()).filter(b => filters[b.suffixId]);
   }, [allMobs, filters]);
+  // ─────────────────────────────────────────────────────────────────────────────
 
   const normalFolderBtns = useMemo(() => {
     const set = new Set();
@@ -301,7 +334,6 @@ const MobTracker = () => {
     return Array.from(set).sort().filter(f => filters[`${FOLDER_FILTER_PREFIX}${f}`] !== false);
   }, [allMobs, filters]);
 
-  // Tutti i bottoni normali + fish, ordinati alfabeticamente insieme
   const allFolderBtns = useMemo(() => {
     const btns = normalFolderBtns.map(f => ({ key: f, label: f.charAt(0).toUpperCase() + f.slice(1), type: 'normal' }));
     btns.push({ key: FISH_FOLDER, label: 'Tropical Fish', type: 'fish' });
@@ -378,10 +410,17 @@ const MobTracker = () => {
       if (mob.specialSuffixId && !filters[mob.specialSuffixId]) return false;
       for (const suffix of mob.activeSuffixes) { if (!filters[suffix]) return false; }
 
+      // Se la cartella è speciale, controlla il toggle varianti:special:<suffixId>
+      if (mob.folder.startsWith('special:') && mob.specialSuffixId) {
+        const specialVarActive = filters[`variants:special:${mob.specialSuffixId}`] !== false;
+        if (!specialVarActive) {
+          // varianti speciali off → mostra solo il mob base (num1 = 1 o assente, nessun activeSuffix aggiuntivo)
+          if ((mob.num1 && mob.num1 > 1) || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
+        }
+      }
+
       if (mob.folder !== 'root' && !mob.folder.startsWith('special:')) {
         const variantsActive = filters[`variants:${mob.folder}`] !== false;
-
-        // Toggle varianti off → mostra solo la variante base, ignora variantMode
         if (!variantsActive) {
           if ((mob.num1 && mob.num1 > 1) || (mob.num2 && mob.num2 > 1) || (mob.num3 && mob.num3 > 1)) return false;
           return mob.activeSuffixes.length === 0;
@@ -445,7 +484,6 @@ const MobTracker = () => {
   const fishVariants  = filters[`variants:${FISH_FOLDER}`] !== false;
 
   const fishPool = useMemo(() => {
-    // variants:__fish__ off → solo il clownfish base
     if (!fishVariants || variantMode === 'none') return [ALL_FISH.find(f => `${f.typeIndex}_${f.bodyColor}_${f.patternColor}` === '0_1_0') ?? ALL_FISH[0]];
     if (variantMode === 'main') return NAMED_FISH;
     return showAllFish ? ALL_FISH : NAMED_FISH;
@@ -474,11 +512,9 @@ const MobTracker = () => {
   const totalCaptured  = isFishOnly ? fishCapturedCount : selectedFolder === 'all' ? mobCapturedCount + fishCapturedCount : mobCapturedCount;
   const totalDisplayed = isFishOnly ? displayedFish.length : selectedFolder === 'all' ? displayedMobs.length + displayedFish.length : displayedMobs.length;
 
-  // Determina se un'azione è un'aggiunta o rimozione
   const getMobName = (id) => {
     const mob = allMobs.find(m => m.fileName === id);
     if (mob) return mob.name;
-    // fish id: fish_typeIndex_bodyColor_patternColor
     return id;
   };
 
@@ -486,9 +522,9 @@ const MobTracker = () => {
     if (captureMode) {
       const wasTracked  = !!trackedMobs[id];
       const wasCaptured = !!capturedMobs[id];
-      return !wasTracked && !wasCaptured; // nessuno → avvistato = aggiunta
+      return !wasTracked && !wasCaptured;
     }
-    return !capturedMobs[id]; // nessuno → catturato = aggiunta
+    return !capturedMobs[id];
   };
 
   const executeToggle = (id) => {
@@ -517,8 +553,6 @@ const MobTracker = () => {
     });
   };
 
-  // captureMode ON:  nessuno → avvistato (giallo) → catturato (verde) → nessuno
-  // captureMode OFF: nessuno → catturato (verde) → nessuno
   const toggleMob = (id) => {
     const adding   = isAddAction(id);
     const removing = !adding && (captureMode ? !!capturedMobs[id] : !!capturedMobs[id]);
@@ -573,19 +607,17 @@ const MobTracker = () => {
     }
     executeApplyDrag(ids);
   };
-  // Ref sempre aggiornata usata nell'effect drag (evita stale closure)
   applyDragRef.current = applyDragSelection;
 
-  // Selezione drag — tutto su ref per evitare re-render durante il drag
   const gridRef           = useRef(null);
   const selBoxRef         = useRef(null);
   const isDragging        = useRef(false);
-  const dragStart         = useRef(null); // { x, y } in coordinate pagina (pageX/pageY)
+  const dragStart         = useRef(null);
   const dragStartedOnCard = useRef(false);
   const selRectRef        = useRef(null);
   const selectedMobsRef   = useRef(new Set());
   const DRAG_THRESHOLD    = 6;
-  const [selRect, setSelRect] = useState(null); // non più usato per render, solo per compatibilità
+  const [selRect, setSelRect] = useState(null);
 
   const getCardEls = () => Array.from(document.querySelectorAll('[data-mob-id]'));
 
@@ -595,7 +627,6 @@ const MobTracker = () => {
     const onCard = !!e.target.closest('[data-mob-id]');
     dragStartedOnCard.current = onCard;
     isDragging.current = true;
-    // pageX/pageY: coordinate assolute documento, non cambiano con lo scroll
     dragStart.current  = { x: e.pageX, y: e.pageY };
     selectedMobsRef.current = new Set();
     if (!onCard) e.preventDefault();
@@ -617,7 +648,6 @@ const MobTracker = () => {
 
       dragStartedOnCard.current = false;
 
-      // Rettangolo in coordinate pagina (assolute) → position: absolute nel document
       const x = Math.min(px, dragStart.current.x);
       const y = Math.min(py, dragStart.current.y);
       const w = Math.abs(px - dragStart.current.x);
@@ -633,7 +663,6 @@ const MobTracker = () => {
         selBoxRef.current.style.height  = `${h}px`;
       }
 
-      // Hit-test: getBoundingClientRect è viewport, aggiungi scroll per confronto con pageX/Y
       const scrollX = window.scrollX, scrollY = window.scrollY;
       const sel = new Set();
       getCardEls().forEach(el => {
@@ -693,6 +722,7 @@ const MobTracker = () => {
       window.removeEventListener('keydown',   onKeyDown);
     };
   }, [selectionMode]);
+
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? '↑ A→Z';
 
   return (
@@ -708,6 +738,7 @@ const MobTracker = () => {
         ::-webkit-scrollbar-thumb { background: #44403c; }
         ::-webkit-scrollbar-thumb:hover { background: #78716c; }
       `}</style>
+
       {/* Dialog conferma */}
       {pendingAction && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -734,6 +765,7 @@ const MobTracker = () => {
           </div>
         </div>
       )}
+
       {showSettings && (
         <Settings
           variantMode={variantMode} setVariantMode={setVariantMode}
@@ -821,7 +853,7 @@ const MobTracker = () => {
                   ${selectedFolder === 'all' ? 'bg-green-700 border-green-900 text-white' : 'bg-stone-700 border-stone-900 text-stone-300 hover:bg-stone-600'}`}
               >Tutti</button>
 
-              {/* Cartelle speciali (baby, jockey ecc.) */}
+              {/* Cartelle speciali — mostrate anche se vuote, purché il toggle sia attivo */}
               {specialBtns.length > 0 && (
                 <><span className="text-stone-600 select-none">|</span>
                 {specialBtns.map(b => (
@@ -912,18 +944,38 @@ const MobTracker = () => {
                         />
                   )
               }
+
+              {/* Messaggio cartella speciale vuota */}
+              {!groupByFolder && displayedMobs.length === 0 && selectedFolder.startsWith('special:') && (
+                <div className="col-span-full flex flex-col items-center justify-center py-16 text-stone-500">
+                  <span className="text-5xl mb-4">📂</span>
+                  <p className="text-lg uppercase">
+                    No mobs in <span className="text-purple-400">{selectedFolder.replace('special:', '')}</span> yet
+                  </p>
+                  <p className="text-sm mt-2">Add images to the <code className="text-stone-400">special/{selectedFolder.replace('special:', '')}</code> folder</p>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Rettangolo selezione — position absolute nel documento, segue lo scroll */}
+          {/* Rettangolo selezione */}
           <div
             ref={selBoxRef}
             className="pointer-events-none z-50 border-2 border-green-400 bg-green-400/10"
             style={{ display: 'none', position: 'absolute' }}
           />
 
-          {/* Sezione Tropical Fish */}
-          {showFishSection && (
+          {/* Messaggio nessun risultato globale */}
+          {searchQuery && displayedMobs.length === 0 && displayedFish.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-24 text-stone-500">
+              <span className="text-6xl mb-4">🔍</span>
+              <p className="text-xl uppercase">No results for "<span className="text-stone-300">{searchQuery}</span>"</p>
+              <p className="text-sm mt-2">Try a different search term</p>
+            </div>
+          )}
+
+          {/* Sezione Tropical Fish — nascosta se la ricerca non produce risultati */}
+          {showFishSection && (!searchQuery || displayedFish.length > 0) && (
             <div className="bg-stone-800 border-4 border-cyan-900 rounded-lg mb-6">
               <div className="w-full flex justify-between items-center px-6 py-4 border-b-4 border-cyan-900">
                 <div className="flex items-center gap-3">
