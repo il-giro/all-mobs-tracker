@@ -163,6 +163,39 @@ export const MOB_ICON_RESOLVERS = [
     },
   },
 
+{
+  id: 'color',
+  resolve(mob) {
+    const folder = mob.folder?.toLowerCase();
+const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: 'green', 8: 'light-blue', 9: 'lime', 10: 'magenta', 11: 'orange', 12: 'pink', 13: 'purple', 14: 'red', 15: 'light-gray', 16: 'white', 17: 'yellow' };
+    // ── Sheep ────────────────────────────────────────────────────────────────
+    if (folder === 'sheep') {
+      const sheepColors = { 1: 'white', 2: 'light-gray', 3: 'gray', 4: 'black', 5: 'brown', 6: 'red', 7: 'orange', 8: 'yellow', 9: 'lime', 10: 'green', 11: 'cyan', 12: 'light-blue', 13: 'blue', 14: 'purple', 15: 'magenta', 16: 'pink' };
+      const colorName = sheepColors[mob.num3];
+      if (!colorName) return null;
+      return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'color', fallbackHide: true }];
+    }
+
+    // ── Llama ────────────────────────────────────────────────────────────────
+    if (folder === 'llama') {
+      if (!mob.num3 || mob.num3 === 1) return null;
+      const colorName = colorMap[mob.num3];
+      if (!colorName) return null;
+      return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'carpet', fallbackHide: true }];
+    }
+
+    // ── Wolf ─────────────────────────────────────────────────────────────────
+    if (folder === 'wolf') {
+      if (mob.num2 === 1 || !mob.num3 || mob.num3 === 1) return null;
+      const colorName = colorMap[mob.num3];
+      if (!colorName) return null;
+      return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: mob.num2 === 3 ? 'armor' : 'collar', fallbackHide: true }];
+    }
+
+    return null;
+  },
+},
+
   // ── Sheared ─────────────────────────────────────────────────────────────────
   // categoryId: 'shearable' → icona nel tooltip cliccabile → /category/shearable
   {
@@ -172,7 +205,7 @@ export const MOB_ICON_RESOLVERS = [
       return [{
         src:          '/icons/items/shears.png',
         alt:          'Sheared',
-        position:     POSITIONS.BOTTOM_RIGHT,
+        position:     POSITIONS.BOTTOM_LEFT,
         size:         'md',
         label:        'Shearable',
         labelRole:    'category',
@@ -191,6 +224,7 @@ export const MOB_ICON_RESOLVERS = [
         src:          '/icons/items/poppy.png',
         alt:          'Poppy',
         position:     POSITIONS.BOTTOM_RIGHT,
+        size:         'md',
         label:        'Poppy',
         labelRole:    'status',
         fallbackHide: true,

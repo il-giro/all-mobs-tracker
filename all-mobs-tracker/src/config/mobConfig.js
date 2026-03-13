@@ -90,7 +90,7 @@ export const ComplexConfig = [
       const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
       const type = { 1: 'Brown', 2: 'Creamy', 3: 'Gray', 4: 'White' };
       const carpetColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
-      return `Llama ${type[n1] || ''} ${carpetColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' with Chest' : '');
+      return `Llama ${type[n1] || ''}` + (carpetColor != 1 ? " (" : "") + ` ${carpetColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (carpetColor != 1 ? ")" : "") + (n2 === 2 ? ' with Chest' : '');
     },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
   },

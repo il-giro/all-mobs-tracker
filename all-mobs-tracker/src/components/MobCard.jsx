@@ -32,7 +32,7 @@ const MobIcon = ({ icon }) => {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div className={`${POSITION_CLASSES[icon.position]} border border-stone-900 bg-stone-950/70`}>
+    <div className={`${POSITION_CLASSES[icon.position]} border-2 border-black bg-stone-400`}>
       <img
         src={icon.src}
         alt={icon.alt}
