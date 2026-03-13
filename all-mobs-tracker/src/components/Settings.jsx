@@ -27,7 +27,7 @@ const FolderIcon = ({ label }) => {
       src={`/icons/mobs/${name}Face.png`}
       alt={label}
       onError={() => setVisible(false)}
-      className="w-5 h-5 object-contain pixelated shrink-0"
+      className="w-6 h-6 object-contain pixelated shrink-0"
       draggable={false}
     />
   );
@@ -342,7 +342,7 @@ const Settings = ({
                   </div>
                   <div className="space-y-2">
                     {merged.map(item => (
-                      <div key={item.key} className="flex items-center bg-stone-900/60 p-3 border-2 border-stone-700 select-none gap-2">
+                      <div key={item.key} className="flex items-center bg-stone-900/60 p-2 border-2 border-stone-700 select-none gap-2">
                         <FolderIcon label={item.label} />
                         <span className="text-sm text-stone-300 uppercase truncate flex-1 pr-2">{item.label}</span>
                         <div className="flex gap-2 shrink-0 items-center">

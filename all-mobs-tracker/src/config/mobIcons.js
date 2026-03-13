@@ -2,8 +2,7 @@
  * mobIcons.js
  *
  * Configurazione centralizzata delle icone mostrate nelle MobCard.
- * Contiene anche le mappe di dati legate alle icone (VillagerBiomes, VillagerJobs)
- * che in precedenza erano in mobConfig.js.
+ * Contiene anche le mappe di dati legate alle icone (VillagerBiomes, VillagerJobs).
  *
  * Ogni "resolver" descrive UN tipo di icona da mostrare sulla card.
  * Per aggiungerne una nuova basta aggiungere un oggetto alla lista MOB_ICON_RESOLVERS.
@@ -14,40 +13,30 @@
  *   id: string            — identificatore univoco (usato come key React)
  *
  *   resolve(mob) → IconData[] | null
- *     Riceve il mob e restituisce un array di icone da mostrare, oppure null se
- *     non applicabile a quel mob.
  *
  *   IconData: {
  *     src:            string     — path dell'immagine
  *     alt:            string     — testo alternativo
  *     position:       Position   — dove posizionare l'icona sulla card
  *     size?:          'sm'|'md'  — dimensione (default 'sm' = w-5 h-5)
- *     label?:         string     — etichetta testuale nel tooltip (opzionale)
- *     labelRole?:     string     — ruolo dell'etichetta, es. 'biome', 'job' (opzionale)
- *     fallbackHide?:  boolean    — nascondi icona se l'immagine non esiste (default false)
- *     alwaysVisible?: boolean    — mostra anche quando il mob è tracciato/catturato (default false)
+ *     label?:         string     — etichetta testuale nel tooltip
+ *     labelRole?:     string     — ruolo dell'etichetta, es. 'biome', 'job'
+ *     categoryId?:    string     — se presente, l'icona nel tooltip diventa
+ *                                  un link alla pagina /category/:categoryId
+ *     fallbackHide?:  boolean    — nascondi icona se l'immagine non esiste
+ *     alwaysVisible?: boolean    — mostra anche quando il mob è tracciato/catturato
  *   }
  * }
  *
  * Position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'bottom-center'
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * COME AGGIUNGERE UNA NUOVA ICONA
+ * COME COLLEGARE UN'ICONA A UNA CATEGORIA
  * ─────────────────────────────────────────────────────────────────────────────
- * 1. Se necessario, aggiungi i dati di supporto (mappe, costanti) in questo file
- * 2. Aggiungi un oggetto a MOB_ICON_RESOLVERS con un id univoco
- * 3. Implementa resolve(mob) che ritorna un array di IconData o null
- * 4. Le icone vengono renderizzate automaticamente in MobCard — nessuna modifica necessaria
- *
- * Esempio minimo:
- *
- *   {
- *     id: 'my-icon',
- *     resolve(mob) {
- *       if (!mob.name.includes('Spider')) return null;
- *       return [{ src: '/icons/web.png', alt: 'web', position: 'top-right' }];
- *     }
- *   }
+ * 1. Aggiungi la categoria in mobCategories.js
+ * 2. Aggiungi categoryId: '<id-categoria>' all'IconData del resolver
+ * 3. L'icona nel tooltip diventa automaticamente cliccabile → /category/<id>
+ * 4. La pagina categoria mostrerà automaticamente tutti i mob con quell'icona
  */
 
 import { ComplexConfig } from './mobConfig';
@@ -82,8 +71,6 @@ export const SIZE_CLASSES = {
 // Usati anche da MobTracker per il sorting per bioma/job — importa da qui.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Mappa biomi: num1 → { label, icon }
-// Il nome dell'icona deve corrispondere al file in /icons/biomes/
 export const VillagerBiomes = {
   1: { label: 'Plains',  icon: '/icons/biomes/Plains.png'       },
   2: { label: 'Desert',  icon: '/icons/biomes/Desert.png'       },
@@ -94,8 +81,6 @@ export const VillagerBiomes = {
   7: { label: 'Taiga',   icon: '/icons/biomes/Taiga.png'        },
 };
 
-// Mappa job: num2 → { label, icon }
-// Il nome dell'icona deve corrispondere al file in /icons/job site/
 export const VillagerJobs = {
   1:  { label: 'Unemployed',    icon: null },
   2:  { label: 'Nitwit',        icon: null },
@@ -148,7 +133,6 @@ export const MOB_ICON_RESOLVERS = [
       if (!config?.useVillagerIcons) return null;
       const jobData = VillagerJobs[mob.num2] ?? null;
       if (!jobData?.icon) return null;
-      // Se c'è un suffix badge, il job va in alto a destra per non sovrapporsi
       const hasSuffix = mob.activeSuffixes.length > 0;
       return [{
         src:       jobData.icon,
@@ -161,7 +145,6 @@ export const MOB_ICON_RESOLVERS = [
   },
 
   // ── Item tenuto in mano (Enderman, ecc.) ────────────────────────────────────
-  // Funziona per qualsiasi mob il cui path immagine contenga "Holding-<ItemName>"
   {
     id: 'holding-item',
     resolve(mob) {
@@ -180,7 +163,8 @@ export const MOB_ICON_RESOLVERS = [
     },
   },
 
-  // -- Sheared -- Per pecore tosate (e altri mob che condividono la stessa icona con/senza tosatura)
+  // ── Sheared ─────────────────────────────────────────────────────────────────
+  // categoryId: 'shearable' → icona nel tooltip cliccabile → /category/shearable
   {
     id: 'sheared',
     resolve(mob) {
@@ -190,15 +174,15 @@ export const MOB_ICON_RESOLVERS = [
         alt:          'Sheared',
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
-        label:        'Sheared',
-        labelRole:    'status',
+        label:        'Shearable',
+        labelRole:    'category',
+        categoryId:   'shearable',
         fallbackHide: true,
       }];
-    }
+    },
   },
 
-  // -- Poppy -- Per copper golem (poppy in testa)
-
+  // ── Poppy (Copper Golem) ─────────────────────────────────────────────────────
   {
     id: 'poppy',
     resolve(mob) {
@@ -211,10 +195,10 @@ export const MOB_ICON_RESOLVERS = [
         labelRole:    'status',
         fallbackHide: true,
       }];
-    }
+    },
   },
 
-  // -- Saddle -- Per mob che possono essere sellati (cavalli, ma anche maiali e strider)
+  // ── Saddle ──────────────────────────────────────────────────────────────────
   {
     id: 'saddle',
     resolve(mob) {
@@ -224,14 +208,14 @@ export const MOB_ICON_RESOLVERS = [
         alt:          'Saddle',
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
-        label:        'Saddle',
+        label:        'Saddled',
         labelRole:    'status',
         fallbackHide: true,
       }];
-    }
+    },
   },
 
-  // -- Chested -- Per mob che possono avere una chest
+  // ── Chested ─────────────────────────────────────────────────────────────────
   {
     id: 'chested',
     resolve(mob) {
@@ -245,10 +229,10 @@ export const MOB_ICON_RESOLVERS = [
         labelRole:    'status',
         fallbackHide: true,
       }];
-    }
+    },
   },
 
-  // -- Banner -- Per illager che tengono uno stendardo (illager banner)
+  // ── Banner ──────────────────────────────────────────────────────────────────
   {
     id: 'banner',
     resolve(mob) {
@@ -262,48 +246,30 @@ export const MOB_ICON_RESOLVERS = [
         labelRole:    'status',
         fallbackHide: true,
       }];
-    }
+    },
   },
 
-  // -- Screaming -- Per capra che urla (screaming goat)
-    {
-        id: 'screaming',
-        resolve(mob) {
-            if (!mob.image?.toLowerCase().includes('screaming') || !mob.image?.toLowerCase().includes('goat')) return null;
-            return [{
-                src:          '/icons/items/screaming.png',
-                alt:          'Screaming',
-                position:     POSITIONS.BOTTOM_RIGHT,
-                size:         'md',
-                label:        'Screaming',
-                labelRole:    'status',
-                fallbackHide: true,
-            }];
-        }
+  // ── Screaming Goat ──────────────────────────────────────────────────────────
+  {
+    id: 'screaming',
+    resolve(mob) {
+      if (!mob.image?.toLowerCase().includes('screaming') || !mob.image?.toLowerCase().includes('goat')) return null;
+      return [{
+        src:          '/icons/items/screaming.png',
+        alt:          'Screaming',
+        position:     POSITIONS.BOTTOM_RIGHT,
+        size:         'md',
+        label:        'Screaming',
+        labelRole:    'status',
+        fallbackHide: true,
+      }];
     },
+  },
 
   // ─────────────────────────────────────────────────────────────────────────
   // Aggiungi nuovi resolver qui sotto
+  // Per collegare a una categoria: categoryId: '<id>'
   // ─────────────────────────────────────────────────────────────────────────
-
-  // Esempio: icona colore per i gatti
-  // {
-  //   id: 'cat-color',
-  //   resolve(mob) {
-  //     if (mob.folder !== 'cat') return null;
-  //     const CAT_COLORS = { 1: 'tabby', 2: 'black', 3: 'red', ... };
-  //     const colorName = CAT_COLORS[mob.num1] ?? null;
-  //     if (!colorName) return null;
-  //     return [{
-  //       src:          `/icons/cat-colors/${colorName}.png`,
-  //       alt:          colorName,
-  //       position:     POSITIONS.BOTTOM_LEFT,
-  //       label:        colorName,
-  //       labelRole:    'color',
-  //       fallbackHide: true,
-  //     }];
-  //   },
-  // },
 
 ];
 
@@ -314,9 +280,6 @@ export const MOB_ICON_RESOLVERS = [
 /**
  * Risolve tutte le icone per un mob, raggruppandole per posizione.
  * Se due icone vogliono la stessa posizione, vince la prima (ordine dei resolver).
- *
- * @param {object} mob
- * @returns {Map<string, IconData>}  posizione → IconData
  */
 export function resolveIcons(mob) {
   const result = new Map();
@@ -334,13 +297,32 @@ export function resolveIcons(mob) {
 
 /**
  * Controlla se un mob usa icone villager (bioma/job).
- * Usato in MobCard per gestire il posizionamento del suffix badge.
- *
- * @param {object} mob
- * @returns {boolean}
  */
 export function hasVillagerIcons(mob) {
   if (!mob.complexId) return false;
   const config = ComplexConfig.find(c => c.id === mob.complexId);
   return !!config?.useVillagerIcons;
+}
+
+/**
+ * Restituisce le categorie a cui appartiene un mob, basandosi sui resolver.
+ * Un mob appartiene a una categoria se almeno un resolver con categoryId
+ * restituisce un'icona per quel mob.
+ *
+ * Usato in CategoryPage per filtrare dinamicamente i mob.
+ *
+ * @param {object} mob        — oggetto mob completo
+ * @param {Array}  categories — array da MobCategories (mobCategories.js)
+ * @returns {Array}           — categorie a cui appartiene il mob
+ */
+export function getMobCategories(mob, categories) {
+  const categoryIds = new Set();
+  for (const resolver of MOB_ICON_RESOLVERS) {
+    const icons = resolver.resolve(mob);
+    if (!icons) continue;
+    for (const icon of icons) {
+      if (icon.categoryId) categoryIds.add(icon.categoryId);
+    }
+  }
+  return categories.filter(cat => categoryIds.has(cat.id));
 }

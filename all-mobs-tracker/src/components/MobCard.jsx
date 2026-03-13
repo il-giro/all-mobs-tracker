@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority } from '../config/mobConfig';
-import { getCategoriesForMob } from '../config/mobCategories';
-import { resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
+import { MobCategories } from '../config/mobCategories';
+import { resolveIcons, hasVillagerIcons, getMobCategories, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {
@@ -27,12 +27,12 @@ const calcPos = (rect) => {
   return { x, y };
 };
 
-// Renderizza una singola icona nella posizione configurata
+// ─── Icona sulla card ─────────────────────────────────────────────────────────
 const MobIcon = ({ icon }) => {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div className={`${POSITION_CLASSES[icon.position]} border border-white rounded-sm z-20`}>
+    <div className={`${POSITION_CLASSES[icon.position]} border border-stone-900 bg-stone-950/70`}>
       <img
         src={icon.src}
         alt={icon.alt}
@@ -44,6 +44,56 @@ const MobIcon = ({ icon }) => {
   );
 };
 
+// ─── Riga icona nel tooltip ───────────────────────────────────────────────────
+// Se l'icona ha categoryId → è un bottone cliccabile che naviga alla pagina categoria.
+// Altrimenti → div statico con info.
+const TooltipIconRow = ({ icon, onNavigate }) => {
+  const [visible, setVisible] = useState(true);
+  const isLink = !!icon.categoryId;
+
+  const handleError = icon.fallbackHide
+    ? () => setVisible(false)
+    : undefined;
+
+  if (!visible) return null;
+
+  const inner = (
+    <>
+      <img
+        src={icon.src}
+        alt={icon.alt}
+        draggable={false}
+        onError={handleError}
+        className="w-5 h-5 object-contain pixelated shrink-0"
+      />
+      <span className={`text-xs uppercase flex-1 ${isLink ? 'text-stone-200' : 'text-stone-300'}`}>
+        {icon.label}
+      </span>
+      <span className="text-[9px] uppercase ml-auto text-stone-500">
+        {isLink ? '→' : (icon.labelRole ?? '')}
+      </span>
+    </>
+  );
+
+  if (isLink) {
+    return (
+      <button
+        onMouseDown={e => { e.stopPropagation(); onNavigate(icon.categoryId); }}
+        className="flex items-center gap-2 border border-stone-700 hover:border-stone-400 bg-stone-900 hover:bg-stone-700 px-1.5 py-1 transition-colors w-full text-left"
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-1.5 py-1">
+      {inner}
+    </div>
+  );
+};
+
+// ─── MobCard ──────────────────────────────────────────────────────────────────
 const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectionMode, onToggle, 'data-mob-id': dataMobId }) => {
   const [tooltipPos, setTooltipPos] = useState(null);
   const navigate   = useNavigate();
@@ -56,10 +106,12 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const allBadges      = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => SuffixConfig[id]);
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const isVillager     = hasVillagerIcons(mob);
-  const mobCategories  = getCategoriesForMob(mob.name, mob.activeSuffixes.map(id => SuffixConfig[id]?.label ?? ''));
 
-  // Risolve tutte le icone da mostrare per questo mob
+  // Risolve le icone una sola volta — fonte di verità per card e tooltip
   const iconMap = resolveIcons(mob);
+
+  // Icone che hanno label da mostrare nel tooltip
+  const tooltipIcons = [...iconMap.values()].filter(icon => icon.label);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => {
@@ -111,6 +163,12 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
     setTooltipPos(calcPos(cardRef.current.getBoundingClientRect()));
   };
 
+  const navigateToCategory = (categoryId) => {
+    setTooltipPos(null);
+    isOpen.current = false;
+    navigate(`/categories/${categoryId}`);
+  };
+
   const borderClass = isCaptured
     ? 'border-green-600'
     : isTracked
@@ -140,7 +198,6 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
         {/* Badge e icone — nascosti se già tracciato/catturato */}
         {!isTracked && !isCaptured && (
           <>
-            {/* Badge categoria complessa (es. Horse, Sheep) — top-left */}
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>
@@ -149,9 +206,6 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
               </div>
             )}
 
-            {/* Suffix badge (Baby, Jockey, ecc.)
-                Se il mob è un villager va sotto al centro per non coprire bioma/job,
-                altrimenti va in alto a destra. */}
             {topSuffixBadge && (
               <div className={isVillager
                 ? 'absolute bottom-1 left-1/2 -translate-x-1/2 z-20'
@@ -163,14 +217,13 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
               </div>
             )}
 
-            {/* Icone risolte da mobIcons.js */}
             {[...iconMap.values()].map(icon => (
               <MobIcon key={icon.resolverId} icon={icon} />
             ))}
           </>
         )}
 
-        {/* Icone con alwaysVisible:true — mostrate anche quando tracciato/catturato */}
+        {/* Icone alwaysVisible — mostrate anche quando tracciato/catturato */}
         {[...iconMap.values()]
           .filter(icon => icon.alwaysVisible)
           .map(icon => <MobIcon key={`always_${icon.resolverId}`} icon={icon} />)
@@ -226,28 +279,21 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
 
-          {/* Righe icone nel tooltip — generate automaticamente dai resolver con label */}
-          {[...iconMap.values()].filter(icon => icon.label).length > 0 && (
-            <div className="flex flex-col gap-1 mb-3 pb-2 border-b-2 border-stone-700">
-              {[...iconMap.values()].filter(icon => icon.label).map(icon => (
-                <div key={icon.resolverId} className="flex items-center gap-2">
-                  <img
-                    src={icon.src}
-                    alt={icon.alt}
-                    draggable={false}
-                    onError={icon.fallbackHide ? (e) => { e.currentTarget.closest('.flex')?.remove(); } : undefined}
-                    className="w-5 h-5 object-contain pixelated shrink-0"
-                  />
-                  <span className="text-stone-300 text-xs uppercase">{icon.label}</span>
-                  {icon.labelRole && (
-                    <span className="text-stone-600 text-[9px] uppercase ml-auto">{icon.labelRole}</span>
-                  )}
-                </div>
+          {/* Icone: statiche o cliccabili (se hanno categoryId) */}
+          {tooltipIcons.length > 0 && (
+            <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
+              {tooltipIcons.map(icon => (
+                <TooltipIconRow
+                  key={icon.resolverId}
+                  icon={icon}
+                  onNavigate={navigateToCategory}
+                />
               ))}
             </div>
           )}
 
-          {hasAnyBadge ? (
+          {/* Suffix badges */}
+          {hasAnyBadge && (
             <div className="flex flex-col gap-2">
               {mob.complexBadge && (
                 <div className="flex items-center gap-2">
@@ -259,7 +305,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
               )}
               {allBadges.length > 0 && (
                 <div className="flex flex-col gap-1">
-                  <span className="text-stone-400 text-xs uppercase mb-0.5">Categories</span>
+                  <span className="text-stone-400 text-xs uppercase mb-0.5">Suffixes</span>
                   {allBadges.map((b, i) => (
                     <div key={b.id} className="flex items-center gap-2">
                       <span className={`text-xs w-4 text-center ${i === 0 ? 'text-yellow-400' : 'text-stone-600'}`}>
@@ -274,30 +320,10 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
                 </div>
               )}
             </div>
-          ) : (
-            !isVillager && iconMap.size === 0 && <p className="text-stone-500 text-xs uppercase">Nessun badge</p>
           )}
 
-          {mobCategories.length > 0 && (
-            <div className="mt-2 pt-2 border-t-2 border-stone-700 flex flex-col gap-1">
-              <span className="text-stone-500 text-[9px] uppercase">Categorie</span>
-              {mobCategories.map(cat => (
-                <button
-                  key={cat.id}
-                  onMouseDown={e => {
-                    e.stopPropagation();
-                    setTooltipPos(null);
-                    isOpen.current = false;
-                    navigate(`/category/${cat.id}`);
-                  }}
-                  className="flex items-center gap-2 bg-amber-900/40 border border-amber-800 px-2 py-1 hover:bg-amber-900/70 transition-colors w-full text-left"
-                >
-                  <span className="text-amber-400 text-sm">{cat.icon}</span>
-                  <span className="text-amber-300 text-xs uppercase">{cat.label}</span>
-                  <span className="text-stone-600 text-[9px] ml-auto">→</span>
-                </button>
-              ))}
-            </div>
+          {!hasAnyBadge && !isVillager && tooltipIcons.length === 0 && (
+            <p className="text-stone-500 text-xs uppercase">No badges</p>
           )}
         </div>,
         document.body
