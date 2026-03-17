@@ -45,15 +45,13 @@ const MobIcon = ({ icon }) => {
 };
 
 // ─── Riga icona nel tooltip ───────────────────────────────────────────────────
-// Se l'icona ha categoryId → è un bottone cliccabile che naviga alla pagina categoria.
-// Altrimenti → div statico con info.
+// Se l'icona ha categoryId → bottone cliccabile → /categories/:categoryId
+// Altrimenti → div statico con info
 const TooltipIconRow = ({ icon, onNavigate }) => {
   const [visible, setVisible] = useState(true);
   const isLink = !!icon.categoryId;
 
-  const handleError = icon.fallbackHide
-    ? () => setVisible(false)
-    : undefined;
+  const handleError = icon.fallbackHide ? () => setVisible(false) : undefined;
 
   if (!visible) return null;
 
@@ -107,10 +105,13 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const isVillager     = hasVillagerIcons(mob);
 
-  // Risolve le icone una sola volta — fonte di verità per card e tooltip
+  // Risolve le icone — fonte di verità per card e tooltip
   const iconMap = resolveIcons(mob);
 
-  // Icone che hanno label da mostrare nel tooltip
+  // Icone visibili sulla card (esclude tooltipOnly)
+  const cardIcons = [...iconMap.values()].filter(icon => !icon.tooltipOnly);
+
+  // Tutte le icone con label per il tooltip (include tooltipOnly)
   const tooltipIcons = [...iconMap.values()].filter(icon => icon.label);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
@@ -217,14 +218,15 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
               </div>
             )}
 
-            {[...iconMap.values()].map(icon => (
+            {/* Solo le icone visibili sulla card (no tooltipOnly) */}
+            {cardIcons.map(icon => (
               <MobIcon key={icon.resolverId} icon={icon} />
             ))}
           </>
         )}
 
         {/* Icone alwaysVisible — mostrate anche quando tracciato/catturato */}
-        {[...iconMap.values()]
+        {cardIcons
           .filter(icon => icon.alwaysVisible)
           .map(icon => <MobIcon key={`always_${icon.resolverId}`} icon={icon} />)
         }
@@ -279,7 +281,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
 
-          {/* Icone: statiche o cliccabili (se hanno categoryId) */}
+          {/* Tutte le icone con label — incluse tooltipOnly */}
           {tooltipIcons.length > 0 && (
             <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
               {tooltipIcons.map(icon => (

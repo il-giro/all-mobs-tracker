@@ -6,10 +6,11 @@ export const SuffixConfig = {
     'P': { id: 'P', label: 'PUMPKIN',       shortLabel: 'pumpkin',       color: 'bg-orange-600', defaultShow: false },
     'J': { id: 'J', label: 'JOCKEY',        shortLabel: 'jockey',        color: 'bg-yellow-600', defaultShow: true  },
     'U': { id: 'U', label: 'UNOBTAINABLE',  shortLabel: '',              color: 'bg-red-600',    defaultShow: false },
+    'F': { id: 'F', label: 'UNTRAPABLE',    shortLabel: '',              color: 'bg-gray-600',   defaultShow: true  },
     'T': { id: 'T', label: 'TEXTURE',       shortLabel: 'wrong texture', color: 'bg-blue-600',   defaultShow: true  },
 };
 
-export const SuffixPriority = ['T', 'U', 'P', 'J', 'B', 'C', 'A'];
+export const SuffixPriority = ['T', 'F', 'U', 'P', 'J', 'B', 'C', 'A'];
 
 export const SpecialFolderMap = {
   'baby breed':    'A',
@@ -18,6 +19,7 @@ export const SpecialFolderMap = {
   'pumpkin':       'P',
   'jockey':        'J',
   'unobtainable':  'U',
+  'untrapable':    'F',
 };
 
 // NOTA: pathIncludes deve essere una stringa UNIVOCA che non sia sottostringa di altri path.
@@ -105,7 +107,7 @@ export const ComplexConfig = [
     isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
     formatName: (match) => {
       const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: '_jeb' };
+      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: 'jeb_' };
       return `Sheep ${color[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' (Sheared)' : '');
     },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })

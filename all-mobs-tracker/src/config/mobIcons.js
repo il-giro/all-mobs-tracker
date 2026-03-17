@@ -25,6 +25,7 @@
  *                                  un link alla pagina /category/:categoryId
  *     fallbackHide?:  boolean    — nascondi icona se l'immagine non esiste
  *     alwaysVisible?: boolean    — mostra anche quando il mob è tracciato/catturato
+ *     tooltipOnly?:   boolean    — non mostrare sulla card, solo nel tooltip
  *   }
  * }
  *
@@ -37,6 +38,13 @@
  * 2. Aggiungi categoryId: '<id-categoria>' all'IconData del resolver
  * 3. L'icona nel tooltip diventa automaticamente cliccabile → /category/<id>
  * 4. La pagina categoria mostrerà automaticamente tutti i mob con quell'icona
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * CONFLITTI DI POSIZIONE
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Se due resolver vogliono la stessa posizione sulla card:
+ * - La seconda icona viene spostata in bottom-center (se libero)
+ * - In ogni caso entrambe le icone compaiono sempre nel tooltip
  */
 
 import { ComplexConfig } from './mobConfig';
@@ -163,41 +171,42 @@ export const MOB_ICON_RESOLVERS = [
     },
   },
 
-{
-  id: 'color',
-  resolve(mob) {
-    const folder = mob.folder?.toLowerCase();
-const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: 'green', 8: 'light-blue', 9: 'lime', 10: 'magenta', 11: 'orange', 12: 'pink', 13: 'purple', 14: 'red', 15: 'light-gray', 16: 'white', 17: 'yellow' };
-    // ── Sheep ────────────────────────────────────────────────────────────────
-    if (folder === 'sheep') {
-      const sheepColors = { 1: 'white', 2: 'light-gray', 3: 'gray', 4: 'black', 5: 'brown', 6: 'red', 7: 'orange', 8: 'yellow', 9: 'lime', 10: 'green', 11: 'cyan', 12: 'light-blue', 13: 'blue', 14: 'purple', 15: 'magenta', 16: 'pink' };
-      const colorName = sheepColors[mob.num3];
-      if (!colorName) return null;
-      return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'color', fallbackHide: true }];
-    }
+  // ── Colore (Sheep, Llama, Wolf) ──────────────────────────────────────────────
+  {
+    id: 'color',
+    resolve(mob) {
+      const folder = mob.folder?.toLowerCase();
+      const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: 'green', 8: 'light-blue', 9: 'lime', 10: 'magenta', 11: 'orange', 12: 'pink', 13: 'purple', 14: 'red', 15: 'light-gray', 16: 'white', 17: 'yellow' };
 
-    // ── Llama ────────────────────────────────────────────────────────────────
-    if (folder === 'llama') {
-      if (!mob.num3 || mob.num3 === 1) return null;
-      const colorName = colorMap[mob.num3];
-      if (!colorName) return null;
-      return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'carpet', fallbackHide: true }];
-    }
+      // ── Sheep ──────────────────────────────────────────────────────────────
+      if (folder === 'sheep') {
+        const sheepColors = { 1: 'white', 2: 'light-gray', 3: 'gray', 4: 'black', 5: 'brown', 6: 'red', 7: 'orange', 8: 'yellow', 9: 'lime', 10: 'green', 11: 'cyan', 12: 'light-blue', 13: 'blue', 14: 'purple', 15: 'magenta', 16: 'pink' };
+        const colorName = sheepColors[mob.num3];
+        if (!colorName) return null;
+        return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'color', fallbackHide: true }];
+      }
 
-    // ── Wolf ─────────────────────────────────────────────────────────────────
-    if (folder === 'wolf') {
-      if (mob.num2 === 1 || !mob.num3 || mob.num3 === 1) return null;
-      const colorName = colorMap[mob.num3];
-      if (!colorName) return null;
-      return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: mob.num2 === 3 ? 'armor' : 'collar', fallbackHide: true }];
-    }
+      // ── Llama ──────────────────────────────────────────────────────────────
+      if (folder === 'llama') {
+        if (!mob.num3 || mob.num3 === 1) return null;
+        const colorName = colorMap[mob.num3];
+        if (!colorName) return null;
+        return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'carpet', fallbackHide: true }];
+      }
 
-    return null;
+      // ── Wolf ───────────────────────────────────────────────────────────────
+      if (folder === 'wolf') {
+        if (mob.num2 === 1 || !mob.num3 || mob.num3 === 1) return null;
+        const colorName = colorMap[mob.num3];
+        if (!colorName) return null;
+        return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: mob.num2 === 3 ? 'armor' : 'collar', fallbackHide: true }];
+      }
+
+      return null;
+    },
   },
-},
 
-  // ── Sheared ─────────────────────────────────────────────────────────────────
-  // categoryId: 'shearable' → icona nel tooltip cliccabile → /category/shearable
+  // ── Sheared ──────────────────────────────────────────────────────────────────
   {
     id: 'sheared',
     resolve(mob) {
@@ -232,7 +241,7 @@ const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: '
     },
   },
 
-  // ── Saddle ──────────────────────────────────────────────────────────────────
+  // ── Saddle ───────────────────────────────────────────────────────────────────
   {
     id: 'saddle',
     resolve(mob) {
@@ -249,7 +258,7 @@ const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: '
     },
   },
 
-  // ── Chested ─────────────────────────────────────────────────────────────────
+  // ── Chested ──────────────────────────────────────────────────────────────────
   {
     id: 'chested',
     resolve(mob) {
@@ -266,7 +275,7 @@ const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: '
     },
   },
 
-  // ── Banner ──────────────────────────────────────────────────────────────────
+  // ── Banner ───────────────────────────────────────────────────────────────────
   {
     id: 'banner',
     resolve(mob) {
@@ -283,7 +292,7 @@ const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: '
     },
   },
 
-  // ── Screaming Goat ──────────────────────────────────────────────────────────
+  // ── Screaming Goat ───────────────────────────────────────────────────────────
   {
     id: 'screaming',
     resolve(mob) {
@@ -300,10 +309,46 @@ const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: '
     },
   },
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // ── Name Tag (Toast, Johnny, jeb_) ───────────────────────────────────────────
+  {
+    id: 'name-tag',
+    resolve(mob) {
+      const specialNames = ['Toast', 'Johnny', 'jeb_'];
+      if (!specialNames.some(name => mob.image?.includes(name))) return null;
+      return [{
+        src:          '/icons/items/name-tag.png',
+        alt:          'Name Tag',
+        position:     POSITIONS.BOTTOM_RIGHT,
+        size:         'md',
+        label:        'Name Tag',
+        labelRole:    'status',
+        fallbackHide: true,
+      }];
+    },
+  },
+
+  // ── Lightning (Charged Creeper, Brown Mooshroom) ─────────────────────────────
+  {
+    id: 'lightning',
+    resolve(mob) {
+      const specialNames = ['Skeleton Horse man', 'Mooshroom  Brown', 'Creeper  Charged'];
+        if (!specialNames.some(name => mob.name === name)) return null;
+      return [{
+        src:          '/icons/items/lightning.png',
+        alt:          'Lightning',
+        position:     POSITIONS.BOTTOM_RIGHT,
+        size:         'md',
+        label:        'Lightning',
+        labelRole:    'status',
+        fallbackHide: true,
+      }];
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Aggiungi nuovi resolver qui sotto
   // Per collegare a una categoria: categoryId: '<id>'
-  // ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
 
 ];
 
@@ -313,7 +358,14 @@ const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: '
 
 /**
  * Risolve tutte le icone per un mob, raggruppandole per posizione.
- * Se due icone vogliono la stessa posizione, vince la prima (ordine dei resolver).
+ *
+ * Logica conflitti:
+ * - Se una posizione è già occupata, si tenta di spostare la nuova icona in
+ *   BOTTOM_CENTER (se libero).
+ * - In ogni caso, tutte le icone con label vengono sempre incluse come
+ *   tooltipOnly, così compaiono nel tooltip anche se non visibili sulla card.
+ * - Le icone tooltipOnly hanno una chiave con prefisso "tooltip_" per non
+ *   collidere con quelle visibili.
  */
 export function resolveIcons(mob) {
   const result = new Map();
@@ -321,11 +373,23 @@ export function resolveIcons(mob) {
     const icons = resolver.resolve(mob);
     if (!icons) continue;
     for (const icon of icons) {
+      const baseEntry = { ...icon, resolverId: resolver.id };
       if (!result.has(icon.position)) {
-        result.set(icon.position, { ...icon, resolverId: resolver.id });
+        // Posizione libera: aggiungi normalmente
+        result.set(icon.position, baseEntry);
+      } else {
+        // Conflitto: prova bottom-center come posizione di ripiego
+        const fallback = POSITIONS.BOTTOM_CENTER;
+        if (!result.has(fallback)) {
+          result.set(fallback, { ...baseEntry, position: fallback });
+        } else {
+          // Anche bottom-center occupato: aggiungi solo come tooltipOnly
+          result.set(`tooltip_${resolver.id}`, { ...baseEntry, tooltipOnly: true });
+        }
       }
     }
   }
+
   return result;
 }
 
