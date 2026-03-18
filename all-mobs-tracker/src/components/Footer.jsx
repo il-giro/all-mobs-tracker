@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
   return (
     <footer style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
-      className="bg-[#0e0e0e] border-t border-stone-800 mt-12 px-8 py-12"
+      className="bg-[#0e0e0e] border-t border-stone-800 mt-12 px-8 py-8"
     >
       <div className="max-w-[1600px] mx-auto">
         <div className="flex flex-col md:flex-row justify-between gap-10 mb-10">
@@ -12,7 +12,7 @@ const Footer = () => {
           <div className="max-w-xs">
             <p className="text-stone-100 text-lg tracking-wide mb-3">Mob Tracker</p>
             <p className="text-stone-500 text-sm leading-relaxed">
-              Traccia i tuoi progressi nella raccolta di mob di Minecraft. Tutti i dati sono salvati localmente nel tuo browser.
+              Track your progress in collecting Minecraft mobs and their variants. All data is saved locally in your browser.
             </p>
           </div>
 
@@ -38,7 +38,7 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="border-t border-stone-800 pt-6 text-center">
           <p className="text-stone-600 text-xs tracking-wide">
-            © {new Date().getFullYear()} Mob Tracker. Tutti i diritti riservati.
+            © {new Date().getFullYear()} Mob Tracker. All rights reserved.
           </p>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority } from '../config/mobConfig';
 import { MobCategories } from '../config/mobCategories';
 import { resolveIcons, hasVillagerIcons, getMobCategories, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
+import { mobNameToSlug } from '../config/mobDescriptions';
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {
@@ -32,7 +33,7 @@ const MobIcon = ({ icon }) => {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div className={`${POSITION_CLASSES[icon.position]} border-2 border-black bg-stone-400`}>
+    <div className={`${POSITION_CLASSES[icon.position]} border border-stone-900 bg-stone-400`}>
       <img
         src={icon.src}
         alt={icon.alt}
@@ -45,13 +46,15 @@ const MobIcon = ({ icon }) => {
 };
 
 // ─── Riga icona nel tooltip ───────────────────────────────────────────────────
-// Se l'icona ha categoryId → bottone cliccabile → /categories/:categoryId
-// Altrimenti → div statico con info
+// Se l'icona ha categoryId → è un bottone cliccabile che naviga alla pagina categoria.
+// Altrimenti → div statico con info.
 const TooltipIconRow = ({ icon, onNavigate }) => {
   const [visible, setVisible] = useState(true);
   const isLink = !!icon.categoryId;
 
-  const handleError = icon.fallbackHide ? () => setVisible(false) : undefined;
+  const handleError = icon.fallbackHide
+    ? () => setVisible(false)
+    : undefined;
 
   if (!visible) return null;
 
@@ -105,13 +108,10 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const isVillager     = hasVillagerIcons(mob);
 
-  // Risolve le icone — fonte di verità per card e tooltip
+  // Risolve le icone una sola volta — fonte di verità per card e tooltip
   const iconMap = resolveIcons(mob);
 
-  // Icone visibili sulla card (esclude tooltipOnly)
-  const cardIcons = [...iconMap.values()].filter(icon => !icon.tooltipOnly);
-
-  // Tutte le icone con label per il tooltip (include tooltipOnly)
+  // Icone che hanno label da mostrare nel tooltip
   const tooltipIcons = [...iconMap.values()].filter(icon => icon.label);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
@@ -218,15 +218,14 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
               </div>
             )}
 
-            {/* Solo le icone visibili sulla card (no tooltipOnly) */}
-            {cardIcons.map(icon => (
+            {[...iconMap.values()].map(icon => (
               <MobIcon key={icon.resolverId} icon={icon} />
             ))}
           </>
         )}
 
         {/* Icone alwaysVisible — mostrate anche quando tracciato/catturato */}
-        {cardIcons
+        {[...iconMap.values()]
           .filter(icon => icon.alwaysVisible)
           .map(icon => <MobIcon key={`always_${icon.resolverId}`} icon={icon} />)
         }
@@ -255,7 +254,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
       {/* Tooltip via portale */}
       {tooltipPos && createPortal(
         <div
-          onClick={e => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
           onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setTooltipPos(null); isOpen.current = false; }}
           style={{
             position: 'absolute',
@@ -266,13 +265,25 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
           }}
           className="bg-stone-800 border-4 border-stone-500 shadow-2xl p-3"
         >
-          {/* Preview immagine */}
-          <div className="flex justify-center mb-3 bg-[#181818] border-2 border-stone-700 overflow-hidden" style={{ height: '120px' }}>
+          {/* Preview immagine — cliccabile → pagina mob */}
+          <div
+            onMouseDown={e => {
+              e.stopPropagation();
+              setTooltipPos(null);
+              isOpen.current = false;
+              const slug = mob.folder && mob.folder !== 'root' && !mob.folder.startsWith('special:')
+                ? mob.folder.toLowerCase().replace(/\s+/g, '-')
+                : mobNameToSlug(mob.name);
+              navigate(`/mobs/${slug}`);
+            }}
+            className="flex justify-center mb-3 bg-[#181818] border-2 border-stone-700 overflow-hidden cursor-pointer hover:border-stone-500 transition-colors group/img"
+            style={{ height: '120px' }}
+          >
             <img
               src={mob.image}
               alt={mob.name}
               draggable={false}
-              className="object-contain pixelated"
+              className="object-contain pixelated group-hover/img:scale-110 transition-transform"
               style={{ width: '100%', height: '100%', imageRendering: 'pixelated' }}
             />
           </div>
@@ -281,7 +292,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
 
-          {/* Tutte le icone con label — incluse tooltipOnly */}
+          {/* Icone: statiche o cliccabili (se hanno categoryId) */}
           {tooltipIcons.length > 0 && (
             <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
               {tooltipIcons.map(icon => (

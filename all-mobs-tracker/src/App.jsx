@@ -4,8 +4,12 @@ import MobTracker from './pages/MobTracker'
 import About from './pages/About'
 import FAQ from './pages/FAQ'
 import WhoAmI from './pages/WhoAmI'
+
 import CategoryPage from './pages/categories/CategoryPage';
 import ShearablePage from './pages/categories/ShearablePage';
+
+import MobPage from './pages/mobs/MobPage';
+
 import './index.css'
 
 function App() {
@@ -16,8 +20,11 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/whoami" element={<WhoAmI />} />
+
         <Route path="/categories/shearable" element={<ShearablePage />} />
         <Route path="/categories/:id" element={<CategoryPage />} />
+
+        <Route path="/mobs/:slug" element={<MobPage />} />
       </Routes>
       <Analytics />
     </BrowserRouter>

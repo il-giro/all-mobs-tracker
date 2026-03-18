@@ -35,20 +35,21 @@ A personal tracker to keep track of every mob (and mob variant) in Minecraft. Cl
 A list of things that could be added or improved:
 
 - [x] Export/import progress (JSON backup)
-- [ ] Multiple save slots / profiles
-- [ ] Mob detail page with description and spawn info
+- [x] Mob detail page with description and spawn info
 - [x] Mark mobs as "seen but not tracked" (partial state)
 - [x] Sort options (alphabetical, by completion, by category)
-- [ ] Mobile swipe to mark as tracked
-- [ ] Dark/light theme toggle
-- [ ] Confetti or animation on 100% completion
+- [ ] Mobile compatibility
 - [x] Filter to show only untracked mobs
 - [x] Filter to show only tracked mobs
 - [ ] Show total count per folder/category in filter buttons
-- [ ] Multiplayer / shared tracking (Supabase or similar)
-- [ ] Changelog or "recently added" section
-- [ ] Better handling of unobtainable mobs (greyed out style)
 
+---
+
+Further future improvements:
+- [ ] Multiple save slots / profiles
+- [ ] Dark/light theme toggle
+- [ ] Confetti or animation on 100% completion
+- [ ] Multiplayer / shared tracking (Supabase or similar)
 ---
 
 ## Mob Checklist
