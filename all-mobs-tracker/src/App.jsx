@@ -6,7 +6,6 @@ import FAQ from './pages/FAQ'
 import WhoAmI from './pages/WhoAmI'
 
 import CategoryPage from './pages/categories/CategoryPage';
-import ShearablePage from './pages/categories/ShearablePage';
 
 import MobPage from './pages/mobs/MobPage';
 
@@ -21,7 +20,6 @@ function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/whoami" element={<WhoAmI />} />
 
-        <Route path="/categories/shearable" element={<ShearablePage />} />
         <Route path="/categories/:id" element={<CategoryPage />} />
 
         <Route path="/mobs/:slug" element={<MobPage />} />

@@ -252,7 +252,8 @@ export const MOB_ICON_RESOLVERS = [
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
         label:        'Saddled',
-        labelRole:    'status',
+        labelRole:    'category',
+        categoryId:   'saddled',
         fallbackHide: true,
       }];
     },
@@ -269,7 +270,8 @@ export const MOB_ICON_RESOLVERS = [
         position:     POSITIONS.BOTTOM_LEFT,
         size:         'md',
         label:        'Chested',
-        labelRole:    'status',
+        labelRole:    'category',
+        categoryId:   'chested',
         fallbackHide: true,
       }];
     },
@@ -286,7 +288,8 @@ export const MOB_ICON_RESOLVERS = [
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
         label:        'Banner',
-        labelRole:    'status',
+        labelRole:    'category',
+        categoryId:   'banner',
         fallbackHide: true,
       }];
     },
@@ -303,7 +306,8 @@ export const MOB_ICON_RESOLVERS = [
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
         label:        'Screaming',
-        labelRole:    'status',
+        labelRole:    'category',
+        categoryId:   'screaming',
         fallbackHide: true,
       }];
     },
@@ -321,7 +325,8 @@ export const MOB_ICON_RESOLVERS = [
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
         label:        'Name Tag',
-        labelRole:    'status',
+        labelRole:    'category',
+        categoryId:   'name-tag',
         fallbackHide: true,
       }];
     },
@@ -339,7 +344,8 @@ export const MOB_ICON_RESOLVERS = [
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
         label:        'Lightning',
-        labelRole:    'status',
+        labelRole:    'category',
+        categoryId:   'lightning',
         fallbackHide: true,
       }];
     },

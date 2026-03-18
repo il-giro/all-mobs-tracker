@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Settings from '../components/Settings';
 import MobCard from '../components/MobCard';
 import TropicalFishCard from '../components/TropicalFishCard';
@@ -8,6 +9,7 @@ import Stats from '../components/Stats';
 import { parseFileName } from '../utils/mobParser';
 import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
 import { VillagerBiomes, VillagerJobs } from '../config/mobIcons';
+import { MobCategories } from '../config/mobCategories';
 import Footer from '../components/Footer';
 
 const ALL_FISH = (() => {
@@ -121,7 +123,9 @@ const MobTracker = () => {
   const [showAllFish, setShowAllFish]       = useState(() => localStorage.getItem('mobTracker_showAllFish') === 'true');
   const [searchQuery, setSearchQuery]       = useState('');
   const [showSettings, setShowSettings]     = useState(false);
+  const navigate = useNavigate();
   const [showStats, setShowStats]           = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [sortBy, setSortBy]                 = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
   const [sortOpen, setSortOpen]             = useState(false);
@@ -231,6 +235,7 @@ const MobTracker = () => {
         if (sortOpen)                        { setSortOpen(false);     return; }
         if (showSettings)                    { setShowSettings(false); return; }
         if (showStats)                       { setShowStats(false);    return; }
+        if (showCategories)                  { setShowCategories(false); return; }
         if (pendingAction)                   { setPendingAction(null); return; }
         if (searchQuery)                     { setSearchQuery('');     return; }
         if (selectedFolder !== 'all')        { setSelectedFolder('all'); return; }
@@ -248,7 +253,7 @@ const MobTracker = () => {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [showSettings, showStats, searchQuery, selectedFolder, sortOpen, pendingAction, trackedMobs, capturedMobs]);
+  }, [showSettings, showStats, showCategories, searchQuery, selectedFolder, sortOpen, pendingAction, trackedMobs, capturedMobs]);
 
   useEffect(() => { localStorage.setItem('mobTracker_saves',         JSON.stringify(trackedMobs));       }, [trackedMobs]);
   useEffect(() => { localStorage.setItem('mobTracker_captured',      JSON.stringify(capturedMobs));      }, [capturedMobs]);
@@ -783,6 +788,70 @@ const MobTracker = () => {
       )}
       {showStats && <Stats allMobs={allMobs} trackedMobs={trackedMobs} onClose={() => setShowStats(false)} />}
 
+      {/* Modal categorie */}
+      {showCategories && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setShowCategories(false)}
+        >
+          <div
+            className="bg-stone-900 border-4 border-amber-800 shadow-2xl w-full max-w-2xl flex flex-col"
+            style={{ maxHeight: '80vh' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header modal */}
+            <div className="flex items-center justify-between px-6 py-4 border-b-4 border-amber-900 shrink-0">
+              <span className="text-2xl uppercase text-amber-400 tracking-widest">Categories</span>
+              <button
+                onClick={() => setShowCategories(false)}
+                className="bg-stone-700 hover:bg-stone-600 text-white px-4 py-1.5 text-xs border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0"
+              >Close</button>
+            </div>
+
+            {/* Lista scrollabile */}
+            <div className="overflow-y-auto flex-1 p-4 space-y-2"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#44403c #0c0c0c' }}
+            >
+              {MobCategories.map(cat => {
+                const colorMap = {
+                  amber:  { border: 'border-amber-800',  hover: 'hover:border-amber-500',  text: 'text-amber-400',  bar: 'bg-amber-500'  },
+                  blue:   { border: 'border-blue-800',   hover: 'hover:border-blue-500',   text: 'text-blue-400',   bar: 'bg-blue-500'   },
+                  green:  { border: 'border-green-800',  hover: 'hover:border-green-500',  text: 'text-green-400',  bar: 'bg-green-500'  },
+                  red:    { border: 'border-red-800',    hover: 'hover:border-red-500',    text: 'text-red-400',    bar: 'bg-red-500'    },
+                  purple: { border: 'border-purple-800', hover: 'hover:border-purple-500', text: 'text-purple-400', bar: 'bg-purple-500' },
+                  cyan:   { border: 'border-cyan-800',   hover: 'hover:border-cyan-500',   text: 'text-cyan-400',   bar: 'bg-cyan-500'   },
+                };
+                const c = colorMap[cat.color] ?? colorMap.amber;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setShowCategories(false); navigate(`/categories/${cat.id}`); }}
+                    className={`flex items-center gap-4 w-full p-4 border-2 ${c.border} ${c.hover} bg-stone-800 hover:bg-stone-700 transition-all group text-left`}
+                  >
+                    {/* Icona */}
+                    <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
+                      {cat.icon?.includes('/') || cat.icon?.includes('.')
+                        ? <img src={cat.icon} alt={cat.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
+                        : <span className={`text-2xl ${c.text}`}>{cat.icon}</span>
+                      }
+                    </div>
+                    {/* Testo */}
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm uppercase ${c.text}`}>{cat.label}</p>
+                      {cat.description && (
+                        <p className="text-xs text-stone-500 leading-relaxed mt-1 line-clamp-2">{cat.description}</p>
+                      )}
+                    </div>
+                    {/* Freccia */}
+                    <span className="text-stone-600 group-hover:text-stone-300 transition-colors shrink-0 text-lg">→</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 p-4 md:p-6">
         <div className="max-w-[1600px] mx-auto">
           <header className="bg-stone-800 rounded-lg p-6 mb-6 border-4 border-stone-600 shadow-xl">
@@ -840,7 +909,7 @@ const MobTracker = () => {
                 </div>
 
                 <div className="flex gap-3 shrink-0">
-                  <button onClick={() => setShowStats(true)}    className="bg-blue-800 hover:bg-blue-700 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Stats</button>
+                  <button onClick={() => setShowCategories(v => !v)} className={`px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 ${showCategories ? 'bg-amber-700 hover:bg-amber-600' : 'bg-stone-700 hover:bg-stone-600'}`}>Categories</button>
                   <button onClick={() => setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
                 </div>
               </div>
