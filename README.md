@@ -56,25 +56,25 @@ Further future improvements:
 
 Use this to track which mobs have all their variants properly added to the tracker.
 
-### Passive [ ]
+### Passive [x]
 
 - [x] Allay
 - [x] Armadillo
 - [x] Axolotl
 - [x] Bat
 - [x] Bat
-- [ ] Cat (baby)
+- [x] Cat
 - [x] Camel
 - [x] Camel husk
-- [ ] Chicken (jockey)
+- [x] Chicken
 - [x] Cod
 - [x] Copper Golem
 - [x] Cow
 - [x] Donkey
 - [x] Frog
 - [x] Glow Squid
-- [ ] Happy Ghast (colors)
-- [ ] Horse (baby) - saddle - armor
+- [x] Happy Ghast
+- [x] Horse
 - [x] Mooshroom
 - [x] Mule
 - [x] Ocelot
@@ -91,9 +91,9 @@ Use this to track which mobs have all their variants properly added to the track
 - [x] Tadpole
 - [x] Tropical Fish
 - [x] Turtle
-- [ ] Villager (baby)
-- [ ] Wandering Trader
-- [ ] Zombie Horse
+- [x] Villager
+- [x] Wandering Trader
+- [x] Zombie Horse
 
 ### Neutral [x]
 
@@ -155,12 +155,12 @@ Use this to track which mobs have all their variants properly added to the track
 
 ### Special / Variants [ ]
 
-- [ ] All Baby variants (all breedable mobs)
+- [x] All Baby variants (all breedable mobs)
 - [x] All Baby monster variants
 - [X] All Pumpkin variants (all mobs that can spawn with pumpkin)
-- [ ] All Jockey variants
+- [x] All Jockey variants
 - [ ] Unobtainable variants
-- [ ] All color variants (wolf collars, happy ghasts...)
+- [ ] All color variants (wolf collars, happy ghasts, cats)
 
 ---
 
