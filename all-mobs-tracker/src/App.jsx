@@ -6,6 +6,7 @@ import FAQ from './pages/FAQ'
 import WhoAmI from './pages/WhoAmI'
 
 import CategoryPage from './pages/categories/CategoryPage';
+import SpecialCategoryPage from './pages/categories/SpecialCategoryPage';
 
 import MobPage from './pages/mobs/MobPage';
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/whoami" element={<WhoAmI />} />
 
         <Route path="/categories/:id" element={<CategoryPage />} />
+        <Route path="/:slug" element={<SpecialCategoryPage />} />
 
         <Route path="/mobs/:slug" element={<MobPage />} />
       </Routes>

@@ -31,6 +31,20 @@ export const MobDescriptions = {
     link: 'https://minecraft.wiki/w/Allay',
   },
 
+  'armadillo': {
+    general: [
+      '• Armadillos can easily be moved with a lead.',
+      '• You can keep an armadillo rolled up by costantly scaring it with a mob that scares it, such as a creeper or a skeleton.',
+    ],
+    link: 'https://minecraft.wiki/w/Armadillo',
+    variants: {
+      'data/armadillo/1.1Armadillo.gif': 'Main variant of the armadillo.',
+      'data/armadillo/1.1Armadillo_A.gif': 'Simple baby armadillo.',
+      'data/armadillo/2.2Armadillo-RolledUp.gif': 'Armadillo variant that is always rolled up.',
+      'data/armadillo/2.2Armadillo-RolledUp_A.gif': 'Baby armadillo variant that is always rolled up.',
+    }
+  },
+
   'wolf': {
     general: 'Wolves can be tamed with bones.',
     link: 'https://minecraft.wiki/w/Wolf',

@@ -245,7 +245,7 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'saddle',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('saddle')) return null;
+      if (!mob.name?.toLowerCase().includes('saddle')) return null;
       return [{
         src:          '/icons/items/saddle.png',
         alt:          'Saddle',
@@ -350,6 +350,25 @@ export const MOB_ICON_RESOLVERS = [
       }];
     },
   },
+
+  // ── Damaged Iron Golem ───────────────────────────────────────────────────────
+  {
+    id: 'damaged-iron-golem',
+    resolve(mob) {
+      if (!mob.image?.toLowerCase().includes('iron golem')) return null;
+    return [{
+        src:          mob.image.toLowerCase().includes('high') ? '/icons/letters/h.png' : (mob.image.toLowerCase().includes('medium') ? '/icons/letters/m.png' : (mob.image.toLowerCase().includes('low') ? '/icons/letters/l.png' : '/icons/letters/n.png')) ,
+        alt:          'Damaged',
+        position:     POSITIONS.BOTTOM_RIGHT,
+        size:         'md',
+        label:        'Damaged',
+        labelRole:    'status',
+        fallbackHide: true,
+      }];
+    },
+  },
+
+
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Aggiungi nuovi resolver qui sotto
