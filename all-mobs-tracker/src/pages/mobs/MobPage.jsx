@@ -490,6 +490,7 @@ const MobPage = () => {
                       youtube: { src: 'https://www.youtube.com/favicon.ico', alt: 'YouTube' },
                       reddit:  { src: 'https://www.reddit.com/favicon.ico',  alt: 'Reddit'  },
                       wiki:    { src: '/icons/wiki.ico',                     alt: 'Wiki'    },
+                      modrinth: { src: 'https://modrinth.com/favicon-light.ico',                 alt: 'Modrinth' },
                       twitch:  { src: 'https://static.twitchsvc.net/assets/uploads/favicon.ico', alt: 'Twitch' },
                     };
                     const ico = block.icon ? iconMap[block.icon] : null;

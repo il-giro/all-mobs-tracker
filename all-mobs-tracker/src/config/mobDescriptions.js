@@ -45,6 +45,22 @@ export const MobDescriptions = {
     }
   },
 
+  'axolotl': {
+    general: [
+      'Axolotls can be found in lush caves, and can be picked up with a bucket.',
+      '\n',
+      '## Useful Resources',
+      { text: 'Show axolotl variants in buckets. (mod)', href: 'https://modrinth.com/mod/axolotl-buckets', icon: 'modrinth' },
+      '---',
+      { text: 'Show axolotl variants in buckets. (resource pack)', href: 'https://modrinth.com/resourcepack/axolotl-bucket-variants', icon: 'modrinth' },
+    ],
+    link: 'https://minecraft.wiki/w/Axolotl',
+    variants: {
+      'data/axolotl/5Axolotl-Blue.gif': 'Rare blue axolotl variant. It has a 1 in 1200 chance to spawn naturally. (0.083% chance)',
+      'data/axolotl/5Axolotl-Blue_A.gif': 'Rare baby blue axolotl variant. It has a 1 in 1200 chance to spawn naturally. (0.083% chance)',
+    }
+  },
+
   'wolf': {
     general: 'Wolves can be tamed with bones.',
     link: 'https://minecraft.wiki/w/Wolf',
@@ -65,6 +81,10 @@ export function getMobLink(slug) {
 
 export function getVariantDescription(slug, fileName) {
   return MobDescriptions[slug]?.variants?.[fileName] ?? null;
+}
+
+export function getSpecialCategoryDesc(slug, fileName) {
+  return MobDescriptions.specialCategories?.[slug]?.[fileName] ?? null;
 }
 
 export function mobNameToSlug(name) {

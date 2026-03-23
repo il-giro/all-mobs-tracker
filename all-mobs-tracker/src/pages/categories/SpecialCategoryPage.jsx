@@ -4,7 +4,7 @@ import { parseFileName } from '../../utils/mobParser';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
-import { mobNameToSlug } from '../../config/mobDescriptions';
+import { mobNameToSlug, getSpecialCategoryDesc } from '../../config/mobDescriptions';
 import Footer from '../../components/Footer';
 
 // ─── slug ↔ suffixId ─────────────────────────────────────────────────────────
@@ -291,7 +291,12 @@ const SpecialCategoryPage = () => {
                   </div>
                 )}
 
-                <p className="text-stone-600 text-xs uppercase border-t border-stone-700 pt-3">No description for this entry.</p>
+                {(() => {
+                  const desc = getSpecialCategoryDesc(slug, vm.fileName);
+                  return desc
+                    ? <p className="text-stone-400 text-xs leading-relaxed border-t border-stone-700 pt-3">{desc}</p>
+                    : <p className="text-stone-600 text-xs uppercase border-t border-stone-700 pt-3">No description for this entry.</p>;
+                })()}
 
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => { toggle(vm.fileName); setSelectedMob(null); }}
