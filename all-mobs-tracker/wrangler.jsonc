@@ -2,9 +2,19 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "allmobs",
+  "main": "worker/index.js",
   "compatibility_date": "2026-10-11",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  }
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "allmobs",
+      "database_id": "219b2bf5-24d2-453d-a6a9-d2f47badf957"
+    }
+  ]
 }
