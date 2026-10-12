@@ -23,6 +23,8 @@ function TableExplorer({ table }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [deletingRecord, setDeletingRecord] = useState(null);
+  const [selectedRecords, setSelectedRecords] = useState(new Set());
+  const [duplicatingRecord, setDuplicatingRecord] = useState(null);
 
   useEffect(() => {
     if (table) {
@@ -75,6 +77,7 @@ function TableExplorer({ table }) {
       if (result.success) {
         setData(result.data);
         setPagination(result.pagination);
+        setSelectedRecords(new Set());
       } else {
         setError(result.error);
       }
@@ -98,6 +101,7 @@ function TableExplorer({ table }) {
 
       if (result.success) {
         setShowCreateModal(false);
+        setDuplicatingRecord(null);
         loadData();
       } else {
         throw new Error(result.error);
@@ -158,9 +162,34 @@ function TableExplorer({ table }) {
     }
   };
 
+  const handleSelectRecord = (recordId) => {
+    const newSelected = new Set(selectedRecords);
+    if (newSelected.has(recordId)) {
+      newSelected.delete(recordId);
+    } else {
+      newSelected.add(recordId);
+    }
+    setSelectedRecords(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRecords.size === data.length) {
+      setSelectedRecords(new Set());
+    } else {
+      setSelectedRecords(new Set(data.map(r => r.id)));
+    }
+  };
+
+  const handleDuplicate = (record) => {
+    // Rimuovi l'ID per creare un nuovo record
+    const { id, ...recordWithoutId } = record;
+    setDuplicatingRecord(recordWithoutId);
+    setShowCreateModal(true);
+  };
+
   const formatValue = (value) => {
     if (value === null || value === undefined) {
-      return <span className="text-gray-400 italic">NULL</span>;
+      return <span className="text-gray-600 italic">NULL</span>;
     }
     if (typeof value === 'boolean') {
       return value ? '✓' : '✗';
@@ -183,8 +212,8 @@ function TableExplorer({ table }) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Caricamento dati...</p>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-400">Caricamento dati...</p>
         </div>
       </div>
     );
@@ -192,12 +221,12 @@ function TableExplorer({ table }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+      <div className="bg-red-900/20 border border-red-900/50 rounded-lg p-6">
         <div className="flex items-center gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
-            <h3 className="font-semibold text-red-900">Errore</h3>
-            <p className="text-red-700">{error}</p>
+            <h3 className="font-semibold text-red-400">Errore</h3>
+            <p className="text-red-300">{error}</p>
           </div>
         </div>
         <button
@@ -213,7 +242,7 @@ function TableExplorer({ table }) {
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div className="flex-1 w-full md:w-auto">
             <input
@@ -224,92 +253,119 @@ function TableExplorer({ table }) {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white placeholder-gray-500"
             />
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={loadData}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors text-white"
               title="Aggiorna"
             >
               🔄
             </button>
 
             <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+              onClick={() => {
+                setDuplicatingRecord(null);
+                setShowCreateModal(true);
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              ➕ Nuovo Record
+              ➕ Nuovo
             </button>
           </div>
         </div>
 
         {pagination && (
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
             <span>
-              Totale: <strong>{pagination.total}</strong> record
+              Totale: <strong className="text-white">{pagination.total}</strong> record
               {search && ` (filtrati)`}
+              {selectedRecords.size > 0 && ` • ${selectedRecords.size} selezionati`}
             </span>
             <span>
-              Pagina <strong>{pagination.page}</strong> di <strong>{pagination.totalPages}</strong>
+              Pagina <strong className="text-white">{pagination.page}</strong> di <strong className="text-white">{pagination.totalPages}</strong>
             </span>
           </div>
         )}
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-800 border-b border-gray-700">
               <tr>
+                <th className="px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedRecords.size === data.length && data.length > 0}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded bg-gray-700 border-gray-600"
+                  />
+                </th>
                 {columns.map((col) => (
                   <th
                     key={col.name}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-750 transition-colors"
                     onClick={() => handleSort(col.name)}
                   >
                     <div className="flex items-center gap-2">
                       {col.name}
-                      {col.pk === 1 && <span className="text-yellow-600" title="Chiave primaria">🔑</span>}
+                      {col.pk === 1 && <span className="text-yellow-500" title="Chiave primaria">🔑</span>}
                       {orderBy === col.name && (
-                        <span>{orderDir === 'asc' ? '↑' : '↓'}</span>
+                        <span className="text-blue-400">{orderDir === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </th>
                 ))}
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Azioni
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-800">
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length + 1} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={columns.length + 2} className="px-6 py-8 text-center text-gray-500">
                     Nessun record trovato
                   </td>
                 </tr>
               ) : (
                 data.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                  <tr key={idx} className={`hover:bg-gray-800 transition-colors ${selectedRecords.has(row.id) ? 'bg-gray-800/50' : ''}`}>
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedRecords.has(row.id)}
+                        onChange={() => handleSelectRecord(row.id)}
+                        className="w-4 h-4 rounded bg-gray-700 border-gray-600"
+                      />
+                    </td>
                     {columns.map((col) => (
-                      <td key={col.name} className="px-6 py-4 text-sm text-gray-900">
+                      <td key={col.name} className="px-6 py-4 text-sm text-gray-300">
                         {formatValue(row[col.name])}
                       </td>
                     ))}
                     <td className="px-6 py-4 text-right text-sm space-x-2">
                       <button
                         onClick={() => setEditingRecord(row)}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
                       >
                         ✏️ Modifica
                       </button>
                       <button
+                        onClick={() => handleDuplicate(row)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-700 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
+                        title="Duplica record"
+                      >
+                        📋 Duplica
+                      </button>
+                      <button
                         onClick={() => setDeletingRecord(row)}
-                        className="text-red-600 hover:text-red-800 font-medium"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600/80 text-white rounded-lg hover:bg-red-600 font-medium transition-colors"
                       >
                         🗑️ Elimina
                       </button>
@@ -328,7 +384,7 @@ function TableExplorer({ table }) {
           <button
             onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page === 1}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-white"
           >
             ← Precedente
           </button>
@@ -352,8 +408,8 @@ function TableExplorer({ table }) {
                   onClick={() => setPage(pageNum)}
                   className={`w-10 h-10 rounded-lg transition-colors ${
                     page === pageNum
-                      ? 'bg-green-600 text-white'
-                      : 'border border-gray-300 hover:bg-gray-50'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-300'
                   }`}
                 >
                   {pageNum}
@@ -365,7 +421,7 @@ function TableExplorer({ table }) {
           <button
             onClick={() => setPage(Math.min(pagination.totalPages, page + 1))}
             disabled={page === pagination.totalPages}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-white"
           >
             Successiva →
           </button>
@@ -377,8 +433,12 @@ function TableExplorer({ table }) {
         <RecordModal
           table={table}
           columns={columns}
+          record={duplicatingRecord}
           onSave={handleCreate}
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => {
+            setShowCreateModal(false);
+            setDuplicatingRecord(null);
+          }}
         />
       )}
 

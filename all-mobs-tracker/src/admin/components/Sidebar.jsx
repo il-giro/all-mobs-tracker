@@ -12,7 +12,6 @@ function Sidebar({ currentPage, selectedTable, onNavigate, collapsed }) {
   const [availableTables, setAvailableTables] = useState([]);
 
   useEffect(() => {
-    // Carica le tabelle disponibili dall'API
     fetch('/api/admin/tables')
       .then(res => res.json())
       .then(data => {
@@ -26,38 +25,37 @@ function Sidebar({ currentPage, selectedTable, onNavigate, collapsed }) {
   const MenuItem = ({ id, label, icon, onClick, active }) => (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm ${
         active
-          ? 'bg-green-600 text-white'
-          : 'text-gray-700 hover:bg-gray-100'
+          ? 'bg-blue-600 text-white shadow-sm'
+          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
       }`}
     >
-      <span className="text-xl">{icon}</span>
+      <span className="text-lg">{icon}</span>
       {!collapsed && <span className="font-medium">{label}</span>}
     </button>
   );
 
   return (
     <aside
-      className={`bg-white border-r border-gray-200 transition-all duration-300 ${
-        collapsed ? 'w-20' : 'w-64'
+      className={`bg-gray-900 border-r border-gray-800 transition-all duration-300 flex flex-col ${
+        collapsed ? 'w-16' : 'w-64'
       }`}
     >
-      <div className="p-6">
+      <div className="p-4 border-b border-gray-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white text-xl font-bold">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
             A
           </div>
           {!collapsed && (
             <div>
-              <h1 className="text-xl font-bold text-gray-900">AllMobs</h1>
-              <p className="text-sm text-gray-500">Admin Dashboard</p>
+              <h1 className="text-sm font-semibold text-white">AllMobs Admin</h1>
             </div>
           )}
         </div>
       </div>
 
-      <nav className="px-4 space-y-1">
+      <nav className="px-3 py-4 space-y-1 flex-1 overflow-y-auto">
         <MenuItem
           id="dashboard"
           label="Dashboard"
@@ -67,9 +65,9 @@ function Sidebar({ currentPage, selectedTable, onNavigate, collapsed }) {
         />
 
         {!collapsed && (
-          <div className="pt-4 pb-2 px-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Database
+          <div className="pt-4 pb-2 px-2">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Tabelle
             </p>
           </div>
         )}
@@ -84,17 +82,17 @@ function Sidebar({ currentPage, selectedTable, onNavigate, collapsed }) {
             active={currentPage === 'table' && selectedTable === table.name}
           />
         ))}
-
-        <div className="pt-4">
-          <MenuItem
-            id="settings"
-            label="Impostazioni"
-            icon="⚙️"
-            onClick={() => onNavigate('settings')}
-            active={currentPage === 'settings'}
-          />
-        </div>
       </nav>
+
+      <div className="p-3 border-t border-gray-800">
+        <MenuItem
+          id="settings"
+          label="Impostazioni"
+          icon="⚙️"
+          onClick={() => onNavigate('settings')}
+          active={currentPage === 'settings'}
+        />
+      </div>
     </aside>
   );
 }
