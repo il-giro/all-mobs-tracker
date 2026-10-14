@@ -26,6 +26,11 @@ function TableExplorer({ table }) {
   const [selectedRecords, setSelectedRecords] = useState(new Set());
   const [duplicatingRecord, setDuplicatingRecord] = useState(null);
 
+  // Cache per arricchimento visivo delle tuple di collegamento
+  const [mobsCache, setMobsCache] = useState({});
+  const [categoriesCache, setCategoriesCache] = useState({});
+  const [variantsCache, setVariantsCache] = useState({});
+
   useEffect(() => {
     if (table) {
       loadSchema();
@@ -38,6 +43,62 @@ function TableExplorer({ table }) {
       loadData();
     }
   }, [page, search, orderBy, orderDir]);
+
+  // Caricamento cache per metadati visivi di mob, categorie e varianti
+  const loadRelationMetadata = async () => {
+    let currentMobs = mobsCache;
+    let currentCats = categoriesCache;
+    let currentVars = variantsCache;
+
+    if (Object.keys(currentCats).length === 0) {
+      try {
+        const res = await fetch('/api/admin/data/CATEGORIES?limit=100');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          currentCats = Object.fromEntries(json.data.map(c => [c.id, c]));
+          setCategoriesCache(currentCats);
+        }
+      } catch (e) {
+        console.error('Errore nel caricamento cache CATEGORIES:', e);
+      }
+    }
+
+    if (table === 'MOB_CATEGORIES' && Object.keys(currentMobs).length === 0) {
+      try {
+        const res = await fetch('/api/admin/data/MOBS?limit=100');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          currentMobs = Object.fromEntries(json.data.map(m => [m.id, m]));
+          setMobsCache(currentMobs);
+        }
+      } catch (e) {
+        console.error('Errore nel caricamento cache MOBS:', e);
+      }
+    }
+
+    if (table === 'VARIANT_CATEGORIES' && Object.keys(currentVars).length === 0) {
+      try {
+        const pages = Array.from({ length: 10 }, (_, i) => i + 1);
+        const responses = await Promise.all(
+          pages.map(p => fetch(`/api/admin/data/VARIANTS?page=${p}&limit=100`).then(r => r.json()))
+        );
+        const map = {};
+        for (const res of responses) {
+          if (res?.success && Array.isArray(res.data)) {
+            for (const v of res.data) {
+              map[v.id] = v;
+            }
+          }
+        }
+        currentVars = map;
+        setVariantsCache(currentVars);
+      } catch (e) {
+        console.error('Errore nel caricamento cache VARIANTS:', e);
+      }
+    }
+
+    return { mobs: currentMobs, categories: currentCats, variants: currentVars };
+  };
 
   const loadSchema = async () => {
     try {
@@ -71,11 +132,48 @@ function TableExplorer({ table }) {
         params.append('orderDir', orderDir);
       }
 
-      const response = await fetch(`/api/admin/data/${table}?${params}`);
-      const result = await response.json();
+      const [dataResponse, metadata] = await Promise.all([
+        fetch(`/api/admin/data/${table}?${params}`),
+        table === 'MOB_CATEGORIES' || table === 'VARIANT_CATEGORIES'
+          ? loadRelationMetadata()
+          : Promise.resolve(null)
+      ]);
+
+      const result = await dataResponse.json();
 
       if (result.success) {
-        setData(result.data);
+        let rows = result.data;
+
+        // Arricchimento visivo delle tuple di collegamento
+        if (table === 'MOB_CATEGORIES' && metadata) {
+          rows = rows.map(r => {
+            const mob = metadata.mobs[r.mob_id];
+            const cat = metadata.categories[r.category_id];
+            return {
+              ...r,
+              mob_img: mob?.img || null,
+              mob_name: mob?.name || (r.mob_id ? `Mob #${r.mob_id}` : ''),
+              category_icon: cat?.icon || null,
+              category_name: cat?.name || (r.category_id ? `Categoria #${r.category_id}` : ''),
+              category_color: cat?.color || null,
+            };
+          });
+        } else if (table === 'VARIANT_CATEGORIES' && metadata) {
+          rows = rows.map(r => {
+            const variant = metadata.variants[r.variant_id];
+            const cat = metadata.categories[r.category_id];
+            return {
+              ...r,
+              variant_img: variant?.img || null,
+              variant_name: variant?.name || (r.variant_id ? `Variante #${r.variant_id}` : ''),
+              category_icon: cat?.icon || null,
+              category_name: cat?.name || (r.category_id ? `Categoria #${r.category_id}` : ''),
+              category_color: cat?.color || null,
+            };
+          });
+        }
+
+        setData(rows);
         setPagination(result.pagination);
         setSelectedRecords(new Set());
       } else {
@@ -89,12 +187,20 @@ function TableExplorer({ table }) {
     }
   };
 
+  // Pulizia campi virtuali prima di inviare al backend
+  const cleanRecordForBackend = (record) => {
+    if (!record) return record;
+    const { mob_img, mob_name, variant_img, variant_name, category_icon, category_name, category_color, ...clean } = record;
+    return clean;
+  };
+
   const handleCreate = async (values) => {
     try {
+      const cleanValues = cleanRecordForBackend(values);
       const response = await fetch(`/api/admin/data/${table}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify(cleanValues)
       });
 
       const result = await response.json();
@@ -113,10 +219,11 @@ function TableExplorer({ table }) {
 
   const handleUpdate = async (id, values) => {
     try {
+      const cleanValues = cleanRecordForBackend(values);
       const response = await fetch(`/api/admin/data/${table}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify(cleanValues)
       });
 
       const result = await response.json();
@@ -136,7 +243,8 @@ function TableExplorer({ table }) {
     if (!deletingRecord) return;
 
     try {
-      const response = await fetch(`/api/admin/data/${table}/${deletingRecord.id}`, {
+      const recordId = deletingRecord.id ?? `${deletingRecord.mob_id || deletingRecord.variant_id}_${deletingRecord.category_id}`;
+      const response = await fetch(`/api/admin/data/${table}/${recordId}`, {
         method: 'DELETE'
       });
 
@@ -162,12 +270,19 @@ function TableExplorer({ table }) {
     }
   };
 
-  const handleSelectRecord = (recordId) => {
+  const getRecordKey = (record, idx) => {
+    if (record.id !== undefined && record.id !== null) return record.id;
+    if (record.mob_id !== undefined && record.category_id !== undefined) return `${record.mob_id}_${record.category_id}`;
+    if (record.variant_id !== undefined && record.category_id !== undefined) return `${record.variant_id}_${record.category_id}`;
+    return idx;
+  };
+
+  const handleSelectRecord = (recordKey) => {
     const newSelected = new Set(selectedRecords);
-    if (newSelected.has(recordId)) {
-      newSelected.delete(recordId);
+    if (newSelected.has(recordKey)) {
+      newSelected.delete(recordKey);
     } else {
-      newSelected.add(recordId);
+      newSelected.add(recordKey);
     }
     setSelectedRecords(newSelected);
   };
@@ -176,32 +291,142 @@ function TableExplorer({ table }) {
     if (selectedRecords.size === data.length) {
       setSelectedRecords(new Set());
     } else {
-      setSelectedRecords(new Set(data.map(r => r.id)));
+      setSelectedRecords(new Set(data.map((r, idx) => getRecordKey(r, idx))));
     }
   };
 
   const handleDuplicate = (record) => {
-    const { id, ...recordWithoutId } = record;
+    const clean = cleanRecordForBackend(record);
+    const { id, ...recordWithoutId } = clean;
     setDuplicatingRecord(recordWithoutId);
     setShowCreateModal(true);
   };
 
   const isImageColumn = (columnName) => {
-    return columnName === 'img' || columnName === 'icon';
+    return columnName === 'img' || columnName === 'icon' || columnName === 'mob_img' || columnName === 'variant_img' || columnName === 'category_icon';
   };
 
   const formatValue = (value, columnName, rowData) => {
+    // Colonna combinata Mob: immagine + nome + ID inline
+    if (columnName === '_combined_mob') {
+      return (
+        <div className="flex items-center gap-3">
+          {rowData.mob_img ? (
+            <img
+              src={rowData.mob_img}
+              alt={rowData.mob_name || ''}
+              className="w-10 h-10 object-contain bg-gray-800 rounded border border-gray-700 flex-shrink-0"
+              style={{ imageRendering: 'pixelated' }}
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-gray-600 flex-shrink-0">🐾</div>
+          )}
+          <div className="min-w-0">
+            <div className="font-medium text-white truncate">{rowData.mob_name || `Mob #${rowData.mob_id}`}</div>
+            <div className="text-xs text-gray-500">ID: {rowData.mob_id}</div>
+          </div>
+        </div>
+      );
+    }
+
+    // Colonna combinata Variante: immagine + nome + ID inline
+    if (columnName === '_combined_variant') {
+      return (
+        <div className="flex items-center gap-3">
+          {rowData.variant_img ? (
+            <img
+              src={rowData.variant_img}
+              alt={rowData.variant_name || ''}
+              className="w-10 h-10 object-contain bg-gray-800 rounded border border-gray-700 flex-shrink-0"
+              style={{ imageRendering: 'pixelated' }}
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-gray-600 flex-shrink-0">🎨</div>
+          )}
+          <div className="min-w-0">
+            <div className="font-medium text-white truncate">{rowData.variant_name || `Variante #${rowData.variant_id}`}</div>
+            <div className="text-xs text-gray-500">ID: {rowData.variant_id}</div>
+          </div>
+        </div>
+      );
+    }
+
+    // Colonna combinata Categoria: icona + nome + ID inline
+    if (columnName === '_combined_category') {
+      const icon = rowData.category_icon;
+      const color = rowData.category_color;
+      const name = rowData.category_name || `Categoria #${rowData.category_id}`;
+      return (
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 flex items-center justify-center rounded border flex-shrink-0"
+            style={{ borderColor: color || '#374151', backgroundColor: color ? `${color}15` : '#1f2937' }}
+          >
+            {icon && icon !== '.' ? (
+              <img
+                src={icon}
+                alt={name}
+                className="w-7 h-7 object-contain"
+                style={{ imageRendering: 'pixelated' }}
+                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
+              />
+            ) : null}
+            <span className="text-lg" style={{ display: icon && icon !== '.' ? 'none' : 'block' }}>📁</span>
+          </div>
+          <div className="min-w-0">
+            <span
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold truncate"
+              style={{
+                backgroundColor: color ? `${color}25` : '#374151',
+                color: color || '#e5e7eb',
+                border: `1px solid ${color || '#4b5563'}`
+              }}
+            >
+              {name}
+            </span>
+            <div className="text-xs text-gray-500 mt-0.5">ID: {rowData.category_id}</div>
+          </div>
+        </div>
+      );
+    }
+
     if (value === null || value === undefined) {
       return <span className="text-gray-600 italic">NULL</span>;
     }
 
-    // Visualizza immagini per colonne img e icon
+    // Visualizza icona categoria con bordo colorato
+    if (columnName === 'category_icon' && typeof value === 'string' && value.length > 0 && value !== '.') {
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className="w-12 h-12 flex items-center justify-center bg-gray-850 rounded border p-1"
+            style={rowData.category_color ? { borderColor: rowData.category_color } : { borderColor: '#374151' }}
+            title={rowData.category_name}
+          >
+            <img
+              src={value}
+              alt={rowData.category_name || 'Icona Categoria'}
+              className="w-8 h-8 object-contain pixelated"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'inline';
+              }}
+            />
+            <span className="text-xs text-gray-500 hidden">{value}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // Visualizza immagini per colonne img, icon, mob_img, variant_img
     if (isImageColumn(columnName) && typeof value === 'string' && value.length > 0 && value !== '.') {
       return (
         <div className="flex items-center gap-2">
           <img
             src={value}
-            alt={rowData.name || 'Image'}
+            alt={rowData.mob_name || rowData.variant_name || rowData.name || 'Immagine'}
             className="w-12 h-12 object-contain bg-gray-800 rounded border border-gray-700"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -211,6 +436,27 @@ function TableExplorer({ table }) {
           <span className="text-xs text-gray-500 hidden">{value}</span>
         </div>
       );
+    }
+
+    // Badge colorato per category_name
+    if (columnName === 'category_name' && typeof value === 'string') {
+      return (
+        <span
+          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+          style={{
+            backgroundColor: rowData.category_color ? `${rowData.category_color}25` : '#374151',
+            color: rowData.category_color || '#e5e7eb',
+            border: `1px solid ${rowData.category_color || '#4b5563'}`
+          }}
+        >
+          {value}
+        </span>
+      );
+    }
+
+    // Testo evidenziato per mob_name o variant_name
+    if ((columnName === 'mob_name' || columnName === 'variant_name') && typeof value === 'string') {
+      return <span className="font-medium text-white">{value}</span>;
     }
 
     if (typeof value === 'boolean') {
@@ -223,14 +469,38 @@ function TableExplorer({ table }) {
   };
 
   const getRowStyle = (row) => {
-    // Applica bordo colorato solo alle righe della tabella CATEGORIES
+    // Applica bordo colorato alle righe di CATEGORIES o delle tabelle di relazione con category_color
     if (table === 'CATEGORIES' && row.color) {
       return {
         borderLeft: `4px solid ${row.color}`
       };
     }
+    if ((table === 'MOB_CATEGORIES' || table === 'VARIANT_CATEGORIES') && row.category_color) {
+      return {
+        borderLeft: `4px solid ${row.category_color}`
+      };
+    }
     return {};
   };
+
+  // Colonne mostrate nella tabella (semplificate visivamente per le tabelle di collegamento)
+  const getDisplayedColumns = () => {
+    if (table === 'MOB_CATEGORIES') {
+      return [
+        { name: '_combined_mob', label: 'Mob', isVirtual: true },
+        { name: '_combined_category', label: 'Categoria', isVirtual: true },
+      ];
+    }
+    if (table === 'VARIANT_CATEGORIES') {
+      return [
+        { name: '_combined_variant', label: 'Variante', isVirtual: true },
+        { name: '_combined_category', label: 'Categoria', isVirtual: true },
+      ];
+    }
+    return columns;
+  };
+
+  const displayedColumns = getDisplayedColumns();
 
   if (!table) {
     return (
@@ -338,14 +608,14 @@ function TableExplorer({ table }) {
                     className="w-4 h-4 rounded bg-gray-700 border-gray-600"
                   />
                 </th>
-                {columns.map((col) => (
+                {displayedColumns.map((col) => (
                   <th
                     key={col.name}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-750 transition-colors"
-                    onClick={() => handleSort(col.name)}
+                    onClick={() => !col.isVirtual && handleSort(col.name)}
                   >
                     <div className="flex items-center gap-2">
-                      {col.name}
+                      {col.label || col.name}
                       {col.pk === 1 && <span className="text-yellow-500" title="Chiave primaria">🔑</span>}
                       {orderBy === col.name && (
                         <span className="text-blue-400">{orderDir === 'asc' ? '↑' : '↓'}</span>
@@ -361,53 +631,56 @@ function TableExplorer({ table }) {
             <tbody className="divide-y divide-gray-800">
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length + 2} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={displayedColumns.length + 2} className="px-6 py-8 text-center text-gray-500">
                     Nessun record trovato
                   </td>
                 </tr>
               ) : (
-                data.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    className={`hover:bg-gray-800 transition-colors ${selectedRecords.has(row.id) ? 'bg-gray-800/50' : ''}`}
-                    style={getRowStyle(row)}
-                  >
-                    <td className="px-4 py-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedRecords.has(row.id)}
-                        onChange={() => handleSelectRecord(row.id)}
-                        className="w-4 h-4 rounded bg-gray-700 border-gray-600"
-                      />
-                    </td>
-                    {columns.map((col) => (
-                      <td key={col.name} className="px-6 py-4 text-sm text-gray-300">
-                        {formatValue(row[col.name], col.name, row)}
+                data.map((row, idx) => {
+                  const recordKey = getRecordKey(row, idx);
+                  return (
+                    <tr
+                      key={recordKey}
+                      className={`hover:bg-gray-800 transition-colors ${selectedRecords.has(recordKey) ? 'bg-gray-800/50' : ''}`}
+                      style={getRowStyle(row)}
+                    >
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedRecords.has(recordKey)}
+                          onChange={() => handleSelectRecord(recordKey)}
+                          className="w-4 h-4 rounded bg-gray-700 border-gray-600"
+                        />
                       </td>
-                    ))}
-                    <td className="px-6 py-4 text-right text-sm space-x-2">
-                      <button
-                        onClick={() => setEditingRecord(row)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-                      >
-                        ✏️ Modifica
-                      </button>
-                      <button
-                        onClick={() => handleDuplicate(row)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-700 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
-                        title="Duplica record"
-                      >
-                        📋 Duplica
-                      </button>
-                      <button
-                        onClick={() => setDeletingRecord(row)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600/80 text-white rounded-lg hover:bg-red-600 font-medium transition-colors"
-                      >
-                        🗑️ Elimina
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      {displayedColumns.map((col) => (
+                        <td key={col.name} className="px-6 py-4 text-sm text-gray-300">
+                          {formatValue(row[col.name], col.name, row)}
+                        </td>
+                      ))}
+                      <td className="px-6 py-4 text-right text-sm space-x-2">
+                        <button
+                          onClick={() => setEditingRecord(cleanRecordForBackend(row))}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                        >
+                          ✏️ Modifica
+                        </button>
+                        <button
+                          onClick={() => handleDuplicate(row)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-700 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
+                          title="Duplica record"
+                        >
+                          📋 Duplica
+                        </button>
+                        <button
+                          onClick={() => setDeletingRecord(row)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600/80 text-white rounded-lg hover:bg-red-600 font-medium transition-colors"
+                        >
+                          🗑️ Elimina
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -483,7 +756,7 @@ function TableExplorer({ table }) {
           table={table}
           columns={columns}
           record={editingRecord}
-          onSave={(values) => handleUpdate(editingRecord.id, values)}
+          onSave={(values) => handleUpdate(editingRecord.id ?? `${editingRecord.mob_id || editingRecord.variant_id}_${editingRecord.category_id}`, values)}
           onClose={() => setEditingRecord(null)}
         />
       )}
