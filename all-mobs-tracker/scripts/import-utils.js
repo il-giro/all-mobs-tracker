@@ -266,11 +266,51 @@ function sortByBasePreference(a, b, baseName) {
   return score(a) - score(b) || a.relativePath.localeCompare(b.relativePath);
 }
 
+const SUFFIX_LABELS = {
+  'A': 'Baby',
+  'B': 'Baby Monster',
+  'C': 'Baby Animal',
+  'P': 'Pumpkin',
+  'J': 'Jockey',
+  'U': 'Unobtainable',
+  'F': 'Untrapable',
+  'T': 'Texture Error'
+};
+
+export function resolveVariantName(image, baseName) {
+  let name = image.parsed?.name?.trim();
+  if (!name) {
+    name = image.normalizedName || baseName;
+  }
+
+  if (image.folder === 'special:pumpkin') {
+    const isJack = image.filename.startsWith('1.3');
+    const isCarved = image.filename.startsWith('1.2');
+    const pumpkinType = isJack ? "Jack o'Lantern" : (isCarved ? "Carved Pumpkin" : "Pumpkin");
+    if (!name.toLowerCase().includes('pumpkin')) {
+      name += ` (${pumpkinType})`;
+    }
+  }
+
+  if (image.parsed?.activeSuffixes?.length) {
+    const suffixTags = image.parsed.activeSuffixes
+      .map(s => SUFFIX_LABELS[s] || s)
+      .filter(tag => !name.toLowerCase().includes(tag.toLowerCase()));
+    if (suffixTags.length > 0) {
+      name += ` (${suffixTags.join(', ')})`;
+    }
+  }
+
+  return name;
+}
+
 export function inferBaseName(image) {
   if (image.folder === 'root') return image.normalizedName;
 
   if (image.folder.startsWith('special:')) {
-    return image.normalizedName.split('-')[0] || image.normalizedName;
+    const raw = image.normalizedName.split('-')[0] || image.normalizedName;
+    if (raw === 'SpiderJockey') return 'Spider';
+    return raw;
   }
 
   return pascalCase(image.folder);
@@ -308,17 +348,19 @@ export function buildImportPlan(images = scanImages()) {
   const variantCandidates = [];
   for (const image of allImages) {
     const baseName = image.baseName;
-    const isPlainBase = image.folder !== 'root' && image.normalizedName === baseName;
+    const isPlainBase = image.folder !== 'root' && image.normalizedName === baseName && !image.hasTechnicalSuffix && image.numericDepth === 0;
     if (image.folder === 'root' || isPlainBase) continue;
+
+    const variantName = resolveVariantName(image, baseName);
     variantCandidates.push({
-      name: image.normalizedName,
+      name: variantName,
       img: image.webPath,
       baseName,
       sourceImage: image.relativePath,
       folder: image.folder,
       numericCode: image.numericCode,
-      parsedType: image.parsed.type,
-      complexId: image.parsed.complexId,
+      parsedType: image.parsed?.type,
+      complexId: image.parsed?.complexId,
       suffixLetters: image.suffixLetters,
       hasTechnicalSuffix: image.hasTechnicalSuffix,
     });
@@ -361,7 +403,7 @@ export function buildImportPlan(images = scanImages()) {
 
   const physicalDuplicateGroups = Object.entries(
     allImages.reduce((acc, image) => {
-      const key = `${image.baseName}\u0000${image.normalizedName}`;
+      const key = `${image.baseName}\u0000${resolveVariantName(image, image.baseName)}`;
       acc[key] ??= [];
       acc[key].push(image.relativePath);
       return acc;
@@ -443,8 +485,8 @@ export function buildCategories() {
   }
 
   const villagerJobs = [
-    { label: 'Unemployed', icon: '/icons/items/villager.png' },
-    { label: 'Nitwit', icon: '/icons/items/villager.png' },
+    { label: 'Unemployed', icon: '/icons/mobs/VillagerFace.png' },
+    { label: 'Nitwit', icon: '/icons/mobs/VillagerFace.png' },
     { label: 'Armorer', icon: '/icons/job site/blast-furnace.png' },
     { label: 'Butcher', icon: '/icons/job site/smoker.png' },
     { label: 'Cartographer', icon: '/icons/job site/cartography-table.png' },
