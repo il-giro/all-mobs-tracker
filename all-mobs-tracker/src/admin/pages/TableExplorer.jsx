@@ -181,16 +181,38 @@ function TableExplorer({ table }) {
   };
 
   const handleDuplicate = (record) => {
-    // Rimuovi l'ID per creare un nuovo record
     const { id, ...recordWithoutId } = record;
     setDuplicatingRecord(recordWithoutId);
     setShowCreateModal(true);
   };
 
-  const formatValue = (value) => {
+  const isImageColumn = (columnName) => {
+    return columnName === 'img' || columnName === 'icon';
+  };
+
+  const formatValue = (value, columnName, rowData) => {
     if (value === null || value === undefined) {
       return <span className="text-gray-600 italic">NULL</span>;
     }
+
+    // Visualizza immagini per colonne img e icon
+    if (isImageColumn(columnName) && typeof value === 'string' && value.length > 0 && value !== '.') {
+      return (
+        <div className="flex items-center gap-2">
+          <img
+            src={value}
+            alt={rowData.name || 'Image'}
+            className="w-12 h-12 object-contain bg-gray-800 rounded border border-gray-700"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'inline';
+            }}
+          />
+          <span className="text-xs text-gray-500 hidden">{value}</span>
+        </div>
+      );
+    }
+
     if (typeof value === 'boolean') {
       return value ? '✓' : '✗';
     }
@@ -198,6 +220,16 @@ function TableExplorer({ table }) {
       return value.substring(0, 50) + '...';
     }
     return value.toString();
+  };
+
+  const getRowStyle = (row) => {
+    // Applica bordo colorato solo alle righe della tabella CATEGORIES
+    if (table === 'CATEGORIES' && row.color) {
+      return {
+        borderLeft: `4px solid ${row.color}`
+      };
+    }
+    return {};
   };
 
   if (!table) {
@@ -335,7 +367,11 @@ function TableExplorer({ table }) {
                 </tr>
               ) : (
                 data.map((row, idx) => (
-                  <tr key={idx} className={`hover:bg-gray-800 transition-colors ${selectedRecords.has(row.id) ? 'bg-gray-800/50' : ''}`}>
+                  <tr
+                    key={idx}
+                    className={`hover:bg-gray-800 transition-colors ${selectedRecords.has(row.id) ? 'bg-gray-800/50' : ''}`}
+                    style={getRowStyle(row)}
+                  >
                     <td className="px-4 py-4">
                       <input
                         type="checkbox"
@@ -346,7 +382,7 @@ function TableExplorer({ table }) {
                     </td>
                     {columns.map((col) => (
                       <td key={col.name} className="px-6 py-4 text-sm text-gray-300">
-                        {formatValue(row[col.name])}
+                        {formatValue(row[col.name], col.name, row)}
                       </td>
                     ))}
                     <td className="px-6 py-4 text-right text-sm space-x-2">
