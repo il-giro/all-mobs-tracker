@@ -1,16 +1,17 @@
 -- ============================================================
 -- AllMobs Database Import Script
--- Generato: 2026-10-14T16:19:16.861Z
+-- Generato: 2026-10-14T16:35:21.155Z
 -- Origine: public/data + configurazioni reali in src/config
--- Sicurezza: nessuna relazione MOB_CATEGORIES/VARIANT_CATEGORIES viene inserita
 -- Idempotenza: WHERE NOT EXISTS su chiavi logiche, senza richiedere UNIQUE remoti
 -- Mob pianificati: 89
 -- Varianti pianificate: 980
--- Categorie pianificate: 45
+-- Categorie pianificate: 53
+-- Relazioni MOB_CATEGORIES pianificate: 222
+-- Relazioni VARIANT_CATEGORIES pianificate: 1464
 -- ============================================================
 
 -- ============================================================
--- CATEGORIE DA src/config/mobCategories.js + dinamiche
+-- CATEGORIE (Statiche, Dinamiche e Suffissi Speciali)
 -- ============================================================
 
 INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
@@ -327,6 +328,62 @@ WHERE NOT EXISTS (
   SELECT 1 FROM CATEGORIES
   WHERE name = 'Profession - Weaponsmith'
     AND variant = 'Weaponsmith'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Baby Breed', '/icons/items/name-tag.png', '#9333ea', '.', 'Baby variant obtained through breeding.', 138, 'A'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Baby Breed'
+    AND variant = 'A'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Baby Monster', '/icons/items/name-tag.png', '#db2777', '.', 'Baby variant of monster mobs.', 139, 'B'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Baby Monster'
+    AND variant = 'B'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Baby Animal', '/icons/items/name-tag.png', '#16a34a', '.', 'Baby variant of animal mobs.', 140, 'C'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Baby Animal'
+    AND variant = 'C'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Pumpkin', '/icons/items/carved-pumpkin.png', '#ea580c', '.', 'Mob wearing a pumpkin or jack o lantern.', 141, 'P'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Pumpkin'
+    AND variant = 'P'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Jockey', '/icons/items/saddle.png', '#ca8a04', '.', 'Jockey mob combination.', 142, 'J'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Jockey'
+    AND variant = 'J'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Unobtainable', '/icons/items/name-tag.png', '#dc2626', '.', 'Unobtainable mob variant in normal survival.', 143, 'U'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Unobtainable'
+    AND variant = 'U'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Untrapable', '/icons/items/chest.png', '#4b5563', '.', 'Mob that cannot be trapped in typical mob traps.', 144, 'F'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Untrapable'
+    AND variant = 'F'
+);
+INSERT INTO CATEGORIES (name, icon, color, link, description, priority, variant)
+SELECT 'Special - Texture Error', '/icons/items/shears.png', '#2563eb', '.', 'Mob variant with texture discrepancies.', 145, 'T'
+WHERE NOT EXISTS (
+  SELECT 1 FROM CATEGORIES
+  WHERE name = 'Special - Texture Error'
+    AND variant = 'T'
 );
 
 -- ============================================================
@@ -10672,6 +10729,18118 @@ WHERE m.name = 'ZombifiedPiglin'
       AND v.mob_id = m.id
   )
 LIMIT 1;
+
+-- ============================================================
+-- RELAZIONI MOB ↔ CATEGORIE
+-- ============================================================
+
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Armadillo'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Axolotl'
+  AND c.name = 'Color - Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Axolotl'
+  AND c.name = 'Color - Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Axolotl'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Bee'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Bogged'
+  AND c.name = 'Shearable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Camel'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Camel'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'CamelHusk'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'CamelHusk'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Cat'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Cat'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Cat'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Cat'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Cat'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Chicken'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ChickenJockey'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ChickenJockey'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ChickenJockey'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Cow'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Creeper'
+  AND c.name = 'Lightning'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Dolphin'
+  AND c.name = 'Special - Baby Animal'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Donkey'
+  AND c.name = 'Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Donkey'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Donkey'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Drowned'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Drowned'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Drowned'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Color - Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Color - Orange'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Color - Pink'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Enderman'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Evoker'
+  AND c.name = 'Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Fox'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Frostbite'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'GlowSquid'
+  AND c.name = 'Special - Baby Animal'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Goat'
+  AND c.name = 'Screaming'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Goat'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Lime'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Magenta'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Orange'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Pink'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Purple'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Color - Yellow'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'HappyGhast'
+  AND c.name = 'Special - Baby Animal'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Hoglin'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Hoglin'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Color - Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Horse'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Husk'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Husk'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - LightBlue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Lime'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Magenta'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Orange'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Pink'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Purple'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Color - Yellow'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Llama'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mooshroom'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mooshroom'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mooshroom'
+  AND c.name = 'Lightning'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mooshroom'
+  AND c.name = 'Shearable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mooshroom'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mule'
+  AND c.name = 'Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mule'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Mule'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Nautilus'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Ocelot'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Panda'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Panda'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Parrot'
+  AND c.name = 'Color - Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Parrot'
+  AND c.name = 'Color - Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Parrot'
+  AND c.name = 'Color - Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Parrot'
+  AND c.name = 'Color - Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Parrot'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Pig'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Pig'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Piglin'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Pillager'
+  AND c.name = 'Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Pillager'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'PolarBear'
+  AND c.name = 'Special - Baby Animal'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Rabbit'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Rabbit'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Rabbit'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Rabbit'
+  AND c.name = 'Name Tag'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Rabbit'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Rabbit'
+  AND c.name = 'Special - Unobtainable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Ravager'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - LightBlue'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - LightGray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Lime'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Magenta'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Orange'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Pink'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Purple'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Color - Yellow'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Name Tag'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Shearable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sheep'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Skeleton'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'SkeletonHorse'
+  AND c.name = 'Lightning'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'SkeletonHorse'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'SkeletonHorse'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'SkeletonHorse'
+  AND c.name = 'Special - Unobtainable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Sniffer'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'SnowGolem'
+  AND c.name = 'Shearable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Spider'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Spider'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Spider'
+  AND c.name = 'Special - Unobtainable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Squid'
+  AND c.name = 'Special - Baby Animal'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Stray'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Strider'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Strider'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Strider'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Strider'
+  AND c.name = 'Special - Texture Error'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Strider'
+  AND c.name = 'Special - Unobtainable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'TraderLlama'
+  AND c.name = 'Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'TraderLlama'
+  AND c.name = 'Color - Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'TraderLlama'
+  AND c.name = 'Color - Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'TraderLlama'
+  AND c.name = 'Color - White'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'TraderLlama'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Turtle'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Vex'
+  AND c.name = 'Special - Untrapable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Desert'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Jungle'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Plains'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Savanna'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Snow'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Swamp'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Biome - Taiga'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Profession - Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Special - Baby Animal'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Villager'
+  AND c.name = 'Special - Untrapable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Vindicator'
+  AND c.name = 'Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Vindicator'
+  AND c.name = 'Name Tag'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'WanderingTrader'
+  AND c.name = 'Special - Untrapable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'WitherSkeleton'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Wolf'
+  AND c.name = 'Color - Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Wolf'
+  AND c.name = 'Color - Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Wolf'
+  AND c.name = 'Special - Baby Breed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Zoglin'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Zombie'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'Zombie'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieHorse'
+  AND c.name = 'Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieHorse'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieHorse'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieHorse'
+  AND c.name = 'Special - Unobtainable'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieNautilus'
+  AND c.name = 'Special - Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Desert'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Jungle'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Plains'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Savanna'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Snow'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Swamp'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Biome - Taiga'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Profession - Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombieVillager'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombifiedPiglin'
+  AND c.name = 'Special - Baby Monster'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+INSERT INTO MOB_CATEGORIES (mob_id, category_id)
+SELECT m.id, c.id
+FROM MOBS m, CATEGORIES c
+WHERE m.name = 'ZombifiedPiglin'
+  AND c.name = 'Special - Pumpkin'
+  AND NOT EXISTS (
+    SELECT 1 FROM MOB_CATEGORIES mc
+    WHERE mc.mob_id = m.id AND mc.category_id = c.id
+  );
+
+-- ============================================================
+-- RELAZIONI VARIANTI ↔ CATEGORIE
+-- ============================================================
+
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Armadillo'
+  AND v.name = 'Armadillo  Rolled Up (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Armadillo'
+  AND v.name = 'Armadillo (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Blue (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Blue (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Cyan (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Cyan (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Gold (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Lucy (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Axolotl'
+  AND v.name = 'Axolotl  Wild (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Bee'
+  AND v.name = 'Bee  Nectar (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Bee'
+  AND v.name = 'Bee (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Bogged'
+  AND v.name = 'Bogged  Sheared'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Camel'
+  AND v.name = 'Camel  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Camel'
+  AND v.name = 'Camel  Sitting  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Camel'
+  AND v.name = 'Camel  Sitting (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Camel'
+  AND v.name = 'Camel (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Jockey ( Husk) (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Jockey ( Husk) (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Jockey ( Parched) (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Jockey ( Parched) (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Sitting  Saddled (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'CamelHusk'
+  AND v.name = 'Camel Husk  Sitting  Saddled (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black  Tamed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  British Shorthair  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  British Shorthair  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  British Shorthair (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Calico  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Calico  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Calico (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Jellie  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Jellie  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Jellie (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Persian  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Persian  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Persian (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Ragdoll  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Ragdoll  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Ragdoll (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red  Tamed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Red (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Siamese  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Siamese  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Siamese (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Tuxedo  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Tuxedo  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  Tuxedo (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White  Tamed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat  White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat Tabby  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat Tabby  Tamed (Baby, Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cat'
+  AND v.name = 'Cat Tabby (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Chicken'
+  AND v.name = 'Chicken  Cold (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Chicken'
+  AND v.name = 'Chicken  Temperate (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Chicken'
+  AND v.name = 'Chicken  Warm (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Zombie Villager (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Zombie Villager (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Cold  Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Zombie Villager (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Zombie Villager (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Temperate  Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Zombie Villager (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Zombie Villager (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey  Warm  Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ChickenJockey'
+  AND v.name = 'Chicken Jockey (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cow'
+  AND v.name = 'Cow  Cold (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cow'
+  AND v.name = 'Cow  Temperate (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Cow'
+  AND v.name = 'Cow  Warm (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Lightning'
+WHERE m.name = 'Creeper'
+  AND v.name = 'Creeper  Charged'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Dolphin'
+  AND v.name = 'Dolphin (Baby Animal)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Donkey'
+  AND v.name = 'Donkey  Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Donkey'
+  AND v.name = 'Donkey  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Donkey'
+  AND v.name = 'Donkey  Saddled  Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Donkey'
+  AND v.name = 'Donkey  Saddled  Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Donkey'
+  AND v.name = 'Donkey (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned  Nautilus (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Drowned'
+  AND v.name = 'Drowned (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Clay (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Dirt (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Gravel (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Melon (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Mud (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Mycelium (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Podzol (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Pumpkin (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Red sand (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding  Red sand (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding allium (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding azure bluet (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding blue orchid (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding blue orchid (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding brown mushroom (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding brown mushroom (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding cactus flower (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding carved pumpkin (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding closed eyeblossom (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding coarse dirt (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding cornflower (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding crimson fungus (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding crimson nylium (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding crimson roots (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding golden dandelion (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding lily of the valley (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding moss block (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding muddy mangrove roots (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding mushroom (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding open eyeblossom (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding orange tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding orange tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding oxeye daisy (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding pale moss block (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding pink tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding pink tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding poppy (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding red tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding red tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding rooted dirt (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding torchflower (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding warped fungus (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding warped nylium (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding warped roots (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding white tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding white tulip (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Enderman'
+  AND v.name = 'Enderman  Holding wither rose (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Evoker'
+  AND v.name = 'Evoker  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Fox'
+  AND v.name = 'Fox  Snow (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Fox'
+  AND v.name = 'Fox (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Frostbite'
+  AND v.name = 'Frostbite (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'GlowSquid'
+  AND v.name = 'Glow Squid (Baby Animal)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Screaming'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat  Left  Screaming'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Screaming'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat  No Horns  Screaming'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Screaming'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat  Right  Screaming'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Screaming'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat  Screaming'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Screaming'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat  Screaming (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat  Screaming (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Goat'
+  AND v.name = 'Goat (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Ghastling (Baby Animal)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Light Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Light Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Lime'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Magenta'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Orange'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Pink'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Purple'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Harnessed Yellow'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'HappyGhast'
+  AND v.name = 'Happy Ghast Leashed White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin  Jockey 1 (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin  Jockey 1 (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin  Jockey 2 (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin  Jockey 2 (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin  Jockey 3 (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin  Jockey 3 (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Hoglin'
+  AND v.name = 'Hoglin (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black Copper Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black Copper Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black Iron Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Diamond Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Diamond Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Diamond Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Netherite Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Netherite Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Netherite Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Dots Saddle + Netherite Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Black White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Diamond Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Netherite Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown Netherite Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Brown White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Saddle + Iron Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut Saddle + Iron Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Chestnut White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy Saddle + Copper Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy Saddle + Copper Armor (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy Saddle + Gold Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Creamy White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Saddle + Leather Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown Saddle + Leather Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Dark Brown White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray Gold Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse Gray White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Black Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Black Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Leather Armor'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Saddle'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White Saddle'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Dots'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Dots (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Field'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Field (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Stockings'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Horse'
+  AND v.name = 'Horse White White Stockings (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Husk'
+  AND v.name = 'Husk (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown ()'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Brown)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Gray)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Gray)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Silver)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (White)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (White)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Brown (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Brown)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Gray)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (White)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Creamy (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray ()'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Brown)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Brown)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Gray)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Silver)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (White)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (White)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama Gray (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White ()'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White () (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White () with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Black)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Black) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Brown)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Brown)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Brown) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Cyan)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Cyan) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Gray)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Gray)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Gray) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Green)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Green) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Light Blue) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Lime)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Lime) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Magenta)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Magenta) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Orange)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Orange) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Pink)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Pink) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Purple)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Purple) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Red) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Silver)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Silver) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (White)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (White) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Yellow)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Llama'
+  AND v.name = 'Llama White (Yellow) with Chest'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Mooshroom'
+  AND v.name = 'Mooshroom  Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Mooshroom'
+  AND v.name = 'Mooshroom  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Mooshroom'
+  AND v.name = 'Mooshroom  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Mooshroom'
+  AND v.name = 'Mooshroom  Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Mooshroom'
+  AND v.name = 'Mooshroom  Red (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Mooshroom'
+  AND v.name = 'Mooshroom  Red (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Mule'
+  AND v.name = 'Mule  Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Mule'
+  AND v.name = 'Mule  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Mule'
+  AND v.name = 'Mule  Saddled  Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Mule'
+  AND v.name = 'Mule  Saddled  Chested'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Mule'
+  AND v.name = 'Mule (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus  Copper  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus  Diamond  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus  Gold  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus  Iron  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus  Netherite  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Nautilus'
+  AND v.name = 'Nautilus (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Ocelot'
+  AND v.name = 'Ocelot (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Aggressive (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Lazy (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Playful (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Weak (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda  Worried (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Panda'
+  AND v.name = 'Panda (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Parrot'
+  AND v.name = 'Parrot  Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Parrot'
+  AND v.name = 'Parrot  Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Parrot'
+  AND v.name = 'Parrot  Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Parrot'
+  AND v.name = 'Parrot  Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Parrot'
+  AND v.name = 'Parrot  Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Pig'
+  AND v.name = 'Pig  Cold  Saddle'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Pig'
+  AND v.name = 'Pig  Cold (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Pig'
+  AND v.name = 'Pig  Temperate  Saddle'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Pig'
+  AND v.name = 'Pig  Temperate (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Pig'
+  AND v.name = 'Pig  Warm  Saddle'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Pig'
+  AND v.name = 'Pig  Warm (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Piglin'
+  AND v.name = 'Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Pillager'
+  AND v.name = 'Pillager  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Pillager'
+  AND v.name = 'Pillager  No Crossbow  Banner (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Pillager'
+  AND v.name = 'Pillager  No Crossbow  Banner (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'PolarBear'
+  AND v.name = 'Polar Bear (Baby Animal)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Gold (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Killer (Baby, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Killer (Baby, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Killer (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Salt (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Toast'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Toast (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  Toast (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  White Splotched'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  White Splotched (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Rabbit'
+  AND v.name = 'Rabbit  White Splotched (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Evoker)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Evoker)  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Evoker)  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Pillager)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Pillager)  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Pillager)  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Vindicator)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Vindicator)  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Ravager'
+  AND v.name = 'Ravager  Jockey( Vindicator)  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Black (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Black (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Blue'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Blue (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Blue (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Blue'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Blue (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Blue (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Brown (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Brown (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Cyan'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Cyan (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Cyan (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Cyan'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Cyan (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Cyan (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Gray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Gray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Gray (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Gray (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Green'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Green (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Green (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Green'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Green (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Green (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep jeb_'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep jeb_ (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep jeb_ (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep jeb_ (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep jeb_ (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightBlue'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightBlue (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightBlue (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightBlue'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightBlue (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightBlue (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightGray'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightGray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightGray'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightGray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightGray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - LightGray'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightGray (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep LightGray (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Lime'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Lime (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Lime (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Lime'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Lime (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Lime (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Magenta'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Magenta (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Magenta (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Magenta'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Magenta (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Magenta (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Orange'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Orange (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Orange (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Orange'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Orange (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Orange (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Pink'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Pink (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Pink (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Pink'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Pink (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Pink (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Purple'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Purple (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Purple (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Purple'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Purple (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Purple (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Red'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Red (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Red (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Red (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Red (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep White (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep White (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Yellow'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Yellow (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Yellow (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Yellow'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Yellow (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'Sheep'
+  AND v.name = 'Sheep Yellow (Sheared)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Skeleton'
+  AND v.name = 'Skeleton (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Skeleton'
+  AND v.name = 'Skeleton (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'SkeletonHorse'
+  AND v.name = 'Skeleton Horse  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'SkeletonHorse'
+  AND v.name = 'Skeleton Horse man  Stray (Jockey)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'SkeletonHorse'
+  AND v.name = 'Skeleton Horse man  Wither Skeleton (Jockey, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'SkeletonHorse'
+  AND v.name = 'Skeleton Horse man  Wither Skeleton (Jockey, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'SkeletonHorse'
+  AND v.name = 'Skeleton Horse man (Jockey)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Sniffer'
+  AND v.name = 'Sniffer (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Shearable'
+WHERE m.name = 'SnowGolem'
+  AND v.name = 'Snow Golem  Sheared'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Bogged (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Bogged (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Parched (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Parched (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Skeleton'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Stray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Wither Skeleton (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey  Wither Skeleton (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Spider'
+  AND v.name = 'Spider Jockey (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Squid'
+  AND v.name = 'Squid (Baby Animal)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Stray'
+  AND v.name = 'Stray (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Stray'
+  AND v.name = 'Stray (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider  Shiver  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider  Shiver (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Baby Strider'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Baby Strider 2 (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Baby Strider 2 (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Baby Strider 2 (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Shiver  Baby Strider'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Shiver  Baby Strider 2 (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Shiver  Baby Strider 2 (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Shiver  Baby Strider 2 (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  New'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Old (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Old (Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Shiver  New (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Shiver  New (Texture Error)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Shiver  Old (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Texture Error'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Shiver  Old (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'Strider'
+  AND v.name = 'Strider Jockey  Zombified Piglin  Shiver  Old (Texture Error, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Brown'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Brown'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Brown (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Creamy (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Gray'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Gray'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Gray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  Gray (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  White'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - White'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'TraderLlama'
+  AND v.name = 'Trader Llama  White (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Turtle'
+  AND v.name = 'Turtle (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Desert (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Desert (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Desert (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Jungle (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Jungle (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Jungle (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Plains (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Plains (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Plains (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Savanna (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Savanna (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Savanna (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Snowy (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Snowy (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Snowy (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Swamp (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Swamp (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Swamp (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Taiga (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Animal'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Taiga (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Untrapable'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager  Taiga (Baby Animal, Untrapable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Desert Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Jungle Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Plains Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Savanna Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Snow Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Swamp Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'Villager'
+  AND v.name = 'Villager Taiga Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Vindicator'
+  AND v.name = 'Vindicator  Banner'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Banner'
+WHERE m.name = 'Vindicator'
+  AND v.name = 'Vindicator  Banner  Johnny'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Vindicator'
+  AND v.name = 'Vindicator  Banner  Johnny'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Name Tag'
+WHERE m.name = 'Vindicator'
+  AND v.name = 'Vindicator  Johnny'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'WitherSkeleton'
+  AND v.name = 'Wither Skeleton (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'WitherSkeleton'
+  AND v.name = 'Wither Skeleton (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Ashen  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Ashen  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Ashen  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Ashen  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Ashen (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Black'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Black (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Chested'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Chestnut (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Pale  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Pale  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Pale  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Pale  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Pale (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Rusty  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Rusty  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Rusty  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Rusty  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Rusty (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Snowy  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Snowy  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Snowy  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Snowy  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Snowy (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Spotted  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Spotted  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Spotted  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Spotted  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Spotted (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Striped  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Striped  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Striped  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Striped  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Striped (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Woods  with Armor (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Woods  with Collar (Red)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Color - Red'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Woods  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Woods  with Collar (Red) (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Breed'
+WHERE m.name = 'Wolf'
+  AND v.name = 'Wolf Woods (Baby)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Zoglin'
+  AND v.name = 'Zoglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'Zombie'
+  AND v.name = 'Zombie (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieHorse'
+  AND v.name = 'Zombie Horse (Baby Monster, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Unobtainable'
+WHERE m.name = 'ZombieHorse'
+  AND v.name = 'Zombie Horse (Baby Monster, Unobtainable)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ZombieHorse'
+  AND v.name = 'Zombie Horse man (Jockey)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieHorse'
+  AND v.name = 'Zombie Horse Saddle'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Copper  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Copper  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Diamond  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Gold  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Iron  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Netherite  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Coral  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Diamond  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Gold  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Iron  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Jockey'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Jockey'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Netherite  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Saddled'
+WHERE m.name = 'ZombieNautilus'
+  AND v.name = 'Zombie Nautilus  Saddled'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Desert'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Desert Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Jungle'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Jungle Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Plains'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Plains Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Savanna'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Savanna Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Snow'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Snow Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Swamp'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Swamp Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Armorer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Armorer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Butcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Butcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cartographer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Cartographer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Cleric'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Cleric'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Farmer'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Farmer'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fisherman'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Fisherman'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Fletcher'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Fletcher'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Leatherworker'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Leatherworker'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Librarian'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Librarian'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Mason'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Mason'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Nitwit'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Nitwit'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Shepherd'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Shepherd'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Toolsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Toolsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Unemployed'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Unemployed'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Unemployed (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Biome - Taiga'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Profession - Weaponsmith'
+WHERE m.name = 'ZombieVillager'
+  AND v.name = 'Zombie Villager Taiga Weaponsmith'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Carved Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Carved Pumpkin) (Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Baby Monster'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Jack o''Lantern) (Pumpkin, Baby Monster)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
+INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)
+SELECT v.id, c.id
+FROM VARIANTS v
+JOIN MOBS m ON m.id = v.mob_id
+JOIN CATEGORIES c ON c.name = 'Special - Pumpkin'
+WHERE m.name = 'ZombifiedPiglin'
+  AND v.name = 'Zombified Piglin (Jack o''Lantern) (Pumpkin)'
+  AND NOT EXISTS (
+    SELECT 1 FROM VARIANT_CATEGORIES vc
+    WHERE vc.variant_id = v.id AND vc.category_id = c.id
+  );
 
 
 -- ============================================================

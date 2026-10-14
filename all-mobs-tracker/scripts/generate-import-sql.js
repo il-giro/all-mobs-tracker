@@ -13,6 +13,7 @@ import {
   __dirname,
   buildCategories,
   buildImportPlan,
+  buildRelationsPlan,
   countSqlStatements,
   escapeSql,
   missingPublicAssets,
@@ -60,6 +61,36 @@ function buildVariantInsert(variant) {
   ].join('\n');
 }
 
+function buildMobCategoryInsert(rel) {
+  return [
+    'INSERT INTO MOB_CATEGORIES (mob_id, category_id)',
+    'SELECT m.id, c.id',
+    'FROM MOBS m, CATEGORIES c',
+    `WHERE m.name = ${escapeSql(rel.mobName)}`,
+    `  AND c.name = ${escapeSql(rel.categoryName)}`,
+    '  AND NOT EXISTS (',
+    '    SELECT 1 FROM MOB_CATEGORIES mc',
+    '    WHERE mc.mob_id = m.id AND mc.category_id = c.id',
+    '  );',
+  ].join('\n');
+}
+
+function buildVariantCategoryInsert(rel) {
+  return [
+    'INSERT INTO VARIANT_CATEGORIES (variant_id, category_id)',
+    'SELECT v.id, c.id',
+    'FROM VARIANTS v',
+    'JOIN MOBS m ON m.id = v.mob_id',
+    'JOIN CATEGORIES c ON c.name = ' + escapeSql(rel.categoryName),
+    `WHERE m.name = ${escapeSql(rel.mobName)}`,
+    `  AND v.name = ${escapeSql(rel.variantName)}`,
+    '  AND NOT EXISTS (',
+    '    SELECT 1 FROM VARIANT_CATEGORIES vc',
+    '    WHERE vc.variant_id = v.id AND vc.category_id = c.id',
+    '  );',
+  ].join('\n');
+}
+
 function section(title, statements) {
   return [
     '-- ============================================================',
@@ -71,22 +102,25 @@ function section(title, statements) {
   ].join('\n');
 }
 
-function buildSql(plan, categoryPlan) {
+function buildSql(plan, categoryPlan, relationsPlan) {
   const lines = [
     '-- ============================================================',
     '-- AllMobs Database Import Script',
     `-- Generato: ${plan.generatedAt}`,
     '-- Origine: public/data + configurazioni reali in src/config',
-    '-- Sicurezza: nessuna relazione MOB_CATEGORIES/VARIANT_CATEGORIES viene inserita',
     '-- Idempotenza: WHERE NOT EXISTS su chiavi logiche, senza richiedere UNIQUE remoti',
     `-- Mob pianificati: ${plan.mobs.length}`,
     `-- Varianti pianificate: ${plan.variants.length}`,
     `-- Categorie pianificate: ${categoryPlan.categories.length}`,
+    `-- Relazioni MOB_CATEGORIES pianificate: ${relationsPlan.mobCategories.length}`,
+    `-- Relazioni VARIANT_CATEGORIES pianificate: ${relationsPlan.variantCategories.length}`,
     '-- ============================================================',
     '',
-    section('CATEGORIE DA src/config/mobCategories.js + dinamiche', categoryPlan.categories.map(buildCategoryInsert)),
+    section('CATEGORIE (Statiche, Dinamiche e Suffissi Speciali)', categoryPlan.categories.map(buildCategoryInsert)),
     section('MOB BASE', plan.mobs.map(buildMobInsert)),
     section('VARIANTI', plan.variants.map(buildVariantInsert)),
+    section('RELAZIONI MOB ↔ CATEGORIE', relationsPlan.mobCategories.map(buildMobCategoryInsert)),
+    section('RELAZIONI VARIANTI ↔ CATEGORIE', relationsPlan.variantCategories.map(buildVariantCategoryInsert)),
     '',
     '-- ============================================================',
     '-- Fine importazione',
@@ -97,7 +131,7 @@ function buildSql(plan, categoryPlan) {
   return lines.join('\n');
 }
 
-function buildReport(plan, categoryPlan, previousSqlCounts, newSql) {
+function buildReport(plan, categoryPlan, relationsPlan, previousSqlCounts, newSql) {
   const newSqlCounts = countSqlStatements(newSql);
   const categoryAssetPaths = categoryPlan.categories.map(category => category.icon);
 
@@ -111,7 +145,9 @@ function buildReport(plan, categoryPlan, previousSqlCounts, newSql) {
       categoriesCount: categoryPlan.categories.length,
       staticCategoriesCount: categoryPlan.staticCategories.length,
       dynamicCategoriesCount: categoryPlan.dynamicCategories.length,
-      relationRowsPlanned: 0,
+      relationRowsPlanned: relationsPlan.mobCategories.length + relationsPlan.variantCategories.length,
+      mobCategoriesPlanned: relationsPlan.mobCategories.length,
+      variantCategoriesPlanned: relationsPlan.variantCategories.length,
       syntheticMobs: plan.syntheticMobs.length,
       variantDuplicateGroups: plan.variantDuplicates.length,
       physicalDuplicateGroups: plan.physicalDuplicateGroups.length,
@@ -138,6 +174,12 @@ function buildReport(plan, categoryPlan, previousSqlCounts, newSql) {
     categories: categoryPlan.categories,
     mobs: plan.mobs,
     variants: plan.variants,
+    relations: {
+      mobCategoriesCount: relationsPlan.mobCategories.length,
+      variantCategoriesCount: relationsPlan.variantCategories.length,
+      sampleMobCategories: relationsPlan.mobCategories.slice(0, 10),
+      sampleVariantCategories: relationsPlan.variantCategories.slice(0, 10),
+    },
     anomalies: {
       missingImageFiles: plan.images.filter(image => !fs.existsSync(image.fullPath)).map(image => image.relativePath),
       missingCategoryIconFiles: [...new Set(missingPublicAssets(categoryAssetPaths))].sort(),
@@ -163,27 +205,31 @@ function main() {
   const images = scanImages();
   const plan = buildImportPlan(images);
   const categoryPlan = buildCategories();
-  const sql = buildSql(plan, categoryPlan);
-  const report = buildReport(plan, categoryPlan, previousSqlCounts, sql);
+  const relationsPlan = buildRelationsPlan(images, plan, categoryPlan);
+  const sql = buildSql(plan, categoryPlan, relationsPlan);
+  const report = buildReport(plan, categoryPlan, relationsPlan, previousSqlCounts, sql);
 
   fs.writeFileSync(SQL_OUTPUT_FILE, sql);
   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
 
   console.log('\n🔨 SQL di importazione generato');
   console.log('='.repeat(72));
-  console.log(`File SQL:    ${SQL_OUTPUT_FILE}`);
-  console.log(`Report:      ${REPORT_FILE}`);
-  console.log(`Categorie:   ${report.summary.categoriesCount}`);
-  console.log(`Mob:         ${report.summary.mobsCount}`);
-  console.log(`Varianti:    ${report.summary.variantsCount}`);
-  console.log(`Relazioni:   ${report.summary.relationRowsPlanned}`);
-  console.log(`Mob sintetici per basi mancanti: ${report.summary.syntheticMobs}`);
+  console.log(`File SQL:              ${SQL_OUTPUT_FILE}`);
+  console.log(`Report:                ${REPORT_FILE}`);
+  console.log(`Categorie:             ${report.summary.categoriesCount}`);
+  console.log(`Mob:                   ${report.summary.mobsCount}`);
+  console.log(`Varianti:              ${report.summary.variantsCount}`);
+  console.log(`Mob ↔ Categorie:       ${report.summary.mobCategoriesPlanned}`);
+  console.log(`Varianti ↔ Categorie:  ${report.summary.variantCategoriesPlanned}`);
+  console.log(`Totale relazioni:      ${report.summary.relationRowsPlanned}`);
 
   if (report.previousSqlComparison) {
     console.log('\nDifferenze rispetto al vecchio scripts/import-data.sql:');
-    console.log(`  categorie: ${report.previousSqlComparison.previous.categories} → ${report.previousSqlComparison.current.categories}`);
-    console.log(`  mob:       ${report.previousSqlComparison.previous.mobs} → ${report.previousSqlComparison.current.mobs}`);
-    console.log(`  varianti:  ${report.previousSqlComparison.previous.variants} → ${report.previousSqlComparison.current.variants}`);
+    console.log(`  categorie:                 ${report.previousSqlComparison.previous.categories} → ${report.previousSqlComparison.current.categories}`);
+    console.log(`  mob:                       ${report.previousSqlComparison.previous.mobs} → ${report.previousSqlComparison.current.mobs}`);
+    console.log(`  varianti:                  ${report.previousSqlComparison.previous.variants} → ${report.previousSqlComparison.current.variants}`);
+    console.log(`  mob ↔ categorie:           ${report.previousSqlComparison.previous.mobCategoryRelations} → ${report.previousSqlComparison.current.mobCategoryRelations}`);
+    console.log(`  varianti ↔ categorie:      ${report.previousSqlComparison.previous.variantCategoryRelations} → ${report.previousSqlComparison.current.variantCategoryRelations}`);
   }
 
   console.log('\n⚠️  Nessuna scrittura remota eseguita. Rivedere report e SQL prima di usare wrangler d1 execute.');

@@ -515,6 +515,30 @@ export function buildCategories() {
     });
   }
 
+  const suffixCategories = [
+    { label: 'Baby Breed', suffixId: 'A', icon: '/icons/items/name-tag.png', color: '#9333ea', desc: 'Baby variant obtained through breeding.' },
+    { label: 'Baby Monster', suffixId: 'B', icon: '/icons/items/name-tag.png', color: '#db2777', desc: 'Baby variant of monster mobs.' },
+    { label: 'Baby Animal', suffixId: 'C', icon: '/icons/items/name-tag.png', color: '#16a34a', desc: 'Baby variant of animal mobs.' },
+    { label: 'Pumpkin', suffixId: 'P', icon: '/icons/items/carved-pumpkin.png', color: '#ea580c', desc: 'Mob wearing a pumpkin or jack o lantern.' },
+    { label: 'Jockey', suffixId: 'J', icon: '/icons/items/saddle.png', color: '#ca8a04', desc: 'Jockey mob combination.' },
+    { label: 'Unobtainable', suffixId: 'U', icon: '/icons/items/name-tag.png', color: '#dc2626', desc: 'Unobtainable mob variant in normal survival.' },
+    { label: 'Untrapable', suffixId: 'F', icon: '/icons/items/chest.png', color: '#4b5563', desc: 'Mob that cannot be trapped in typical mob traps.' },
+    { label: 'Texture Error', suffixId: 'T', icon: '/icons/items/shears.png', color: '#2563eb', desc: 'Mob variant with texture discrepancies.' },
+  ];
+
+  for (const item of suffixCategories) {
+    dynamicCategories.push({
+      name: `Special - ${item.label}`,
+      icon: item.icon,
+      color: item.color,
+      link: '.',
+      description: item.desc,
+      priority: priority++,
+      variant: item.suffixId,
+      source: `dynamic:special:${item.suffixId}`,
+    });
+  }
+
   const categories = [...staticCategories, ...dynamicCategories];
   const seen = new Set();
   const duplicateCategories = [];
@@ -525,6 +549,143 @@ export function buildCategories() {
   }
 
   return { categories, staticCategories, dynamicCategories, duplicateCategories };
+}
+
+export function buildRelationsPlan(images, plan, categoryPlan) {
+  const SUFFIX_MAP = {
+    'A': 'Special - Baby Breed',
+    'B': 'Special - Baby Monster',
+    'C': 'Special - Baby Animal',
+    'P': 'Special - Pumpkin',
+    'J': 'Special - Jockey',
+    'U': 'Special - Unobtainable',
+    'F': 'Special - Untrapable',
+    'T': 'Special - Texture Error',
+  };
+
+  const STATIC_MOB_MAP = {
+    'Saddled': ['Horse', 'Donkey', 'Mule', 'Pig', 'Strider', 'Camel', 'SkeletonHorse', 'ZombieHorse'],
+    'Shearable': ['Sheep', 'Mooshroom', 'SnowGolem', 'Bogged'],
+    'Chested': ['Donkey', 'Mule', 'Llama', 'TraderLlama'],
+    'Name Tag': ['Sheep', 'Rabbit', 'Vindicator'],
+    'Banner': ['Pillager', 'Vindicator', 'Evoker'],
+    'Lightning': ['Creeper', 'Mooshroom', 'SkeletonHorse'],
+    'Screaming': ['Goat'],
+  };
+
+  const mobRelationsMap = new Map();
+  const variantRelationsMap = new Map();
+
+  for (const img of images) {
+    const baseName = inferBaseName(img);
+    const vName = resolveVariantName(img, baseName);
+
+    // 1. Suffissi speciali
+    const suffixes = new Set(img.suffixLetters || []);
+    if (img.parsed?.activeSuffixes) img.parsed.activeSuffixes.forEach(s => suffixes.add(s));
+    if (img.folder === 'special:pumpkin') suffixes.add('P');
+    if (img.folder === 'special:baby breed') suffixes.add('A');
+    if (img.folder === 'special:baby monster') suffixes.add('B');
+    if (img.folder === 'special:baby animal') suffixes.add('C');
+    if (img.folder.includes('jockey') || vName.includes('(Jockey)')) suffixes.add('J');
+
+    for (const s of suffixes) {
+      const catName = SUFFIX_MAP[s];
+      if (catName) {
+        mobRelationsMap.set(`${baseName}\u0000${catName}`, { mobName: baseName, categoryName: catName });
+        if (img.folder !== 'root') {
+          variantRelationsMap.set(`${baseName}\u0000${vName}\u0000${catName}`, { mobName: baseName, variantName: vName, categoryName: catName });
+        }
+      }
+    }
+
+    // 2. Colori
+    const colors = ['White', 'LightGray', 'Gray', 'Black', 'Brown', 'Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Cyan', 'LightBlue', 'Blue', 'Purple', 'Magenta', 'Pink'];
+    for (const col of colors) {
+      const reg = new RegExp(`\\b${col}\\b`, 'i');
+      if (reg.test(vName) || reg.test(img.filename)) {
+        const catName = `Color - ${col}`;
+        mobRelationsMap.set(`${baseName}\u0000${catName}`, { mobName: baseName, categoryName: catName });
+        if (img.folder !== 'root') {
+          variantRelationsMap.set(`${baseName}\u0000${vName}\u0000${catName}`, { mobName: baseName, variantName: vName, categoryName: catName });
+        }
+      }
+    }
+
+    // 3. Biomi
+    const biomes = ['Plains', 'Desert', 'Jungle', 'Savanna', 'Snow', 'Swamp', 'Taiga'];
+    for (const b of biomes) {
+      if ((baseName === 'Villager' || baseName === 'ZombieVillager') && (vName.includes(b) || img.filename.includes(b))) {
+        const catName = `Biome - ${b}`;
+        mobRelationsMap.set(`${baseName}\u0000${catName}`, { mobName: baseName, categoryName: catName });
+        if (img.folder !== 'root') {
+          variantRelationsMap.set(`${baseName}\u0000${vName}\u0000${catName}`, { mobName: baseName, variantName: vName, categoryName: catName });
+        }
+      }
+    }
+
+    // 4. Professioni
+    const jobs = ['Unemployed', 'Nitwit', 'Armorer', 'Butcher', 'Cartographer', 'Cleric', 'Farmer', 'Fisherman', 'Fletcher', 'Leatherworker', 'Librarian', 'Mason', 'Shepherd', 'Toolsmith', 'Weaponsmith'];
+    for (const j of jobs) {
+      if ((baseName === 'Villager' || baseName === 'ZombieVillager') && (vName.includes(j) || img.filename.includes(j))) {
+        const catName = `Profession - ${j}`;
+        mobRelationsMap.set(`${baseName}\u0000${catName}`, { mobName: baseName, categoryName: catName });
+        if (img.folder !== 'root') {
+          variantRelationsMap.set(`${baseName}\u0000${vName}\u0000${catName}`, { mobName: baseName, variantName: vName, categoryName: catName });
+        }
+      }
+    }
+
+    // 5. Categorie statiche
+    if (vName.toLowerCase().includes('saddle') || img.filename.toLowerCase().includes('saddle')) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Saddled`, { mobName: baseName, variantName: vName, categoryName: 'Saddled' });
+      }
+    }
+    if (vName.toLowerCase().includes('sheared') || img.filename.toLowerCase().includes('sheared')) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Shearable`, { mobName: baseName, variantName: vName, categoryName: 'Shearable' });
+      }
+    }
+    if (vName.toLowerCase().includes('chest') || img.filename.toLowerCase().includes('chest')) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Chested`, { mobName: baseName, variantName: vName, categoryName: 'Chested' });
+      }
+    }
+    if (['Toast', 'Johnny', 'jeb_'].some(n => vName.includes(n) || img.filename.includes(n))) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Name Tag`, { mobName: baseName, variantName: vName, categoryName: 'Name Tag' });
+      }
+    }
+    if (vName.toLowerCase().includes('banner') || img.filename.toLowerCase().includes('banner')) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Banner`, { mobName: baseName, variantName: vName, categoryName: 'Banner' });
+      }
+    }
+    if (vName.toLowerCase().includes('lightning') || vName.toLowerCase().includes('charged') || img.filename.toLowerCase().includes('charged')) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Lightning`, { mobName: baseName, variantName: vName, categoryName: 'Lightning' });
+      }
+    }
+    if (vName.toLowerCase().includes('screaming') || img.filename.toLowerCase().includes('screaming')) {
+      if (img.folder !== 'root') {
+        variantRelationsMap.set(`${baseName}\u0000${vName}\u0000Screaming`, { mobName: baseName, variantName: vName, categoryName: 'Screaming' });
+      }
+    }
+  }
+
+  for (const [catName, mobList] of Object.entries(STATIC_MOB_MAP)) {
+    for (const mName of mobList) {
+      if (plan.mobs.some(m => m.name === mName)) {
+        mobRelationsMap.set(`${mName}\u0000${catName}`, { mobName: mName, categoryName: catName });
+      }
+    }
+  }
+
+  const mobCategories = [...mobRelationsMap.values()].sort((a, b) => a.mobName.localeCompare(b.mobName) || a.categoryName.localeCompare(b.categoryName));
+  const variantCategories = [...variantRelationsMap.values()].sort((a, b) => a.mobName.localeCompare(b.mobName) || a.variantName.localeCompare(b.variantName) || a.categoryName.localeCompare(b.categoryName));
+
+  return { mobCategories, variantCategories };
 }
 
 export function missingPublicAssets(paths) {

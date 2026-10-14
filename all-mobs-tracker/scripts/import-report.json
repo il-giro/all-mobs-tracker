@@ -1,14 +1,17 @@
 {
-  "timestamp": "2026-10-14T16:19:16.861Z",
-  "note": "Report generato localmente. Nessuna scrittura su D1 remoto eseguita.",
+  "timestamp": "2026-10-14T16:35:25.939Z",
+  "note": "Anteprima locale: nessuna scrittura su D1 remoto è stata eseguita.",
   "summary": {
     "totalImages": 1018,
     "mobsCount": 89,
     "variantsCount": 980,
-    "categoriesCount": 45,
+    "categoriesCount": 53,
     "staticCategoriesCount": 7,
-    "dynamicCategoriesCount": 38,
-    "relationRowsPlanned": 0,
+    "dynamicCategoriesCount": 46,
+    "relationRowsPlanned": 1686,
+    "mobCategoriesPlanned": 222,
+    "variantCategoriesPlanned": 1464,
+    "folders": 64,
     "syntheticMobs": 0,
     "variantDuplicateGroups": 0,
     "physicalDuplicateGroups": 0
@@ -20,42 +23,6 @@
       "src/utils/mobParser.js"
     ],
     "images": "public/data/**/*.{png,jpg,jpeg,gif,webp}"
-  },
-  "generatedSqlCounts": {
-    "categories": 45,
-    "mobs": 89,
-    "variants": 980,
-    "mobCategoryRelations": 0,
-    "variantCategoryRelations": 0,
-    "insertOrReplace": false,
-    "insertOrIgnore": false
-  },
-  "previousSqlComparison": {
-    "previous": {
-      "categories": 45,
-      "mobs": 89,
-      "variants": 980,
-      "mobCategoryRelations": 0,
-      "variantCategoryRelations": 0,
-      "insertOrReplace": false,
-      "insertOrIgnore": false
-    },
-    "current": {
-      "categories": 45,
-      "mobs": 89,
-      "variants": 980,
-      "mobCategoryRelations": 0,
-      "variantCategoryRelations": 0,
-      "insertOrReplace": false,
-      "insertOrIgnore": false
-    },
-    "differences": {
-      "categories": 0,
-      "mobs": 0,
-      "variants": 0,
-      "mobCategoryRelations": 0,
-      "variantCategoryRelations": 0
-    }
   },
   "categories": [
     {
@@ -507,6 +474,86 @@
       "priority": 137,
       "variant": "Weaponsmith",
       "source": "dynamic:profession"
+    },
+    {
+      "name": "Special - Baby Breed",
+      "icon": "/icons/items/name-tag.png",
+      "color": "#9333ea",
+      "link": ".",
+      "description": "Baby variant obtained through breeding.",
+      "priority": 138,
+      "variant": "A",
+      "source": "dynamic:special:A"
+    },
+    {
+      "name": "Special - Baby Monster",
+      "icon": "/icons/items/name-tag.png",
+      "color": "#db2777",
+      "link": ".",
+      "description": "Baby variant of monster mobs.",
+      "priority": 139,
+      "variant": "B",
+      "source": "dynamic:special:B"
+    },
+    {
+      "name": "Special - Baby Animal",
+      "icon": "/icons/items/name-tag.png",
+      "color": "#16a34a",
+      "link": ".",
+      "description": "Baby variant of animal mobs.",
+      "priority": 140,
+      "variant": "C",
+      "source": "dynamic:special:C"
+    },
+    {
+      "name": "Special - Pumpkin",
+      "icon": "/icons/items/carved-pumpkin.png",
+      "color": "#ea580c",
+      "link": ".",
+      "description": "Mob wearing a pumpkin or jack o lantern.",
+      "priority": 141,
+      "variant": "P",
+      "source": "dynamic:special:P"
+    },
+    {
+      "name": "Special - Jockey",
+      "icon": "/icons/items/saddle.png",
+      "color": "#ca8a04",
+      "link": ".",
+      "description": "Jockey mob combination.",
+      "priority": 142,
+      "variant": "J",
+      "source": "dynamic:special:J"
+    },
+    {
+      "name": "Special - Unobtainable",
+      "icon": "/icons/items/name-tag.png",
+      "color": "#dc2626",
+      "link": ".",
+      "description": "Unobtainable mob variant in normal survival.",
+      "priority": 143,
+      "variant": "U",
+      "source": "dynamic:special:U"
+    },
+    {
+      "name": "Special - Untrapable",
+      "icon": "/icons/items/chest.png",
+      "color": "#4b5563",
+      "link": ".",
+      "description": "Mob that cannot be trapped in typical mob traps.",
+      "priority": 144,
+      "variant": "F",
+      "source": "dynamic:special:F"
+    },
+    {
+      "name": "Special - Texture Error",
+      "icon": "/icons/items/shears.png",
+      "color": "#2563eb",
+      "link": ".",
+      "description": "Mob variant with texture discrepancies.",
+      "priority": 145,
+      "variant": "T",
+      "source": "dynamic:special:T"
     }
   ],
   "mobs": [
@@ -13566,7 +13613,43 @@
   },
   "existingDataCheck": {
     "status": "not-run",
-    "reason": "Questo generatore non interroga il database remoto. I conflitti con dati esistenti richiedono Wrangler autenticato e query read-only.",
+    "reason": "Wrangler non era autenticato durante il controllo precedente. Questo script locale non interroga D1 remoto e non può sapere quali record esistono già.",
+    "recommendedReadOnlyCommands": [
+      "npx wrangler d1 execute allmobs --remote --command=\"SELECT name, img FROM MOBS ORDER BY name;\"",
+      "npx wrangler d1 execute allmobs --remote --command=\"SELECT v.name, v.img, m.name AS mob_name FROM VARIANTS v LEFT JOIN MOBS m ON m.id = v.mob_id ORDER BY m.name, v.name;\"",
+      "npx wrangler d1 execute allmobs --remote --command=\"SELECT name, variant, icon FROM CATEGORIES ORDER BY priority, name;\""
+    ],
     "conflictsWithExistingData": []
+  },
+  "sqlComparison": {
+    "file": "scripts/import-data.sql",
+    "exists": true,
+    "currentSqlCounts": {
+      "categories": 53,
+      "mobs": 89,
+      "variants": 980,
+      "mobCategoryRelations": 222,
+      "variantCategoryRelations": 1464,
+      "insertOrReplace": false,
+      "insertOrIgnore": false
+    },
+    "previewCounts": {
+      "categories": 53,
+      "mobs": 89,
+      "variants": 980,
+      "mobCategoryRelations": 222,
+      "variantCategoryRelations": 1464
+    },
+    "differences": {
+      "categories": 0,
+      "mobs": 0,
+      "variants": 0,
+      "mobCategoryRelations": 0,
+      "variantCategoryRelations": 0
+    },
+    "flags": {
+      "usesInsertOrReplace": false,
+      "usesInsertOrIgnore": false
+    }
   }
 }

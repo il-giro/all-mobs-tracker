@@ -12,6 +12,7 @@ import {
   __dirname,
   buildCategories,
   buildImportPlan,
+  buildRelationsPlan,
   countSqlStatements,
   missingPublicAssets,
   scanImages,
@@ -20,7 +21,7 @@ import {
 const REPORT_FILE = path.join(__dirname, 'import-report.json');
 const SQL_FILE = path.join(__dirname, 'import-data.sql');
 
-function buildSqlComparison(plan, categories) {
+function buildSqlComparison(plan, categories, relationsPlan) {
   if (!fs.existsSync(SQL_FILE)) {
     return {
       file: 'scripts/import-data.sql',
@@ -40,15 +41,15 @@ function buildSqlComparison(plan, categories) {
       categories: categories.length,
       mobs: plan.mobs.length,
       variants: plan.variants.length,
-      mobCategoryRelations: 0,
-      variantCategoryRelations: 0,
+      mobCategoryRelations: relationsPlan.mobCategories.length,
+      variantCategoryRelations: relationsPlan.variantCategories.length,
     },
     differences: {
       categories: categories.length - counts.categories,
       mobs: plan.mobs.length - counts.mobs,
       variants: plan.variants.length - counts.variants,
-      mobCategoryRelations: 0 - counts.mobCategoryRelations,
-      variantCategoryRelations: 0 - counts.variantCategoryRelations,
+      mobCategoryRelations: relationsPlan.mobCategories.length - counts.mobCategoryRelations,
+      variantCategoryRelations: relationsPlan.variantCategories.length - counts.variantCategoryRelations,
     },
     flags: {
       usesInsertOrReplace: counts.insertOrReplace,
@@ -61,6 +62,7 @@ function buildReport() {
   const images = scanImages();
   const plan = buildImportPlan(images);
   const categoryPlan = buildCategories();
+  const relationsPlan = buildRelationsPlan(images, plan, categoryPlan);
   const categoryAssetPaths = categoryPlan.categories.map(category => category.icon);
 
   const report = {
@@ -73,7 +75,9 @@ function buildReport() {
       categoriesCount: categoryPlan.categories.length,
       staticCategoriesCount: categoryPlan.staticCategories.length,
       dynamicCategoriesCount: categoryPlan.dynamicCategories.length,
-      relationRowsPlanned: 0,
+      relationRowsPlanned: relationsPlan.mobCategories.length + relationsPlan.variantCategories.length,
+      mobCategoriesPlanned: relationsPlan.mobCategories.length,
+      variantCategoriesPlanned: relationsPlan.variantCategories.length,
       folders: [...new Set(images.map(image => image.folder))].length,
       syntheticMobs: plan.syntheticMobs.length,
       variantDuplicateGroups: plan.variantDuplicates.length,
@@ -106,7 +110,7 @@ function buildReport() {
       ],
       conflictsWithExistingData: [],
     },
-    sqlComparison: buildSqlComparison(plan, categoryPlan.categories),
+    sqlComparison: buildSqlComparison(plan, categoryPlan.categories, relationsPlan),
   };
 
   return report;
