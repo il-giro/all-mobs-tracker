@@ -599,15 +599,19 @@ export function buildRelationsPlan(images, plan, categoryPlan) {
       }
     }
 
-    // 2. Colori
-    const colors = ['White', 'LightGray', 'Gray', 'Black', 'Brown', 'Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Cyan', 'LightBlue', 'Blue', 'Purple', 'Magenta', 'Pink'];
-    for (const col of colors) {
-      const reg = new RegExp(`\\b${col}\\b`, 'i');
-      if (reg.test(vName) || reg.test(img.filename)) {
-        const catName = `Color - ${col}`;
-        mobRelationsMap.set(`${baseName}\u0000${catName}`, { mobName: baseName, categoryName: catName });
-        if (img.folder !== 'root') {
-          variantRelationsMap.set(`${baseName}\u0000${vName}\u0000${catName}`, { mobName: baseName, variantName: vName, categoryName: catName });
+    // 2. Colori — solo mob su cui si può usare un colorante:
+    //    Sheep (lana), Wolf/Cat (collare), Llama/TraderLlama (tappeto), HappyGhast (sellino)
+    const DYEABLE_MOBS = new Set(['Sheep', 'Wolf', 'Cat', 'Llama', 'TraderLlama', 'HappyGhast']);
+    if (DYEABLE_MOBS.has(baseName)) {
+      const colors = ['White', 'LightGray', 'Gray', 'Black', 'Brown', 'Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Cyan', 'LightBlue', 'Blue', 'Purple', 'Magenta', 'Pink'];
+      for (const col of colors) {
+        const reg = new RegExp(`\\b${col}\\b`, 'i');
+        if (reg.test(vName) || reg.test(img.filename)) {
+          const catName = `Color - ${col}`;
+          mobRelationsMap.set(`${baseName}\u0000${catName}`, { mobName: baseName, categoryName: catName });
+          if (img.folder !== 'root') {
+            variantRelationsMap.set(`${baseName}\u0000${vName}\u0000${catName}`, { mobName: baseName, variantName: vName, categoryName: catName });
+          }
         }
       }
     }
