@@ -226,6 +226,106 @@ async function handleAdminAPI(request, env) {
     }
   }
 
+  // POST /api/admin/data/:table/bulk-delete - Eliminazione di massa
+  if (path.match(/^\/api\/admin\/data\/[^\/]+\/bulk-delete$/) && request.method === 'POST') {
+    const parts = path.split('/');
+    parts.pop(); // 'bulk-delete'
+    const tableName = parts.pop();
+
+    if (!isAllowedTable(tableName)) {
+      return Response.json(
+        { success: false, error: 'Tabella non autorizzata' },
+        { status: 403 }
+      );
+    }
+
+    try {
+      const { ids } = await request.json();
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return Response.json(
+          { success: false, error: 'Nessun ID fornito per l\'eliminazione' },
+          { status: 400 }
+        );
+      }
+
+      let statements = [];
+
+      if (tableName === 'MOB_CATEGORIES') {
+        const query = `DELETE FROM MOB_CATEGORIES WHERE mob_id = ? AND category_id = ?`;
+        statements = ids.map(compositeId => {
+          const [mobId, categoryId] = String(compositeId).split('_');
+          return env.DB.prepare(query).bind(mobId, categoryId);
+        });
+      } else if (tableName === 'VARIANT_CATEGORIES') {
+        const query = `DELETE FROM VARIANT_CATEGORIES WHERE variant_id = ? AND category_id = ?`;
+        statements = ids.map(compositeId => {
+          const [variantId, categoryId] = String(compositeId).split('_');
+          return env.DB.prepare(query).bind(variantId, categoryId);
+        });
+      } else {
+        const query = `DELETE FROM ${tableName} WHERE id = ?`;
+        statements = ids.map(id => env.DB.prepare(query).bind(id));
+      }
+
+      await env.DB.batch(statements);
+
+      return Response.json({
+        success: true,
+        deletedCount: ids.length
+      });
+    } catch (error) {
+      return Response.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      );
+    }
+  }
+
+  // POST /api/admin/data/:table/bulk-assign-category - Assegnazione categoria multipla
+  if (path.match(/^\/api\/admin\/data\/[^\/]+\/bulk-assign-category$/) && request.method === 'POST') {
+    const parts = path.split('/');
+    parts.pop(); // 'bulk-assign-category'
+    const tableName = parts.pop();
+
+    if (tableName !== 'MOBS' && tableName !== 'VARIANTS') {
+      return Response.json(
+        { success: false, error: 'Assegnazione categoria consentita solo per MOBS o VARIANTS' },
+        { status: 400 }
+      );
+    }
+
+    try {
+      const { targetIds, categoryId } = await request.json();
+      if (!Array.isArray(targetIds) || targetIds.length === 0 || !categoryId) {
+        return Response.json(
+          { success: false, error: 'targetIds o categoryId mancanti' },
+          { status: 400 }
+        );
+      }
+
+      let statements = [];
+      if (tableName === 'MOBS') {
+        const query = `INSERT OR IGNORE INTO MOB_CATEGORIES (mob_id, category_id) VALUES (?, ?)`;
+        statements = targetIds.map(mobId => env.DB.prepare(query).bind(mobId, categoryId));
+      } else {
+        const query = `INSERT OR IGNORE INTO VARIANT_CATEGORIES (variant_id, category_id) VALUES (?, ?)`;
+        statements = targetIds.map(varId => env.DB.prepare(query).bind(varId, categoryId));
+      }
+
+      await env.DB.batch(statements);
+
+      return Response.json({
+        success: true,
+        count: targetIds.length
+      });
+    } catch (error) {
+      return Response.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      );
+    }
+  }
+
   // POST /api/admin/data/:table - Crea un nuovo record
   if (path.match(/^\/api\/admin\/data\/[^\/]+$/) && request.method === 'POST') {
     const tableName = path.split('/').pop();
@@ -240,23 +340,25 @@ async function handleAdminAPI(request, env) {
     try {
       const body = await request.json();
 
-      // Ottieni lo schema per validazione
+      // Ottieni lo schema per validazione (esclude solo 'id' autoincrementante)
       const schemaResult = await env.DB.prepare(
         `PRAGMA table_info(${tableName})`
       ).all();
-      const columns = schemaResult.results.filter(col => col.name !== 'id' && col.pk !== 1);
+      const columns = schemaResult.results.filter(col => col.name !== 'id');
 
       const columnNames = columns.map(col => col.name);
       const values = columnNames.map(name => body[name] ?? null);
       const placeholders = columnNames.map(() => '?').join(', ');
 
-      const query = `INSERT INTO ${tableName} (${columnNames.join(', ')}) VALUES (${placeholders})`;
+      const isRelationTable = tableName === 'MOB_CATEGORIES' || tableName === 'VARIANT_CATEGORIES';
+      const insertVerb = isRelationTable ? 'INSERT OR IGNORE INTO' : 'INSERT INTO';
+      const query = `${insertVerb} ${tableName} (${columnNames.join(', ')}) VALUES (${placeholders})`;
 
       const result = await env.DB.prepare(query).bind(...values).run();
 
       return Response.json({
         success: true,
-        id: result.meta.last_row_id
+        id: result.meta?.last_row_id || null
       });
     } catch (error) {
       return Response.json(
@@ -267,9 +369,9 @@ async function handleAdminAPI(request, env) {
   }
 
   // PUT /api/admin/data/:table/:id - Aggiorna un record
-  if (path.match(/^\/api\/admin\/data\/[^\/]+\/\d+$/) && request.method === 'PUT') {
+  if (path.match(/^\/api\/admin\/data\/[^\/]+\/[^\/]+$/) && request.method === 'PUT') {
     const parts = path.split('/');
-    const id = parts.pop();
+    const rawId = parts.pop();
     const tableName = parts.pop();
 
     if (!isAllowedTable(tableName)) {
@@ -282,24 +384,32 @@ async function handleAdminAPI(request, env) {
     try {
       const body = await request.json();
 
-      // Ottieni lo schema
-      const schemaResult = await env.DB.prepare(
-        `PRAGMA table_info(${tableName})`
-      ).all();
-      const columns = schemaResult.results.filter(col => col.name !== 'id' && col.pk !== 1);
+      if (tableName === 'MOB_CATEGORIES') {
+        const [oldMobId, oldCatId] = rawId.split('_');
+        const query = `UPDATE MOB_CATEGORIES SET mob_id = ?, category_id = ? WHERE mob_id = ? AND category_id = ?`;
+        await env.DB.prepare(query).bind(body.mob_id, body.category_id, oldMobId, oldCatId).run();
+      } else if (tableName === 'VARIANT_CATEGORIES') {
+        const [oldVarId, oldCatId] = rawId.split('_');
+        const query = `UPDATE VARIANT_CATEGORIES SET variant_id = ?, category_id = ? WHERE variant_id = ? AND category_id = ?`;
+        await env.DB.prepare(query).bind(body.variant_id, body.category_id, oldVarId, oldCatId).run();
+      } else {
+        const schemaResult = await env.DB.prepare(
+          `PRAGMA table_info(${tableName})`
+        ).all();
+        const columns = schemaResult.results.filter(col => col.name !== 'id');
 
-      const setClauses = columns
-        .filter(col => body.hasOwnProperty(col.name))
-        .map(col => `${col.name} = ?`)
-        .join(', ');
+        const setClauses = columns
+          .filter(col => body.hasOwnProperty(col.name))
+          .map(col => `${col.name} = ?`)
+          .join(', ');
 
-      const values = columns
-        .filter(col => body.hasOwnProperty(col.name))
-        .map(col => body[col.name]);
+        const values = columns
+          .filter(col => body.hasOwnProperty(col.name))
+          .map(col => body[col.name]);
 
-      const query = `UPDATE ${tableName} SET ${setClauses} WHERE id = ?`;
-
-      await env.DB.prepare(query).bind(...values, id).run();
+        const query = `UPDATE ${tableName} SET ${setClauses} WHERE id = ?`;
+        await env.DB.prepare(query).bind(...values, rawId).run();
+      }
 
       return Response.json({
         success: true

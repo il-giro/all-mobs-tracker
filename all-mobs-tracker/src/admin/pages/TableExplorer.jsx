@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import RecordModal from '../components/RecordModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import BulkDeleteConfirmModal from '../components/BulkDeleteConfirmModal';
+import BulkCategoryModal from '../components/BulkCategoryModal';
 
 const TABLES_LABELS = {
   'MOBS': 'Mob',
@@ -25,6 +27,12 @@ function TableExplorer({ table }) {
   const [deletingRecord, setDeletingRecord] = useState(null);
   const [selectedRecords, setSelectedRecords] = useState(new Set());
   const [duplicatingRecord, setDuplicatingRecord] = useState(null);
+
+  // Stati per operazioni di massa e notifiche
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [showBulkCategoryModal, setShowBulkCategoryModal] = useState(false);
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   // Cache per arricchimento visivo delle tuple di collegamento
   const [mobsCache, setMobsCache] = useState({});
@@ -239,6 +247,13 @@ function TableExplorer({ table }) {
     }
   };
 
+  const showNotification = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3500);
+  };
+
   const handleDelete = async () => {
     if (!deletingRecord) return;
 
@@ -253,12 +268,84 @@ function TableExplorer({ table }) {
       if (result.success) {
         setDeletingRecord(null);
         loadData();
+        showNotification('Record eliminato con successo');
       } else {
         throw new Error(result.error);
       }
     } catch (err) {
       alert('Errore nella cancellazione: ' + err.message);
     }
+  };
+
+  // Eliminazione di massa dei record selezionati
+  const handleBulkDelete = async () => {
+    if (selectedRecords.size === 0) return;
+
+    try {
+      setBulkActionLoading(true);
+      const ids = Array.from(selectedRecords);
+      const response = await fetch(`/api/admin/data/${table}/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowBulkDeleteModal(false);
+        setSelectedRecords(new Set());
+        await loadData();
+        showNotification(`Eliminati con successo ${result.deletedCount || ids.length} record`);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      alert('Errore nella cancellazione multipla: ' + err.message);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  // Assegnazione di massa di una categoria ai record selezionati (MOBS o VARIANTS)
+  const handleBulkAssignCategory = async (categoryId) => {
+    if (selectedRecords.size === 0 || !categoryId) return;
+
+    try {
+      setBulkActionLoading(true);
+      const targetIds = Array.from(selectedRecords);
+      const response = await fetch(`/api/admin/data/${table}/bulk-assign-category`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetIds, categoryId })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowBulkCategoryModal(false);
+        setSelectedRecords(new Set());
+        showNotification(`Categoria assegnata con successo a ${targetIds.length} elementi!`);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      alert('Errore nell\'assegnazione categoria: ' + err.message);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  // Esportazione JSON negli appunti dei record selezionati
+  const handleExportSelected = () => {
+    if (selectedRecords.size === 0) return;
+    const selectedRows = data.filter((row, idx) => selectedRecords.has(getRecordKey(row, idx)));
+    const cleanRows = selectedRows.map(cleanRecordForBackend);
+    const jsonString = JSON.stringify(cleanRows, null, 2);
+
+    navigator.clipboard.writeText(jsonString)
+      .then(() => showNotification(`Copiati ${selectedRows.length} record negli appunti in formato JSON!`))
+      .catch(() => alert('Impossibile copiare negli appunti'));
   };
 
   const handleSort = (columnName) => {
@@ -581,12 +668,45 @@ function TableExplorer({ table }) {
         </div>
 
         {pagination && (
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
-            <span>
-              Totale: <strong className="text-white">{pagination.total}</strong> record
-              {search && ` (filtrati)`}
-              {selectedRecords.size > 0 && ` • ${selectedRecords.size} selezionati`}
-            </span>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-400">
+            <div className="flex items-center gap-3">
+              <span>
+                Totale: <strong className="text-white">{pagination.total}</strong> record
+                {search && ` (filtrati)`}
+              </span>
+              {selectedRecords.size > 0 && (
+                <div className="flex items-center gap-2 pl-3 border-l border-gray-700">
+                  <span className="text-blue-400 font-semibold">{selectedRecords.size} selezionati</span>
+                  <button
+                    onClick={() => setShowBulkDeleteModal(true)}
+                    className="px-2.5 py-1 text-xs bg-red-900/40 text-red-300 border border-red-700/50 hover:bg-red-800/60 rounded font-medium transition-colors"
+                  >
+                    🗑️ Elimina selezionati
+                  </button>
+                  {(table === 'MOBS' || table === 'VARIANTS') && (
+                    <button
+                      onClick={() => setShowBulkCategoryModal(true)}
+                      className="px-2.5 py-1 text-xs bg-indigo-900/40 text-indigo-300 border border-indigo-700/50 hover:bg-indigo-800/60 rounded font-medium transition-colors"
+                    >
+                      🏷️ Assegna Categoria
+                    </button>
+                  )}
+                  <button
+                    onClick={handleExportSelected}
+                    className="px-2 py-1 text-xs bg-gray-800 text-gray-300 border border-gray-750 hover:bg-gray-700 rounded transition-colors"
+                    title="Copia JSON"
+                  >
+                    📋 JSON
+                  </button>
+                  <button
+                    onClick={() => setSelectedRecords(new Set())}
+                    className="text-xs text-gray-500 hover:text-gray-300 underline ml-1"
+                  >
+                    Deseleziona
+                  </button>
+                </div>
+              )}
+            </div>
             <span>
               Pagina <strong className="text-white">{pagination.page}</strong> di <strong className="text-white">{pagination.totalPages}</strong>
             </span>
@@ -737,12 +857,71 @@ function TableExplorer({ table }) {
         </div>
       )}
 
+      {/* Barra Azioni Flottante per Elementi Selezionati */}
+      {selectedRecords.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-gray-900/95 backdrop-blur-md border border-blue-500/50 shadow-2xl rounded-2xl px-5 py-3 flex items-center gap-4 text-white">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow">
+              {selectedRecords.size}
+            </span>
+            <span className="text-sm font-medium text-gray-200">selezionati</span>
+          </div>
+
+          <div className="h-5 w-px bg-gray-700" />
+
+          <div className="flex items-center gap-2">
+            {(table === 'MOBS' || table === 'VARIANTS') && (
+              <button
+                onClick={() => setShowBulkCategoryModal(true)}
+                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow"
+              >
+                🏷️ Assegna Categoria
+              </button>
+            )}
+
+            <button
+              onClick={handleExportSelected}
+              className="px-3 py-1.5 bg-gray-800 hover:bg-gray-750 border border-gray-700 text-gray-200 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
+              title="Copia dati selezionati in JSON negli appunti"
+            >
+              📋 Copia JSON
+            </button>
+
+            <button
+              onClick={() => setShowBulkDeleteModal(true)}
+              className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow"
+            >
+              🗑️ Elimina selezionati ({selectedRecords.size})
+            </button>
+
+            <button
+              onClick={() => setSelectedRecords(new Set())}
+              className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors ml-1"
+              title="Deseleziona tutti"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notifiche */}
+      {toast && (
+        <div className={`fixed top-6 right-6 z-50 px-4 py-3 rounded-xl border shadow-xl flex items-center gap-2 text-sm font-medium ${
+          toast.type === 'success' ? 'bg-emerald-950/90 border-emerald-600 text-emerald-200' : 'bg-blue-950/90 border-blue-600 text-blue-200'
+        }`}>
+          <span>{toast.type === 'success' ? '✅' : 'ℹ️'}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       {/* Modals */}
       {showCreateModal && (
         <RecordModal
           table={table}
           columns={columns}
           record={duplicatingRecord}
+          metadata={{ mobs: mobsCache, categories: categoriesCache, variants: variantsCache }}
           onSave={handleCreate}
           onClose={() => {
             setShowCreateModal(false);
@@ -756,6 +935,7 @@ function TableExplorer({ table }) {
           table={table}
           columns={columns}
           record={editingRecord}
+          metadata={{ mobs: mobsCache, categories: categoriesCache, variants: variantsCache }}
           onSave={(values) => handleUpdate(editingRecord.id ?? `${editingRecord.mob_id || editingRecord.variant_id}_${editingRecord.category_id}`, values)}
           onClose={() => setEditingRecord(null)}
         />
@@ -767,6 +947,27 @@ function TableExplorer({ table }) {
           tableName={TABLES_LABELS[table] || table}
           onConfirm={handleDelete}
           onCancel={() => setDeletingRecord(null)}
+        />
+      )}
+
+      {showBulkDeleteModal && (
+        <BulkDeleteConfirmModal
+          count={selectedRecords.size}
+          tableName={TABLES_LABELS[table] || table}
+          loading={bulkActionLoading}
+          onConfirm={handleBulkDelete}
+          onCancel={() => setShowBulkDeleteModal(false)}
+        />
+      )}
+
+      {showBulkCategoryModal && (
+        <BulkCategoryModal
+          count={selectedRecords.size}
+          targetType={table === 'MOBS' ? 'Mob' : 'Varianti'}
+          categories={categoriesCache}
+          loading={bulkActionLoading}
+          onAssign={handleBulkAssignCategory}
+          onCancel={() => setShowBulkCategoryModal(false)}
         />
       )}
     </div>
