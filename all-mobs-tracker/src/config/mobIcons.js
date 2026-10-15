@@ -439,6 +439,25 @@ export function hasVillagerIcons(mob) {
  * @returns {Array}           — categorie a cui appartiene il mob
  */
 export function getMobCategories(mob, categories) {
+  if (!mob) return [];
+  const targetCategories = categories || [];
+
+  // Se il mob ha già categorie assegnate dal database
+  if (Array.isArray(mob.categories) && mob.categories.length > 0) {
+    if (targetCategories.length === 0) return mob.categories;
+    const targetSet = new Set(targetCategories.map(c => c.id ?? c.dbId));
+    const matched = mob.categories.filter(c => targetSet.has(c.id) || targetSet.has(c.dbId));
+    if (matched.length > 0) return matched;
+    return mob.categories;
+  }
+
+  if (Array.isArray(mob.categoryIds) && mob.categoryIds.length > 0) {
+    const idSet = new Set(mob.categoryIds);
+    const matched = targetCategories.filter(cat => idSet.has(cat.dbId) || idSet.has(cat.id));
+    if (matched.length > 0) return matched;
+  }
+
+  // Fallback basato sui resolver icona esistenti
   const categoryIds = new Set();
   for (const resolver of MOB_ICON_RESOLVERS) {
     const icons = resolver.resolve(mob);
@@ -447,5 +466,5 @@ export function getMobCategories(mob, categories) {
       if (icon.categoryId) categoryIds.add(icon.categoryId);
     }
   }
-  return categories.filter(cat => categoryIds.has(cat.id));
+  return targetCategories.filter(cat => categoryIds.has(cat.id));
 }

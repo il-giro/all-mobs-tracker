@@ -15,6 +15,12 @@ export default defineConfig({
   server: {
     fs: {
       strict: false
+    },
+    proxy: {
+      '/api': {
+        target: 'https://allmobs.riccardogir07.workers.dev',
+        changeOrigin: true
+      }
     }
   }
 })

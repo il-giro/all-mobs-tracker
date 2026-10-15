@@ -2,6 +2,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "allmobs",
+  "account_id": "47f30de8af34357aa3fa1deba5134f1a",
   "main": "worker/index.js",
   "compatibility_date": "2026-10-11",
   "assets": {

@@ -11,6 +11,7 @@ import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConf
 import { VillagerBiomes, VillagerJobs } from '../config/mobIcons';
 import { MobCategories } from '../config/mobCategories';
 import Footer from '../components/Footer';
+import useTrackerData from '../utils/mobDatabase';
 
 const ALL_FISH = (() => {
   const fish = [];
@@ -88,7 +89,7 @@ const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
 };
 
 const MobTracker = () => {
-  const [allMobs, setAllMobs]               = useState([]);
+  const { allMobs, categories: dbCategories } = useTrackerData();
   const [trackedMobs, setTrackedMobs]       = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves') || '{}'));
   const [capturedMobs, setCapturedMobs]     = useState(() => JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'));
   const [captureMode, setCaptureMode]       = useState(() => localStorage.getItem('mobTracker_captureMode') === 'true');
@@ -137,27 +138,6 @@ const MobTracker = () => {
     defaults[`variants:${FISH_FOLDER}`] = true;
     return defaults;
   });
-
-  useEffect(() => {
-    const load = async () => {
-      const modules = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
-      const data = Object.keys(modules).map(path => {
-        const parts = path.split('/'), dataIdx = parts.indexOf('data');
-        const fileName = parts[parts.length - 1];
-        const afterData = parts.slice(dataIdx + 1, -1);
-        let folder = 'root', specialSuffixId = null;
-        if (afterData.length === 0) { folder = 'root'; }
-        else if (afterData[0].toLowerCase() === 'special' && afterData[1]) {
-          specialSuffixId = SpecialFolderMap[afterData[1].toLowerCase()] ?? null;
-          folder = `special:${afterData[1]}`;
-        } else { folder = afterData[0]; }
-        const uniqueKey = path.replace('/public/', '');
-        return { ...parseFileName(fileName, path), image: path.replace('/public', ''), fileName: uniqueKey, displayFileName: fileName, folder, specialSuffixId };
-      }).sort((a, b) => a.name.localeCompare(b.name));
-      setAllMobs(data);
-    };
-    load();
-  }, []);
 
   useEffect(() => {
     if (allMobs.length === 0) return;

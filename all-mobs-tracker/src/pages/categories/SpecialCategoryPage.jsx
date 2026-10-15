@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { parseFileName } from '../../utils/mobParser';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
-import { mobNameToSlug, getSpecialCategoryDesc } from '../../config/mobDescriptions';
+import { getSpecialCategoryDesc } from '../../config/mobDescriptions';
 import Footer from '../../components/Footer';
+import useTrackerData from '../../utils/mobDatabase';
 
 // ─── slug ↔ suffixId ─────────────────────────────────────────────────────────
 // 'baby-breed' → 'A',  'jockey' → 'J'
@@ -45,45 +45,7 @@ const useTrackedMobs = () => {
   return [tracked, captured, captureMode, toggle];
 };
 
-// ─── Hook: carica mob per suffixId ───────────────────────────────────────────
-const useSpecialMobs = (suffixId) => {
-  const [mobs, setMobs]       = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!suffixId) return;
-    setLoading(true);
-    const modules  = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
-    const allPaths = Object.keys(modules);
-
-    const all = allPaths.map(path => {
-      const parts = path.split('/'), dataIdx = parts.indexOf('data');
-      const fileName = parts[parts.length - 1];
-      const afterData = parts.slice(dataIdx + 1, -1);
-      let folder = 'root', specialSuffixId = null;
-      if (afterData.length === 0) { folder = 'root'; }
-      else if (afterData[0].toLowerCase() === 'special' && afterData[1]) {
-        specialSuffixId = SpecialFolderMap[afterData[1].toLowerCase()] ?? null;
-        folder = `special:${afterData[1]}`;
-      } else { folder = afterData[0]; }
-      return {
-        ...parseFileName(fileName, path),
-        image: path.replace('/public', ''), fileName: path.replace('/public/', ''),
-        displayFileName: fileName, folder, specialSuffixId,
-      };
-    });
-
-    const filtered = all.filter(mob =>
-      mob.specialSuffixId === suffixId ||
-      mob.activeSuffixes?.includes(suffixId)
-    );
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
-    setMobs(filtered);
-    setLoading(false);
-  }, [suffixId]);
-
-  return { mobs, loading };
-};
+// ─── (rimosso) useSpecialMobs: ora usiamo useTrackerData dal database ─────────
 
 // ─── Icona sulla card ─────────────────────────────────────────────────────────
 const MobIcon = ({ icon }) => {
@@ -162,10 +124,20 @@ const SpecialCategoryPage = () => {
   const navigate   = useNavigate();
   const suffixId   = slugToSuffixId(slug ?? '');
   const config     = suffixId ? SuffixConfig[suffixId] : null;
-  const { mobs, loading } = useSpecialMobs(suffixId);
+  const { allMobs, loading } = useTrackerData();
   const [tracked, captured, captureMode, toggle] = useTrackedMobs();
   const [selectedMob, setSelectedMob] = useState(null);
   const [cardSize, setCardSize]       = useState(120);
+
+  const mobs = useMemo(() => {
+    if (!suffixId || !allMobs.length) return [];
+    return allMobs
+      .filter(mob =>
+        mob.specialSuffixId === suffixId ||
+        mob.activeSuffixes?.includes(suffixId)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [suffixId, allMobs]);
 
   if (!config) {
     return (

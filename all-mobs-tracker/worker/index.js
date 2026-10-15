@@ -523,6 +523,137 @@ export default {
       return handleAdminAPI(request, env);
     }
 
+    // CORS preflight per le API
+    if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/')) {
+      return new Response(null, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      });
+    }
+
+    // API pubblica: ottiene tutti i dati del tracker (categorie, mob, varianti e relazioni)
+    if (url.pathname === '/api/tracker-data' && request.method === 'GET') {
+      try {
+        const [categoriesRes, mobsRes, variantsRes] = await Promise.all([
+          env.DB.prepare('SELECT id, name, icon, color, link, description, priority, variant FROM CATEGORIES ORDER BY priority ASC, id ASC').all(),
+          env.DB.prepare(`
+            SELECT m.id, m.name, m.img, m.link, m.description,
+                   GROUP_CONCAT(mc.category_id) as category_ids
+            FROM MOBS m
+            LEFT JOIN MOB_CATEGORIES mc ON m.id = mc.mob_id
+            GROUP BY m.id
+            ORDER BY m.id ASC
+          `).all(),
+          env.DB.prepare(`
+            SELECT v.id, v.name, v.img, v.link, v.description, v.mob_id,
+                   GROUP_CONCAT(vc.category_id) as category_ids
+            FROM VARIANTS v
+            LEFT JOIN VARIANT_CATEGORIES vc ON v.id = vc.variant_id
+            GROUP BY v.id
+            ORDER BY v.id ASC
+          `).all()
+        ]);
+
+        const categories = (categoriesRes.results || []).map(c => ({
+          ...c,
+          slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        }));
+
+        const mobs = (mobsRes.results || []).map(m => ({
+          ...m,
+          category_ids: m.category_ids ? m.category_ids.split(',').map(Number) : []
+        }));
+
+        const variants = (variantsRes.results || []).map(v => ({
+          ...v,
+          category_ids: v.category_ids ? v.category_ids.split(',').map(Number) : []
+        }));
+
+        return Response.json({
+          success: true,
+          categories,
+          mobs,
+          variants
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'no-cache'
+          }
+        });
+      } catch (error) {
+        return Response.json(
+          { success: false, error: error.message },
+          { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
+        );
+      }
+    }
+
+    // API pubblica: lista categorie
+    if (url.pathname === '/api/categories' && request.method === 'GET') {
+      try {
+        const result = await env.DB.prepare('SELECT id, name, icon, color, link, description, priority, variant FROM CATEGORIES ORDER BY priority ASC, id ASC').all();
+        const categories = (result.results || []).map(c => ({
+          ...c,
+          slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        }));
+        return Response.json({ success: true, categories }, {
+          headers: { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache' }
+        });
+      } catch (error) {
+        return Response.json({ success: false, error: error.message }, { status: 500 });
+      }
+    }
+
+    // API pubblica: lista mob base
+    if (url.pathname === '/api/mobs' && request.method === 'GET') {
+      try {
+        const result = await env.DB.prepare(`
+          SELECT m.id, m.name, m.img, m.link, m.description,
+                 GROUP_CONCAT(mc.category_id) as category_ids
+          FROM MOBS m
+          LEFT JOIN MOB_CATEGORIES mc ON m.id = mc.mob_id
+          GROUP BY m.id
+          ORDER BY m.id ASC
+        `).all();
+        const mobs = (result.results || []).map(m => ({
+          ...m,
+          category_ids: m.category_ids ? m.category_ids.split(',').map(Number) : []
+        }));
+        return Response.json({ success: true, mobs }, {
+          headers: { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache' }
+        });
+      } catch (error) {
+        return Response.json({ success: false, error: error.message }, { status: 500 });
+      }
+    }
+
+    // API pubblica: lista varianti
+    if (url.pathname === '/api/variants' && request.method === 'GET') {
+      try {
+        const result = await env.DB.prepare(`
+          SELECT v.id, v.name, v.img, v.link, v.description, v.mob_id,
+                 GROUP_CONCAT(vc.category_id) as category_ids
+          FROM VARIANTS v
+          LEFT JOIN VARIANT_CATEGORIES vc ON v.id = vc.variant_id
+          GROUP BY v.id
+          ORDER BY v.id ASC
+        `).all();
+        const variants = (result.results || []).map(v => ({
+          ...v,
+          category_ids: v.category_ids ? v.category_ids.split(',').map(Number) : []
+        }));
+        return Response.json({ success: true, variants }, {
+          headers: { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache' }
+        });
+      } catch (error) {
+        return Response.json({ success: false, error: error.message }, { status: 500 });
+      }
+    }
+
     // API di prova: restituisce le tabelle del database
     if (url.pathname === "/api/db-test" && request.method === "GET") {
       try {

@@ -1,77 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { CategoryMap, MobCategories } from '../../config/mobCategories';
+import { CategoryMap, MobCategories, getCategoryById } from '../../config/mobCategories';
 import { parseFileName } from '../../utils/mobParser';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { mobNameToSlug } from '../../config/mobDescriptions';
 import Footer from '../../components/Footer';
-
-// ─── Hook: tracciamento mob ───────────────────────────────────────────────────
-const useTrackedMobs = () => {
-  const [tracked,  setTracked]  = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves')    || '{}'));
-  const [captured, setCaptured] = useState(() => JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'));
-  const captureMode = localStorage.getItem('mobTracker_captureMode') === 'true';
-
-  const toggle = (fileName) => {
-    if (captureMode) {
-      const wasTracked = !!tracked[fileName], wasCaptured = !!captured[fileName];
-      if (!wasTracked && !wasCaptured) {
-        setTracked(p  => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
-      } else if (wasTracked && !wasCaptured) {
-        setCaptured(p => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
-      } else {
-        setTracked(p  => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
-        setCaptured(p => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
-      }
-    } else {
-      const wasCaptured = !!captured[fileName];
-      if (wasCaptured) {
-        setTracked(p  => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
-        setCaptured(p => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
-      } else {
-        setTracked(p  => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
-        setCaptured(p => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
-      }
-    }
-  };
-  return [tracked, captured, captureMode, toggle];
-};
-
-// ─── Hook: carica mob per categoria ──────────────────────────────────────────
-const useCategoryMobs = (categoryId) => {
-  const [mobs, setMobs]       = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!categoryId) return;
-    setLoading(true);
-    const modules  = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
-    const allPaths = Object.keys(modules);
-    const all = allPaths.map(path => {
-      const parts = path.split('/'), dataIdx = parts.indexOf('data');
-      const fileName = parts[parts.length - 1];
-      const afterData = parts.slice(dataIdx + 1, -1);
-      let folder = 'root', specialSuffixId = null;
-      if (afterData.length === 0) { folder = 'root'; }
-      else if (afterData[0].toLowerCase() === 'special' && afterData[1]) {
-        specialSuffixId = SpecialFolderMap[afterData[1].toLowerCase()] ?? null;
-        folder = `special:${afterData[1]}`;
-      } else { folder = afterData[0]; }
-      return {
-        ...parseFileName(fileName, path),
-        image: path.replace('/public', ''), fileName: path.replace('/public/', ''),
-        displayFileName: fileName, folder, specialSuffixId,
-      };
-    });
-    const filtered = all.filter(mob => getMobCategories(mob, MobCategories).some(c => c.id === categoryId));
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
-    setMobs(filtered);
-    setLoading(false);
-  }, [categoryId]);
-
-  return { mobs, loading };
-};
+import useTrackerData from '../../utils/mobDatabase';
 
 // ─── Icona categoria ──────────────────────────────────────────────────────────
 const CatIcon = ({ icon, label, className = '' }) => {
@@ -153,11 +88,20 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
   const { id: paramId }  = useParams();
   const id               = propId ?? paramId;
   const navigate         = useNavigate();
-  const category         = CategoryMap[id];
-  const { mobs, loading } = useCategoryMobs(id);
+  const { allMobs, categoryMap, loading } = useTrackerData();
+  const category         = getCategoryById(id) || categoryMap?.[id] || CategoryMap[id];
   const [tracked, captured, captureMode, toggle] = useTrackedMobs();
   const [selectedMob, setSelectedMob] = useState(null);
   const [cardSize, setCardSize]       = useState(120);
+
+  const mobs = React.useMemo(() => {
+    if (!category || !allMobs.length) return [];
+    return allMobs.filter(mob => {
+      if (mob.categoryIds && mob.categoryIds.includes(category.dbId)) return true;
+      if (mob.categories && mob.categories.some(c => c.id === id || c.dbId === category.dbId)) return true;
+      return getMobCategories(mob, MobCategories).some(c => c.id === id);
+    }).sort((a, b) => a.name.localeCompare(b.name));
+  }, [category, allMobs, id]);
 
   if (!category) {
     return (

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { parseFileName } from '../../utils/mobParser';
-import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
-import { getMobDescription, getMobLink, getVariantDescription, mobNameToSlug } from '../../config/mobDescriptions';
+import { SuffixConfig, SuffixPriority } from '../../config/mobConfig';
+import { getMobDescription, getMobLink } from '../../config/mobDescriptions';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
 import Footer from '../../components/Footer';
+import useTrackerData from '../../utils/mobDatabase';
+import { mobNameToSlug } from '../../config/mobDescriptions';
 
 // ─── Hook: tracciamento mob ───────────────────────────────────────────────────
 const useTrackedMobs = () => {
@@ -40,71 +41,7 @@ const useTrackedMobs = () => {
   return [tracked, captured, captureMode, toggle];
 };
 
-// ─── Hook: carica tutti i mob, trova il mob principale e le sue varianti ──────
-const useMobData = (slug) => {
-  const [allMobs, setAllMobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    const modules  = import.meta.glob('/public/data/**/*.{png,jpg,jpeg,gif,webp}', { eager: true });
-    const allPaths = Object.keys(modules);
-
-    const parsed = allPaths.map(path => {
-      const parts     = path.split('/');
-      const dataIdx   = parts.indexOf('data');
-      const fileName  = parts[parts.length - 1];
-      const afterData = parts.slice(dataIdx + 1, -1);
-      let folder = 'root';
-      let specialSuffixId = null;
-      if (afterData.length === 0) {
-        folder = 'root';
-      } else if (afterData[0].toLowerCase() === 'special' && afterData[1]) {
-        specialSuffixId = SpecialFolderMap[afterData[1].toLowerCase()] ?? null;
-        folder = `special:${afterData[1]}`;
-      } else {
-        folder = afterData[0];
-      }
-      const uniqueKey = path.replace('/public/', '');
-      return {
-        ...parseFileName(fileName, path),
-        image:           path.replace('/public', ''),
-        fileName:        uniqueKey,
-        displayFileName: fileName,
-        folder,
-        specialSuffixId,
-      };
-    });
-
-    setAllMobs(parsed);
-    setLoading(false);
-  }, []);
-
-  // Trova tutti i mob il cui folder corrisponde allo slug
-  const mobGroup = useMemo(() => {
-    if (!slug || allMobs.length === 0) return [];
-
-    return allMobs
-      .filter(m => {
-        // Per mob in root (es. Allay) → usa lo slug del nome
-        if (m.folder === 'root' || m.folder.startsWith('special:')) {
-          return mobNameToSlug(m.name) === slug;
-        }
-        // Per mob in cartella → usa il folder come slug
-        return m.folder.toLowerCase().replace(/\s+/g, '-') === slug;
-      })
-      .sort((a, b) => {
-        const aScore = (a.num1 ?? 1) * 10000 + (a.num2 ?? 0) * 100 + (a.num3 ?? 0) + a.activeSuffixes.length;
-        const bScore = (b.num1 ?? 1) * 10000 + (b.num2 ?? 0) * 100 + (b.num3 ?? 0) + b.activeSuffixes.length;
-        return aScore - bScore;
-      });
-  }, [slug, allMobs]);
-
-  // Mob principale = il primo (base)
-  const mainMob = mobGroup[0] ?? null;
-
-  return { mainMob, variants: mobGroup, loading };
-};
+// ─── (rimosso) useMobData: ora usiamo useTrackerData dal database ─────────────
 
 // ─── Icona categoria ──────────────────────────────────────────────────────────
 const CategoryIcon = ({ icon, label, className = '' }) => {
@@ -219,11 +156,32 @@ const VariantCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImag
 const MobPage = () => {
   const { slug }                                 = useParams();
   const navigate                                 = useNavigate();
-  const { mainMob, variants, loading }           = useMobData(slug);
+  const { allMobs, loading }                     = useTrackerData();
   const [tracked, captured, captureMode, toggle] = useTrackedMobs();
+
+  // Trova tutti i mob il cui folder/nome corrisponde allo slug
+  const mobGroup = useMemo(() => {
+    if (!slug || !allMobs.length) return [];
+    return allMobs
+      .filter(m => {
+        if (m.folder === 'root' || m.folder?.startsWith('special:')) {
+          return mobNameToSlug(m.name) === slug;
+        }
+        return m.folder?.toLowerCase().replace(/\s+/g, '-') === slug;
+      })
+      .sort((a, b) => {
+        const aScore = (a.num1 ?? 1) * 10000 + (a.num2 ?? 0) * 100 + (a.num3 ?? 0) + (a.activeSuffixes?.length ?? 0);
+        const bScore = (b.num1 ?? 1) * 10000 + (b.num2 ?? 0) * 100 + (b.num3 ?? 0) + (b.activeSuffixes?.length ?? 0);
+        return aScore - bScore;
+      });
+  }, [slug, allMobs]);
+
+  const mainMob  = mobGroup[0] ?? null;
+  const variants = mobGroup;
 
   const description = slug ? getMobDescription(slug) : null;
   const wikiLink    = slug ? getMobLink(slug) : null;
+
 
   // Favicon dinamica
   useEffect(() => {
