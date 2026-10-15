@@ -81,7 +81,91 @@ async function handleAdminAPI(request, env) {
 
       const offset = (page - 1) * limit;
 
-      // Ottieni lo schema per la ricerca
+      // Query speciali con JOIN per le tabelle di relazione (ricerca per nome)
+      if (tableName === 'MOB_CATEGORIES') {
+        const searchClause = search
+          ? `WHERE (m.name LIKE ? OR c.name LIKE ?)`
+          : '';
+        const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
+
+        let orderClause = 'ORDER BY m.name ASC, c.name ASC';
+        if (orderBy === 'mob_id') orderClause = `ORDER BY m.name ${orderDir}`;
+        else if (orderBy === 'category_id') orderClause = `ORDER BY c.name ${orderDir}`;
+
+        const dataQuery = `
+          SELECT mc.mob_id, mc.category_id,
+                 m.name as mob_name_sort, c.name as cat_name_sort
+          FROM MOB_CATEGORIES mc
+          JOIN MOBS m ON mc.mob_id = m.id
+          JOIN CATEGORIES c ON mc.category_id = c.id
+          ${searchClause}
+          ${orderClause}
+          LIMIT ? OFFSET ?`;
+        const countQuery = `
+          SELECT COUNT(*) as total
+          FROM MOB_CATEGORIES mc
+          JOIN MOBS m ON mc.mob_id = m.id
+          JOIN CATEGORIES c ON mc.category_id = c.id
+          ${searchClause}`;
+
+        const [dataResult, countResult] = await Promise.all([
+          env.DB.prepare(dataQuery).bind(...searchParams, limit, offset).all(),
+          env.DB.prepare(countQuery).bind(...searchParams).all()
+        ]);
+
+        const total = countResult.results[0]?.total || 0;
+        // Rimuovi le colonne di ordinamento interne dalla risposta
+        const data = dataResult.results.map(({ mob_name_sort, cat_name_sort, ...r }) => r);
+
+        return Response.json({
+          success: true,
+          data,
+          pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+        });
+      }
+
+      if (tableName === 'VARIANT_CATEGORIES') {
+        const searchClause = search
+          ? `WHERE (v.name LIKE ? OR c.name LIKE ?)`
+          : '';
+        const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
+
+        let orderClause = 'ORDER BY v.name ASC, c.name ASC';
+        if (orderBy === 'variant_id') orderClause = `ORDER BY v.name ${orderDir}`;
+        else if (orderBy === 'category_id') orderClause = `ORDER BY c.name ${orderDir}`;
+
+        const dataQuery = `
+          SELECT vc.variant_id, vc.category_id,
+                 v.name as var_name_sort, c.name as cat_name_sort
+          FROM VARIANT_CATEGORIES vc
+          JOIN VARIANTS v ON vc.variant_id = v.id
+          JOIN CATEGORIES c ON vc.category_id = c.id
+          ${searchClause}
+          ${orderClause}
+          LIMIT ? OFFSET ?`;
+        const countQuery = `
+          SELECT COUNT(*) as total
+          FROM VARIANT_CATEGORIES vc
+          JOIN VARIANTS v ON vc.variant_id = v.id
+          JOIN CATEGORIES c ON vc.category_id = c.id
+          ${searchClause}`;
+
+        const [dataResult, countResult] = await Promise.all([
+          env.DB.prepare(dataQuery).bind(...searchParams, limit, offset).all(),
+          env.DB.prepare(countQuery).bind(...searchParams).all()
+        ]);
+
+        const total = countResult.results[0]?.total || 0;
+        const data = dataResult.results.map(({ var_name_sort, cat_name_sort, ...r }) => r);
+
+        return Response.json({
+          success: true,
+          data,
+          pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+        });
+      }
+
+      // Tabelle standard (MOBS, VARIANTS, CATEGORIES)
       const schemaResult = await env.DB.prepare(
         `PRAGMA table_info(${tableName})`
       ).all();
@@ -229,9 +313,11 @@ async function handleAdminAPI(request, env) {
   }
 
   // DELETE /api/admin/data/:table/:id - Elimina un record
-  if (path.match(/^\/api\/admin\/data\/[^\/]+\/\d+$/) && request.method === 'DELETE') {
+  // Supporta sia id semplice (MOBS, VARIANTS, CATEGORIES) sia chiavi composite
+  // (MOB_CATEGORIES: "mobId_catId", VARIANT_CATEGORIES: "varId_catId")
+  if (path.match(/^\/api\/admin\/data\/[^\/]+\/[^\/]+$/) && request.method === 'DELETE') {
     const parts = path.split('/');
-    const id = parts.pop();
+    const rawId = parts.pop();
     const tableName = parts.pop();
 
     if (!isAllowedTable(tableName)) {
@@ -242,8 +328,29 @@ async function handleAdminAPI(request, env) {
     }
 
     try {
-      const query = `DELETE FROM ${tableName} WHERE id = ?`;
-      await env.DB.prepare(query).bind(id).run();
+      let query;
+      let bindParams;
+
+      if (tableName === 'MOB_CATEGORIES') {
+        const [mobId, categoryId] = rawId.split('_');
+        if (!mobId || !categoryId) {
+          return Response.json({ success: false, error: 'ID composito non valido per MOB_CATEGORIES' }, { status: 400 });
+        }
+        query = `DELETE FROM MOB_CATEGORIES WHERE mob_id = ? AND category_id = ?`;
+        bindParams = [mobId, categoryId];
+      } else if (tableName === 'VARIANT_CATEGORIES') {
+        const [variantId, categoryId] = rawId.split('_');
+        if (!variantId || !categoryId) {
+          return Response.json({ success: false, error: 'ID composito non valido per VARIANT_CATEGORIES' }, { status: 400 });
+        }
+        query = `DELETE FROM VARIANT_CATEGORIES WHERE variant_id = ? AND category_id = ?`;
+        bindParams = [variantId, categoryId];
+      } else {
+        query = `DELETE FROM ${tableName} WHERE id = ?`;
+        bindParams = [rawId];
+      }
+
+      await env.DB.prepare(query).bind(...bindParams).run();
 
       return Response.json({
         success: true

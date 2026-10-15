@@ -20,6 +20,8 @@ export const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
 
 export const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp']);
 
+export const DYEABLE_MOBS = new Set(['Sheep', 'Wolf', 'Cat', 'Llama', 'TraderLlama', 'HappyGhast']);
+
 const COLOR_HEX = {
   white: '#ffffff',
   red: '#ef4444',
@@ -329,11 +331,14 @@ export function buildImportPlan(images = scanImages()) {
 
   const mobs = [];
   const mobByName = new Map();
+  const mobWebPaths = new Set();
   for (const group of folderGroups.values()) {
     const baseName = group[0].baseName;
     const representative = [...group].sort((a, b) => sortByBasePreference(a, b, baseName))[0];
+    const resolvedName = resolveVariantName(representative, baseName);
     const mob = {
-      name: baseName,
+      name: resolvedName || baseName,
+      baseName,
       img: representative.webPath,
       sourceImage: representative.relativePath,
       folder: representative.folder,
@@ -342,6 +347,7 @@ export function buildImportPlan(images = scanImages()) {
     if (!mobByName.has(mob.name)) {
       mobByName.set(mob.name, mob);
       mobs.push(mob);
+      mobWebPaths.add(representative.webPath);
     }
   }
 
@@ -349,7 +355,7 @@ export function buildImportPlan(images = scanImages()) {
   for (const image of allImages) {
     const baseName = image.baseName;
     const isPlainBase = image.folder !== 'root' && image.normalizedName === baseName && !image.hasTechnicalSuffix && image.numericDepth === 0;
-    if (image.folder === 'root' || isPlainBase) continue;
+    if (image.folder === 'root' || isPlainBase || mobWebPaths.has(image.webPath)) continue;
 
     const variantName = resolveVariantName(image, baseName);
     variantCandidates.push({
@@ -601,7 +607,6 @@ export function buildRelationsPlan(images, plan, categoryPlan) {
 
     // 2. Colori — solo mob su cui si può usare un colorante:
     //    Sheep (lana), Wolf/Cat (collare), Llama/TraderLlama (tappeto), HappyGhast (sellino)
-    const DYEABLE_MOBS = new Set(['Sheep', 'Wolf', 'Cat', 'Llama', 'TraderLlama', 'HappyGhast']);
     if (DYEABLE_MOBS.has(baseName)) {
       const colors = ['White', 'LightGray', 'Gray', 'Black', 'Brown', 'Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Cyan', 'LightBlue', 'Blue', 'Purple', 'Magenta', 'Pink'];
       for (const col of colors) {

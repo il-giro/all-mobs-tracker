@@ -1,18 +1,18 @@
 {
-  "timestamp": "2026-10-14T16:35:25.939Z",
+  "timestamp": "2026-10-15T08:31:09.152Z",
   "note": "Anteprima locale: nessuna scrittura su D1 remoto è stata eseguita.",
   "summary": {
     "totalImages": 1018,
-    "mobsCount": 89,
-    "variantsCount": 980,
+    "mobsCount": 122,
+    "variantsCount": 929,
     "categoriesCount": 53,
     "staticCategoriesCount": 7,
     "dynamicCategoriesCount": 46,
-    "relationRowsPlanned": 1686,
-    "mobCategoriesPlanned": 222,
-    "variantCategoriesPlanned": 1464,
+    "relationRowsPlanned": 1523,
+    "mobCategoriesPlanned": 199,
+    "variantCategoriesPlanned": 1324,
     "folders": 64,
-    "syntheticMobs": 0,
+    "syntheticMobs": 33,
     "variantDuplicateGroups": 0,
     "physicalDuplicateGroups": 0
   },
@@ -559,6 +559,7 @@
   "mobs": [
     {
       "name": "Allay",
+      "baseName": "Allay",
       "img": "/data/Allay.gif",
       "sourceImage": "Allay.gif",
       "folder": "root",
@@ -566,6 +567,7 @@
     },
     {
       "name": "Armadillo",
+      "baseName": "Armadillo",
       "img": "/data/armadillo/1.1Armadillo.gif",
       "sourceImage": "armadillo/1.1Armadillo.gif",
       "folder": "armadillo",
@@ -573,6 +575,14 @@
     },
     {
       "name": "Axolotl",
+      "img": "/data/axolotl/5Axolotl-Blue.gif",
+      "sourceImage": "axolotl/5Axolotl-Blue.gif",
+      "folder": "axolotl",
+      "synthetic": true
+    },
+    {
+      "name": "Axolotl  Lucy",
+      "baseName": "Axolotl",
       "img": "/data/axolotl/1Axolotl-Lucy.gif",
       "sourceImage": "axolotl/1Axolotl-Lucy.gif",
       "folder": "axolotl",
@@ -580,6 +590,7 @@
     },
     {
       "name": "Bat",
+      "baseName": "Bat",
       "img": "/data/bat/1.1Bat.gif",
       "sourceImage": "bat/1.1Bat.gif",
       "folder": "bat",
@@ -587,6 +598,7 @@
     },
     {
       "name": "Bee",
+      "baseName": "Bee",
       "img": "/data/bee/1.1Bee.gif",
       "sourceImage": "bee/1.1Bee.gif",
       "folder": "bee",
@@ -594,6 +606,7 @@
     },
     {
       "name": "Blaze",
+      "baseName": "Blaze",
       "img": "/data/Blaze.gif",
       "sourceImage": "Blaze.gif",
       "folder": "root",
@@ -601,6 +614,7 @@
     },
     {
       "name": "Bogged",
+      "baseName": "Bogged",
       "img": "/data/bogged/1Bogged.gif",
       "sourceImage": "bogged/1Bogged.gif",
       "folder": "bogged",
@@ -608,6 +622,7 @@
     },
     {
       "name": "Breeze",
+      "baseName": "Breeze",
       "img": "/data/Breeze.gif",
       "sourceImage": "Breeze.gif",
       "folder": "root",
@@ -615,27 +630,45 @@
     },
     {
       "name": "Camel",
+      "baseName": "Camel",
       "img": "/data/camel/1.1Camel.gif",
       "sourceImage": "camel/1.1Camel.gif",
       "folder": "camel",
       "synthetic": false
     },
     {
-      "name": "CamelHusk",
+      "name": "Camel Husk",
+      "baseName": "CamelHusk",
       "img": "/data/camel husk/1.1CamelHusk.gif",
       "sourceImage": "camel husk/1.1CamelHusk.gif",
       "folder": "camel husk",
       "synthetic": false
     },
     {
+      "name": "CamelHusk",
+      "img": "/data/camel husk/3.1CamelHusk-Jockey_J.png",
+      "sourceImage": "camel husk/3.1CamelHusk-Jockey_J.png",
+      "folder": "camel husk",
+      "synthetic": true
+    },
+    {
       "name": "Cat",
+      "img": "/data/cat/11.2Cat-Black.png",
+      "sourceImage": "cat/11.2Cat-Black.png",
+      "folder": "cat",
+      "synthetic": true
+    },
+    {
+      "name": "Cat Tabby  Tamed",
+      "baseName": "Cat",
       "img": "/data/cat/1.1CatTabby-Tamed.png",
       "sourceImage": "cat/1.1CatTabby-Tamed.png",
       "folder": "cat",
       "synthetic": false
     },
     {
-      "name": "CaveSpider",
+      "name": "Cave Spider",
+      "baseName": "CaveSpider",
       "img": "/data/CaveSpider.png",
       "sourceImage": "CaveSpider.png",
       "folder": "root",
@@ -643,34 +676,67 @@
     },
     {
       "name": "Chicken",
+      "img": "/data/chicken/2Chicken-Cold.png",
+      "sourceImage": "chicken/2Chicken-Cold.png",
+      "folder": "chicken",
+      "synthetic": true
+    },
+    {
+      "name": "Chicken  Temperate",
+      "baseName": "Chicken",
       "img": "/data/chicken/1Chicken-Temperate.png",
       "sourceImage": "chicken/1Chicken-Temperate.png",
       "folder": "chicken",
       "synthetic": false
     },
     {
-      "name": "ChickenJockey",
+      "name": "Chicken Jockey  Temperate  Zombie (Baby Monster)",
+      "baseName": "ChickenJockey",
       "img": "/data/chicken jockey/1.2ChickenJockey-Temperate-Zombie_B.webp",
       "sourceImage": "chicken jockey/1.2ChickenJockey-Temperate-Zombie_B.webp",
       "folder": "chicken jockey",
       "synthetic": false
     },
     {
+      "name": "ChickenJockey",
+      "img": "/data/chicken jockey/3.4ChickenJockey-Cold-Drowned_B.webp",
+      "sourceImage": "chicken jockey/3.4ChickenJockey-Cold-Drowned_B.webp",
+      "folder": "chicken jockey",
+      "synthetic": true
+    },
+    {
       "name": "Cod",
+      "baseName": "Cod",
       "img": "/data/Cod.gif",
       "sourceImage": "Cod.gif",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "CopperGolem",
+      "name": "Copper Golem  Unoxidized",
+      "baseName": "CopperGolem",
       "img": "/data/copper golem/1.1CopperGolem-Unoxidized.gif",
       "sourceImage": "copper golem/1.1CopperGolem-Unoxidized.gif",
       "folder": "copper golem",
       "synthetic": false
     },
     {
+      "name": "CopperGolem",
+      "img": "/data/copper golem/2.1CopperGolem-Exposed.gif",
+      "sourceImage": "copper golem/2.1CopperGolem-Exposed.gif",
+      "folder": "copper golem",
+      "synthetic": true
+    },
+    {
       "name": "Cow",
+      "img": "/data/cow/2Cow-Cold.png",
+      "sourceImage": "cow/2Cow-Cold.png",
+      "folder": "cow",
+      "synthetic": true
+    },
+    {
+      "name": "Cow  Temperate",
+      "baseName": "Cow",
       "img": "/data/cow/1Cow-Temperate.png",
       "sourceImage": "cow/1Cow-Temperate.png",
       "folder": "cow",
@@ -678,6 +744,7 @@
     },
     {
       "name": "Creaking",
+      "baseName": "Creaking",
       "img": "/data/Creaking.gif",
       "sourceImage": "Creaking.gif",
       "folder": "root",
@@ -685,6 +752,7 @@
     },
     {
       "name": "Creeper",
+      "baseName": "Creeper",
       "img": "/data/creeper/1Creeper.png",
       "sourceImage": "creeper/1Creeper.png",
       "folder": "creeper",
@@ -692,6 +760,7 @@
     },
     {
       "name": "Dolphin",
+      "baseName": "Dolphin",
       "img": "/data/dolphin/Dolphin.gif",
       "sourceImage": "dolphin/Dolphin.gif",
       "folder": "dolphin",
@@ -699,6 +768,7 @@
     },
     {
       "name": "Donkey",
+      "baseName": "Donkey",
       "img": "/data/donkey/1Donkey.png",
       "sourceImage": "donkey/1Donkey.png",
       "folder": "donkey",
@@ -706,20 +776,23 @@
     },
     {
       "name": "Drowned",
+      "baseName": "Drowned",
       "img": "/data/drowned/1.1Drowned.png",
       "sourceImage": "drowned/1.1Drowned.png",
       "folder": "drowned",
       "synthetic": false
     },
     {
-      "name": "ElderGuardian",
+      "name": "Elder Guardian",
+      "baseName": "ElderGuardian",
       "img": "/data/ElderGuardian.gif",
       "sourceImage": "ElderGuardian.gif",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "EnderDragon",
+      "name": "Ender Dragon",
+      "baseName": "EnderDragon",
       "img": "/data/EnderDragon.gif",
       "sourceImage": "EnderDragon.gif",
       "folder": "root",
@@ -727,6 +800,7 @@
     },
     {
       "name": "Enderman",
+      "baseName": "Enderman",
       "img": "/data/enderman/1Enderman.png",
       "sourceImage": "enderman/1Enderman.png",
       "folder": "enderman",
@@ -734,6 +808,7 @@
     },
     {
       "name": "Endermite",
+      "baseName": "Endermite",
       "img": "/data/Endermite.gif",
       "sourceImage": "Endermite.gif",
       "folder": "root",
@@ -741,6 +816,7 @@
     },
     {
       "name": "Evoker",
+      "baseName": "Evoker",
       "img": "/data/evoker/1.1Evoker.png",
       "sourceImage": "evoker/1.1Evoker.png",
       "folder": "evoker",
@@ -748,6 +824,7 @@
     },
     {
       "name": "Fox",
+      "baseName": "Fox",
       "img": "/data/fox/1Fox.png",
       "sourceImage": "fox/1Fox.png",
       "folder": "fox",
@@ -755,6 +832,14 @@
     },
     {
       "name": "Frog",
+      "img": "/data/frog/3Frog-Cold.gif",
+      "sourceImage": "frog/3Frog-Cold.gif",
+      "folder": "frog",
+      "synthetic": true
+    },
+    {
+      "name": "Frog  Temperate",
+      "baseName": "Frog",
       "img": "/data/frog/1Frog-Temperate.gif",
       "sourceImage": "frog/1Frog-Temperate.gif",
       "folder": "frog",
@@ -762,6 +847,7 @@
     },
     {
       "name": "Frostbite",
+      "baseName": "Frostbite",
       "img": "/data/frostbite/Frostbite.webp",
       "sourceImage": "frostbite/Frostbite.webp",
       "folder": "frostbite",
@@ -769,20 +855,30 @@
     },
     {
       "name": "Ghast",
+      "baseName": "Ghast",
       "img": "/data/Ghast.gif",
       "sourceImage": "Ghast.gif",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "GlowSquid",
+      "name": "Glow Squid",
+      "baseName": "GlowSquid",
       "img": "/data/glow squid/GlowSquid.gif",
       "sourceImage": "glow squid/GlowSquid.gif",
       "folder": "glow squid",
       "synthetic": false
     },
     {
+      "name": "GlowSquid",
+      "img": "/data/glow squid/GlowSquid_C.png",
+      "sourceImage": "glow squid/GlowSquid_C.png",
+      "folder": "glow squid",
+      "synthetic": true
+    },
+    {
       "name": "Goat",
+      "baseName": "Goat",
       "img": "/data/goat/1.1Goat.png",
       "sourceImage": "goat/1.1Goat.png",
       "folder": "goat",
@@ -790,20 +886,30 @@
     },
     {
       "name": "Guardian",
+      "baseName": "Guardian",
       "img": "/data/Guardian.gif",
       "sourceImage": "Guardian.gif",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "HappyGhast",
+      "name": "Happy Ghast",
+      "baseName": "HappyGhast",
       "img": "/data/happy ghast/1.1.1HappyGhast.gif",
       "sourceImage": "happy ghast/1.1.1HappyGhast.gif",
       "folder": "happy ghast",
       "synthetic": false
     },
     {
+      "name": "HappyGhast",
+      "img": "/data/happy ghast/Ghastling_C.gif",
+      "sourceImage": "happy ghast/Ghastling_C.gif",
+      "folder": "happy ghast",
+      "synthetic": true
+    },
+    {
       "name": "Hoglin",
+      "baseName": "Hoglin",
       "img": "/data/hoglin/1.1Hoglin.gif",
       "sourceImage": "hoglin/1.1Hoglin.gif",
       "folder": "hoglin",
@@ -811,6 +917,14 @@
     },
     {
       "name": "Horse",
+      "img": "/data/horse/5.1.1.png",
+      "sourceImage": "horse/5.1.1.png",
+      "folder": "horse",
+      "synthetic": true
+    },
+    {
+      "name": "Horse White",
+      "baseName": "Horse",
       "img": "/data/horse/1.1.1.png",
       "sourceImage": "horse/1.1.1.png",
       "folder": "horse",
@@ -818,34 +932,67 @@
     },
     {
       "name": "Husk",
+      "baseName": "Husk",
       "img": "/data/husk/Husk.png",
       "sourceImage": "husk/Husk.png",
       "folder": "husk",
       "synthetic": false
     },
     {
-      "name": "IronGolem",
+      "name": "Iron Golem",
+      "baseName": "IronGolem",
       "img": "/data/iron golem/1IronGolem.png",
       "sourceImage": "iron golem/1IronGolem.png",
       "folder": "iron golem",
       "synthetic": false
     },
     {
+      "name": "IronGolem",
+      "img": "/data/iron golem/4IronGolemHigh.png",
+      "sourceImage": "iron golem/4IronGolemHigh.png",
+      "folder": "iron golem",
+      "synthetic": true
+    },
+    {
       "name": "Llama",
+      "img": "/data/llama/1.1.1Llama-Brown_A.png",
+      "sourceImage": "llama/1.1.1Llama-Brown_A.png",
+      "folder": "llama",
+      "synthetic": true
+    },
+    {
+      "name": "Llama Brown ()",
+      "baseName": "Llama",
       "img": "/data/llama/1.1.1Llama-Brown.png",
       "sourceImage": "llama/1.1.1Llama-Brown.png",
       "folder": "llama",
       "synthetic": false
     },
     {
-      "name": "MagmaCube",
+      "name": "Magma Cube  Medium",
+      "baseName": "MagmaCube",
       "img": "/data/magma cube/1MagmaCube-Medium.gif",
       "sourceImage": "magma cube/1MagmaCube-Medium.gif",
       "folder": "magma cube",
       "synthetic": false
     },
     {
+      "name": "MagmaCube",
+      "img": "/data/magma cube/3MagmaCube-Big.gif",
+      "sourceImage": "magma cube/3MagmaCube-Big.gif",
+      "folder": "magma cube",
+      "synthetic": true
+    },
+    {
       "name": "Mooshroom",
+      "img": "/data/mooshroom/2Mooshroom-Brown.png",
+      "sourceImage": "mooshroom/2Mooshroom-Brown.png",
+      "folder": "mooshroom",
+      "synthetic": true
+    },
+    {
+      "name": "Mooshroom  Red",
+      "baseName": "Mooshroom",
       "img": "/data/mooshroom/1Mooshroom-Red.png",
       "sourceImage": "mooshroom/1Mooshroom-Red.png",
       "folder": "mooshroom",
@@ -853,6 +1000,7 @@
     },
     {
       "name": "Mule",
+      "baseName": "Mule",
       "img": "/data/mule/1Mule.png",
       "sourceImage": "mule/1Mule.png",
       "folder": "mule",
@@ -860,6 +1008,7 @@
     },
     {
       "name": "Nautilus",
+      "baseName": "Nautilus",
       "img": "/data/nautilus/1.1Nautilus.gif",
       "sourceImage": "nautilus/1.1Nautilus.gif",
       "folder": "nautilus",
@@ -867,6 +1016,7 @@
     },
     {
       "name": "Ocelot",
+      "baseName": "Ocelot",
       "img": "/data/ocelot/Ocelot.png",
       "sourceImage": "ocelot/Ocelot.png",
       "folder": "ocelot",
@@ -874,6 +1024,7 @@
     },
     {
       "name": "Panda",
+      "baseName": "Panda",
       "img": "/data/panda/1Panda.png",
       "sourceImage": "panda/1Panda.png",
       "folder": "panda",
@@ -881,6 +1032,7 @@
     },
     {
       "name": "Parched",
+      "baseName": "Parched",
       "img": "/data/Parched.png",
       "sourceImage": "Parched.png",
       "folder": "root",
@@ -888,6 +1040,14 @@
     },
     {
       "name": "Parrot",
+      "img": "/data/parrot/2Parrot-Blue.png",
+      "sourceImage": "parrot/2Parrot-Blue.png",
+      "folder": "parrot",
+      "synthetic": true
+    },
+    {
+      "name": "Parrot  Red",
+      "baseName": "Parrot",
       "img": "/data/parrot/1Parrot-Red.png",
       "sourceImage": "parrot/1Parrot-Red.png",
       "folder": "parrot",
@@ -895,6 +1055,7 @@
     },
     {
       "name": "Phantom",
+      "baseName": "Phantom",
       "img": "/data/Phantom.gif",
       "sourceImage": "Phantom.gif",
       "folder": "root",
@@ -902,6 +1063,14 @@
     },
     {
       "name": "Pig",
+      "img": "/data/pig/2.1Pig-Cold.png",
+      "sourceImage": "pig/2.1Pig-Cold.png",
+      "folder": "pig",
+      "synthetic": true
+    },
+    {
+      "name": "Pig  Temperate",
+      "baseName": "Pig",
       "img": "/data/pig/1.1Pig-Temperate.png",
       "sourceImage": "pig/1.1Pig-Temperate.png",
       "folder": "pig",
@@ -909,13 +1078,22 @@
     },
     {
       "name": "Piglin",
+      "img": "/data/piglin/1.2Piglin-Crossbow.gif",
+      "sourceImage": "piglin/1.2Piglin-Crossbow.gif",
+      "folder": "piglin",
+      "synthetic": true
+    },
+    {
+      "name": "Piglin (Baby Monster)",
+      "baseName": "Piglin",
       "img": "/data/piglin/1.1Piglin_B.png",
       "sourceImage": "piglin/1.1Piglin_B.png",
       "folder": "piglin",
       "synthetic": false
     },
     {
-      "name": "PiglinBrute",
+      "name": "Piglin Brute",
+      "baseName": "PiglinBrute",
       "img": "/data/PiglinBrute.png",
       "sourceImage": "PiglinBrute.png",
       "folder": "root",
@@ -923,20 +1101,30 @@
     },
     {
       "name": "Pillager",
+      "baseName": "Pillager",
       "img": "/data/pillager/1.1Pillager.gif",
       "sourceImage": "pillager/1.1Pillager.gif",
       "folder": "pillager",
       "synthetic": false
     },
     {
-      "name": "PolarBear",
+      "name": "Polar Bear",
+      "baseName": "PolarBear",
       "img": "/data/polar bear/PolarBear.gif",
       "sourceImage": "polar bear/PolarBear.gif",
       "folder": "polar bear",
       "synthetic": false
     },
     {
+      "name": "PolarBear",
+      "img": "/data/polar bear/PolarBear_C.png",
+      "sourceImage": "polar bear/PolarBear_C.png",
+      "folder": "polar bear",
+      "synthetic": true
+    },
+    {
       "name": "Pufferfish",
+      "baseName": "Pufferfish",
       "img": "/data/Pufferfish.gif",
       "sourceImage": "Pufferfish.gif",
       "folder": "root",
@@ -944,6 +1132,14 @@
     },
     {
       "name": "Rabbit",
+      "img": "/data/rabbit/3Rabbit-Black.gif",
+      "sourceImage": "rabbit/3Rabbit-Black.gif",
+      "folder": "rabbit",
+      "synthetic": true
+    },
+    {
+      "name": "Rabbit  Brown",
+      "baseName": "Rabbit",
       "img": "/data/rabbit/1Rabbit-Brown.gif",
       "sourceImage": "rabbit/1Rabbit-Brown.gif",
       "folder": "rabbit",
@@ -951,6 +1147,7 @@
     },
     {
       "name": "Ravager",
+      "baseName": "Ravager",
       "img": "/data/ravager/1.1Ravager.png",
       "sourceImage": "ravager/1.1Ravager.png",
       "folder": "ravager",
@@ -958,6 +1155,14 @@
     },
     {
       "name": "Salmon",
+      "img": "/data/salmon/1.3Salmon-Large.gif",
+      "sourceImage": "salmon/1.3Salmon-Large.gif",
+      "folder": "salmon",
+      "synthetic": true
+    },
+    {
+      "name": "Salmon  Normal",
+      "baseName": "Salmon",
       "img": "/data/salmon/1.1Salmon-Normal.gif",
       "sourceImage": "salmon/1.1Salmon-Normal.gif",
       "folder": "salmon",
@@ -965,6 +1170,14 @@
     },
     {
       "name": "Sheep",
+      "img": "/data/sheep/1.1.4Sheep-Black.png",
+      "sourceImage": "sheep/1.1.4Sheep-Black.png",
+      "folder": "sheep",
+      "synthetic": true
+    },
+    {
+      "name": "Sheep White",
+      "baseName": "Sheep",
       "img": "/data/sheep/1.1.1Sheep-White.png",
       "sourceImage": "sheep/1.1.1Sheep-White.png",
       "folder": "sheep",
@@ -972,6 +1185,7 @@
     },
     {
       "name": "Shulker",
+      "baseName": "Shulker",
       "img": "/data/Shulker.webp",
       "sourceImage": "Shulker.webp",
       "folder": "root",
@@ -979,6 +1193,7 @@
     },
     {
       "name": "Silverfish",
+      "baseName": "Silverfish",
       "img": "/data/Silverfish.gif",
       "sourceImage": "Silverfish.gif",
       "folder": "root",
@@ -986,20 +1201,37 @@
     },
     {
       "name": "Skeleton",
+      "baseName": "Skeleton",
       "img": "/data/Skeleton.png",
       "sourceImage": "Skeleton.png",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "SkeletonHorse",
+      "name": "Skeleton Horse",
+      "baseName": "SkeletonHorse",
       "img": "/data/skeleton horse/1.1SkeletonHorse.png",
       "sourceImage": "skeleton horse/1.1SkeletonHorse.png",
       "folder": "skeleton horse",
       "synthetic": false
     },
     {
+      "name": "SkeletonHorse",
+      "img": "/data/skeleton horse/1.2SkeletonHorse-Saddled.png",
+      "sourceImage": "skeleton horse/1.2SkeletonHorse-Saddled.png",
+      "folder": "skeleton horse",
+      "synthetic": true
+    },
+    {
       "name": "Slime",
+      "img": "/data/slime/2Slime-Big.gif",
+      "sourceImage": "slime/2Slime-Big.gif",
+      "folder": "slime",
+      "synthetic": true
+    },
+    {
+      "name": "Slime  Semi large",
+      "baseName": "Slime",
       "img": "/data/slime/1Slime-Semi-large.gif",
       "sourceImage": "slime/1Slime-Semi-large.gif",
       "folder": "slime",
@@ -1007,20 +1239,30 @@
     },
     {
       "name": "Sniffer",
+      "baseName": "Sniffer",
       "img": "/data/sniffer/Sniffer.gif",
       "sourceImage": "sniffer/Sniffer.gif",
       "folder": "sniffer",
       "synthetic": false
     },
     {
-      "name": "SnowGolem",
+      "name": "Snow Golem",
+      "baseName": "SnowGolem",
       "img": "/data/snow golem/1SnowGolem.png",
       "sourceImage": "snow golem/1SnowGolem.png",
       "folder": "snow golem",
       "synthetic": false
     },
     {
+      "name": "SnowGolem",
+      "img": "/data/snow golem/2SnowGolem-Sheared.png",
+      "sourceImage": "snow golem/2SnowGolem-Sheared.png",
+      "folder": "snow golem",
+      "synthetic": true
+    },
+    {
       "name": "Spider",
+      "baseName": "Spider",
       "img": "/data/spider/1.1Spider.png",
       "sourceImage": "spider/1.1Spider.png",
       "folder": "spider",
@@ -1028,6 +1270,7 @@
     },
     {
       "name": "Squid",
+      "baseName": "Squid",
       "img": "/data/squid/Squid.gif",
       "sourceImage": "squid/Squid.gif",
       "folder": "squid",
@@ -1035,6 +1278,7 @@
     },
     {
       "name": "Stray",
+      "baseName": "Stray",
       "img": "/data/Stray.png",
       "sourceImage": "Stray.png",
       "folder": "root",
@@ -1042,13 +1286,15 @@
     },
     {
       "name": "Strider",
+      "baseName": "Strider",
       "img": "/data/strider/1.1Strider.gif",
       "sourceImage": "strider/1.1Strider.gif",
       "folder": "strider",
       "synthetic": false
     },
     {
-      "name": "SulfurCube",
+      "name": "Sulfur Cube",
+      "baseName": "SulfurCube",
       "img": "/data/SulfurCube.png",
       "sourceImage": "SulfurCube.png",
       "folder": "root",
@@ -1056,27 +1302,38 @@
     },
     {
       "name": "Tadpole",
+      "baseName": "Tadpole",
       "img": "/data/Tadpole.gif",
       "sourceImage": "Tadpole.gif",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "TraderLlama",
+      "name": "Trader Llama  Brown",
+      "baseName": "TraderLlama",
       "img": "/data/trader llama/1.1TraderLlama-Brown.png",
       "sourceImage": "trader llama/1.1TraderLlama-Brown.png",
       "folder": "trader llama",
       "synthetic": false
     },
     {
+      "name": "TraderLlama",
+      "img": "/data/trader llama/1.1TraderLlama-Brown_A.png",
+      "sourceImage": "trader llama/1.1TraderLlama-Brown_A.png",
+      "folder": "trader llama",
+      "synthetic": true
+    },
+    {
       "name": "Turtle",
+      "baseName": "Turtle",
       "img": "/data/turtle/Turtle.png",
       "sourceImage": "turtle/Turtle.png",
       "folder": "turtle",
       "synthetic": false
     },
     {
-      "name": "Vex",
+      "name": "Vex (Untrapable)",
+      "baseName": "Vex",
       "img": "/data/Vex_F.gif",
       "sourceImage": "Vex_F.gif",
       "folder": "root",
@@ -1084,6 +1341,14 @@
     },
     {
       "name": "Villager",
+      "img": "/data/villager/Villager-Desert_CF.png",
+      "sourceImage": "villager/Villager-Desert_CF.png",
+      "folder": "villager",
+      "synthetic": true
+    },
+    {
+      "name": "Villager  Snowy (Baby Animal, Untrapable)",
+      "baseName": "Villager",
       "img": "/data/villager/Villager-Snowy_CF.png",
       "sourceImage": "villager/Villager-Snowy_CF.png",
       "folder": "villager",
@@ -1091,13 +1356,15 @@
     },
     {
       "name": "Vindicator",
+      "baseName": "Vindicator",
       "img": "/data/vindicator/1.1Vindicator.png",
       "sourceImage": "vindicator/1.1Vindicator.png",
       "folder": "vindicator",
       "synthetic": false
     },
     {
-      "name": "WanderingTrader",
+      "name": "Wandering Trader (Untrapable)",
+      "baseName": "WanderingTrader",
       "img": "/data/WanderingTrader_F.png",
       "sourceImage": "WanderingTrader_F.png",
       "folder": "root",
@@ -1105,6 +1372,7 @@
     },
     {
       "name": "Warden",
+      "baseName": "Warden",
       "img": "/data/Warden.gif",
       "sourceImage": "Warden.gif",
       "folder": "root",
@@ -1112,6 +1380,7 @@
     },
     {
       "name": "Witch",
+      "baseName": "Witch",
       "img": "/data/Witch.png",
       "sourceImage": "Witch.png",
       "folder": "root",
@@ -1119,20 +1388,37 @@
     },
     {
       "name": "Wither",
+      "baseName": "Wither",
       "img": "/data/Wither.png",
       "sourceImage": "Wither.png",
       "folder": "root",
       "synthetic": false
     },
     {
-      "name": "WitherSkeleton",
+      "name": "Wither Skeleton",
+      "baseName": "WitherSkeleton",
       "img": "/data/WitherSkeleton.png",
       "sourceImage": "WitherSkeleton.png",
       "folder": "root",
       "synthetic": false
     },
     {
+      "name": "WitherSkeleton",
+      "img": "/data/special/pumpkin/1.2WitherSkeleton_P.png",
+      "sourceImage": "special/pumpkin/1.2WitherSkeleton_P.png",
+      "folder": "special:pumpkin",
+      "synthetic": true
+    },
+    {
       "name": "Wolf",
+      "img": "/data/wolf/2.1.1.png",
+      "sourceImage": "wolf/2.1.1.png",
+      "folder": "wolf",
+      "synthetic": true
+    },
+    {
+      "name": "Wolf Pale",
+      "baseName": "Wolf",
       "img": "/data/wolf/1.1.1.png",
       "sourceImage": "wolf/1.1.1.png",
       "folder": "wolf",
@@ -1140,6 +1426,7 @@
     },
     {
       "name": "Zoglin",
+      "baseName": "Zoglin",
       "img": "/data/zoglin/Zoglin.png",
       "sourceImage": "zoglin/Zoglin.png",
       "folder": "zoglin",
@@ -1147,53 +1434,74 @@
     },
     {
       "name": "Zombie",
+      "baseName": "Zombie",
       "img": "/data/zombie/Zombie.png",
       "sourceImage": "zombie/Zombie.png",
       "folder": "zombie",
       "synthetic": false
     },
     {
-      "name": "ZombieHorse",
+      "name": "Zombie Horse man (Jockey)",
+      "baseName": "ZombieHorse",
       "img": "/data/zombie horse/ZombieHorse-man_J.png",
       "sourceImage": "zombie horse/ZombieHorse-man_J.png",
       "folder": "zombie horse",
       "synthetic": false
     },
     {
-      "name": "ZombieNautilus",
+      "name": "Zombie Nautilus",
+      "baseName": "ZombieNautilus",
       "img": "/data/zombie nautilus/1.1ZombieNautilus.gif",
       "sourceImage": "zombie nautilus/1.1ZombieNautilus.gif",
       "folder": "zombie nautilus",
       "synthetic": false
     },
     {
-      "name": "ZombieVillager",
+      "name": "Zombie Villager Plains Unemployed",
+      "baseName": "ZombieVillager",
       "img": "/data/zombie villager/1.1.png",
       "sourceImage": "zombie villager/1.1.png",
       "folder": "zombie villager",
       "synthetic": false
     },
     {
-      "name": "ZombifiedPiglin",
+      "name": "ZombieHorse",
+      "img": "/data/zombie horse/1.1.png",
+      "sourceImage": "zombie horse/1.1.png",
+      "folder": "zombie horse",
+      "synthetic": true
+    },
+    {
+      "name": "ZombieNautilus",
+      "img": "/data/zombie nautilus/1.2ZombieNautilus-Copper.png",
+      "sourceImage": "zombie nautilus/1.2ZombieNautilus-Copper.png",
+      "folder": "zombie nautilus",
+      "synthetic": true
+    },
+    {
+      "name": "ZombieVillager",
+      "img": "/data/special/pumpkin/1.2ZombieVillager_P.png",
+      "sourceImage": "special/pumpkin/1.2ZombieVillager_P.png",
+      "folder": "special:pumpkin",
+      "synthetic": true
+    },
+    {
+      "name": "Zombified Piglin",
+      "baseName": "ZombifiedPiglin",
       "img": "/data/zombified piglin/1.1ZombifiedPiglin.png",
       "sourceImage": "zombified piglin/1.1ZombifiedPiglin.png",
       "folder": "zombified piglin",
       "synthetic": false
+    },
+    {
+      "name": "ZombifiedPiglin",
+      "img": "/data/zombified piglin/1.3ZombifiedPiglin-Axe.gif",
+      "sourceImage": "zombified piglin/1.3ZombifiedPiglin-Axe.gif",
+      "folder": "zombified piglin",
+      "synthetic": true
     }
   ],
   "variants": [
-    {
-      "name": "Armadillo",
-      "img": "/data/armadillo/1.1Armadillo.gif",
-      "baseName": "Armadillo",
-      "sourceImage": "armadillo/1.1Armadillo.gif",
-      "folder": "armadillo",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
     {
       "name": "Armadillo  Rolled Up",
       "img": "/data/armadillo/2.2Armadillo-RolledUp.gif",
@@ -1313,18 +1621,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Axolotl  Lucy",
-      "img": "/data/axolotl/1Axolotl-Lucy.gif",
-      "baseName": "Axolotl",
-      "sourceImage": "axolotl/1Axolotl-Lucy.gif",
-      "folder": "axolotl",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Axolotl  Lucy (Baby)",
       "img": "/data/axolotl/1Axolotl-Lucy_A.gif",
       "baseName": "Axolotl",
@@ -1365,36 +1661,12 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Bat",
-      "img": "/data/bat/1.1Bat.gif",
-      "baseName": "Bat",
-      "sourceImage": "bat/1.1Bat.gif",
-      "folder": "bat",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Bat  Hang",
       "img": "/data/bat/2.2Bat-Hang.png",
       "baseName": "Bat",
       "sourceImage": "bat/2.2Bat-Hang.png",
       "folder": "bat",
       "numericCode": "2.2",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Bee",
-      "img": "/data/bee/1.1Bee.gif",
-      "baseName": "Bee",
-      "sourceImage": "bee/1.1Bee.gif",
-      "folder": "bee",
-      "numericCode": "1.1",
       "parsedType": "complex_variant",
       "complexId": null,
       "suffixLetters": [],
@@ -1441,18 +1713,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Bogged",
-      "img": "/data/bogged/1Bogged.gif",
-      "baseName": "Bogged",
-      "sourceImage": "bogged/1Bogged.gif",
-      "folder": "bogged",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Bogged  Sheared",
       "img": "/data/bogged/2Bogged-Sheared.png",
       "baseName": "Bogged",
@@ -1460,18 +1720,6 @@
       "folder": "bogged",
       "numericCode": "2",
       "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Camel",
-      "img": "/data/camel/1.1Camel.gif",
-      "baseName": "Camel",
-      "sourceImage": "camel/1.1Camel.gif",
-      "folder": "camel",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
       "complexId": null,
       "suffixLetters": [],
       "hasTechnicalSuffix": false
@@ -1539,18 +1787,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Camel Husk",
-      "img": "/data/camel husk/1.1CamelHusk.gif",
-      "baseName": "CamelHusk",
-      "sourceImage": "camel husk/1.1CamelHusk.gif",
-      "folder": "camel husk",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Camel Husk  Jockey",
@@ -2177,18 +2413,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Cat Tabby  Tamed",
-      "img": "/data/cat/1.1CatTabby-Tamed.png",
-      "baseName": "Cat",
-      "sourceImage": "cat/1.1CatTabby-Tamed.png",
-      "folder": "cat",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Cat Tabby  Tamed (Baby, Texture Error)",
       "img": "/data/cat/1.1CatTabby-Tamed_AT.png",
       "baseName": "Cat",
@@ -2242,18 +2466,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Chicken  Temperate",
-      "img": "/data/chicken/1Chicken-Temperate.png",
-      "baseName": "Chicken",
-      "sourceImage": "chicken/1Chicken-Temperate.png",
-      "folder": "chicken",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Chicken  Temperate (Baby)",
@@ -2414,20 +2626,6 @@
       "sourceImage": "chicken jockey/1.3ChickenJockey-Temperate-Husk_B.webp",
       "folder": "chicken jockey",
       "numericCode": "1.3",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [
-        "B"
-      ],
-      "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Chicken Jockey  Temperate  Zombie (Baby Monster)",
-      "img": "/data/chicken jockey/1.2ChickenJockey-Temperate-Zombie_B.webp",
-      "baseName": "ChickenJockey",
-      "sourceImage": "chicken jockey/1.2ChickenJockey-Temperate-Zombie_B.webp",
-      "folder": "chicken jockey",
-      "numericCode": "1.2",
       "parsedType": "complex_variant",
       "complexId": null,
       "suffixLetters": [
@@ -2626,18 +2824,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Copper Golem  Unoxidized",
-      "img": "/data/copper golem/1.1CopperGolem-Unoxidized.gif",
-      "baseName": "CopperGolem",
-      "sourceImage": "copper golem/1.1CopperGolem-Unoxidized.gif",
-      "folder": "copper golem",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Copper Golem  Unoxidized  Poppy",
       "img": "/data/copper golem/1.2CopperGolem-Unoxidized-Poppy.png",
       "baseName": "CopperGolem",
@@ -2700,18 +2886,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Cow  Temperate",
-      "img": "/data/cow/1Cow-Temperate.png",
-      "baseName": "Cow",
-      "sourceImage": "cow/1Cow-Temperate.png",
-      "folder": "cow",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Cow  Temperate (Baby)",
       "img": "/data/cow/1Cow-Temperate_A.png",
       "baseName": "Cow",
@@ -2752,18 +2926,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Creeper",
-      "img": "/data/creeper/1Creeper.png",
-      "baseName": "Creeper",
-      "sourceImage": "creeper/1Creeper.png",
-      "folder": "creeper",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Creeper  Charged",
       "img": "/data/creeper/2Creeper-Charged.webp",
       "baseName": "Creeper",
@@ -2788,18 +2950,6 @@
         "C"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Donkey",
-      "img": "/data/donkey/1Donkey.png",
-      "baseName": "Donkey",
-      "sourceImage": "donkey/1Donkey.png",
-      "folder": "donkey",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Donkey  Chested",
@@ -2850,18 +3000,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Drowned",
-      "img": "/data/drowned/1.1Drowned.png",
-      "baseName": "Drowned",
-      "sourceImage": "drowned/1.1Drowned.png",
-      "folder": "drowned",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Drowned  Fishing Rod",
@@ -2984,18 +3122,6 @@
         "P"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Enderman",
-      "img": "/data/enderman/1Enderman.png",
-      "baseName": "Enderman",
-      "sourceImage": "enderman/1Enderman.png",
-      "folder": "enderman",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Enderman  Holding  Cactus",
@@ -3618,18 +3744,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Evoker",
-      "img": "/data/evoker/1.1Evoker.png",
-      "baseName": "Evoker",
-      "sourceImage": "evoker/1.1Evoker.png",
-      "folder": "evoker",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Evoker  Banner",
       "img": "/data/evoker/1.2Evoker-Banner.png",
       "baseName": "Evoker",
@@ -3637,18 +3751,6 @@
       "folder": "evoker",
       "numericCode": "1.2",
       "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Fox",
-      "img": "/data/fox/1Fox.png",
-      "baseName": "Fox",
-      "sourceImage": "fox/1Fox.png",
-      "folder": "fox",
-      "numericCode": "1",
-      "parsedType": "main_variant",
       "complexId": null,
       "suffixLetters": [],
       "hasTechnicalSuffix": false
@@ -3706,18 +3808,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Frog  Temperate",
-      "img": "/data/frog/1Frog-Temperate.gif",
-      "baseName": "Frog",
-      "sourceImage": "frog/1Frog-Temperate.gif",
-      "folder": "frog",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Frog  Warm",
       "img": "/data/frog/2Frog-Warm.gif",
       "baseName": "Frog",
@@ -3756,18 +3846,6 @@
         "C"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Goat",
-      "img": "/data/goat/1.1Goat.png",
-      "baseName": "Goat",
-      "sourceImage": "goat/1.1Goat.png",
-      "folder": "goat",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Goat  Left",
@@ -3894,18 +3972,6 @@
         "C"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Happy Ghast",
-      "img": "/data/happy ghast/1.1.1HappyGhast.gif",
-      "baseName": "HappyGhast",
-      "sourceImage": "happy ghast/1.1.1HappyGhast.gif",
-      "folder": "happy ghast",
-      "numericCode": "1.1.1",
-      "parsedType": "color_variant",
-      "complexId": "happy ghast",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Happy Ghast Harnessed Black",
@@ -4108,18 +4174,6 @@
       "numericCode": "1.3.16",
       "parsedType": "color_variant",
       "complexId": "happy ghast",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Hoglin",
-      "img": "/data/hoglin/1.1Hoglin.gif",
-      "baseName": "Hoglin",
-      "sourceImage": "hoglin/1.1Hoglin.gif",
-      "folder": "hoglin",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
       "suffixLetters": [],
       "hasTechnicalSuffix": false
     },
@@ -5103,18 +5157,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Horse White",
-      "img": "/data/horse/1.1.1.png",
-      "baseName": "Horse",
-      "sourceImage": "horse/1.1.1.png",
-      "folder": "horse",
-      "numericCode": "1.1.1",
-      "parsedType": "color_variant",
-      "complexId": "horse",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Horse White (Baby)",
       "img": "/data/horse/1.1.1_A.png",
       "baseName": "Horse",
@@ -5329,18 +5371,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Iron Golem",
-      "img": "/data/iron golem/1IronGolem.png",
-      "baseName": "IronGolem",
-      "sourceImage": "iron golem/1IronGolem.png",
-      "folder": "iron golem",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Iron Golem High",
       "img": "/data/iron golem/4IronGolemHigh.png",
       "baseName": "IronGolem",
@@ -5373,18 +5403,6 @@
       "numericCode": "3",
       "parsedType": "main_variant",
       "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Llama Brown ()",
-      "img": "/data/llama/1.1.1Llama-Brown.png",
-      "baseName": "Llama",
-      "sourceImage": "llama/1.1.1Llama-Brown.png",
-      "folder": "llama",
-      "numericCode": "1.1.1",
-      "parsedType": "color_variant",
-      "complexId": "llama",
       "suffixLetters": [],
       "hasTechnicalSuffix": false
     },
@@ -7077,18 +7095,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Magma Cube  Medium",
-      "img": "/data/magma cube/1MagmaCube-Medium.gif",
-      "baseName": "MagmaCube",
-      "sourceImage": "magma cube/1MagmaCube-Medium.gif",
-      "folder": "magma cube",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Magma Cube  Small",
       "img": "/data/magma cube/2MagmaCube-Small.gif",
       "baseName": "MagmaCube",
@@ -7127,18 +7133,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Mooshroom  Red",
-      "img": "/data/mooshroom/1Mooshroom-Red.png",
-      "baseName": "Mooshroom",
-      "sourceImage": "mooshroom/1Mooshroom-Red.png",
-      "folder": "mooshroom",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Mooshroom  Red (Baby)",
       "img": "/data/mooshroom/1Mooshroom-Red_A.png",
       "baseName": "Mooshroom",
@@ -7151,18 +7145,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Mule",
-      "img": "/data/mule/1Mule.png",
-      "baseName": "Mule",
-      "sourceImage": "mule/1Mule.png",
-      "folder": "mule",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Mule  Chested",
@@ -7213,18 +7195,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Nautilus",
-      "img": "/data/nautilus/1.1Nautilus.gif",
-      "baseName": "Nautilus",
-      "sourceImage": "nautilus/1.1Nautilus.gif",
-      "folder": "nautilus",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": "nautilus",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Nautilus  Copper",
@@ -7385,18 +7355,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Panda",
-      "img": "/data/panda/1Panda.png",
-      "baseName": "Panda",
-      "sourceImage": "panda/1Panda.png",
-      "folder": "panda",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Panda  Aggressive",
@@ -7617,18 +7575,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Parrot  Red",
-      "img": "/data/parrot/1Parrot-Red.png",
-      "baseName": "Parrot",
-      "sourceImage": "parrot/1Parrot-Red.png",
-      "folder": "parrot",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Pig  Cold",
       "img": "/data/pig/2.1Pig-Cold.png",
       "baseName": "Pig",
@@ -7665,18 +7611,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Pig  Temperate",
-      "img": "/data/pig/1.1Pig-Temperate.png",
-      "baseName": "Pig",
-      "sourceImage": "pig/1.1Pig-Temperate.png",
-      "folder": "pig",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Pig  Temperate  Saddle",
@@ -7779,32 +7713,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Piglin (Baby Monster)",
-      "img": "/data/piglin/1.1Piglin_B.png",
-      "baseName": "Piglin",
-      "sourceImage": "piglin/1.1Piglin_B.png",
-      "folder": "piglin",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [
-        "B"
-      ],
-      "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Pillager",
-      "img": "/data/pillager/1.1Pillager.gif",
-      "baseName": "Pillager",
-      "sourceImage": "pillager/1.1Pillager.gif",
-      "folder": "pillager",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Pillager  Banner",
       "img": "/data/pillager/1.3Pillager-Banner.png",
       "baseName": "Pillager",
@@ -7881,18 +7789,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Rabbit  Brown",
-      "img": "/data/rabbit/1Rabbit-Brown.gif",
-      "baseName": "Rabbit",
-      "sourceImage": "rabbit/1Rabbit-Brown.gif",
-      "folder": "rabbit",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Rabbit  Brown (Baby)",
@@ -8068,18 +7964,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Ravager",
-      "img": "/data/ravager/1.1Ravager.png",
-      "baseName": "Ravager",
-      "sourceImage": "ravager/1.1Ravager.png",
-      "folder": "ravager",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Ravager  Jockey( Evoker)",
       "img": "/data/ravager/4.1Ravager-Jockey(Evoker)_J.png",
       "baseName": "Ravager",
@@ -8170,18 +8054,6 @@
       "sourceImage": "salmon/1.3Salmon-Large.gif",
       "folder": "salmon",
       "numericCode": "1.3",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Salmon  Normal",
-      "img": "/data/salmon/1.1Salmon-Normal.gif",
-      "baseName": "Salmon",
-      "sourceImage": "salmon/1.1Salmon-Normal.gif",
-      "folder": "salmon",
-      "numericCode": "1.1",
       "parsedType": "complex_variant",
       "complexId": null,
       "suffixLetters": [],
@@ -8770,18 +8642,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Sheep White",
-      "img": "/data/sheep/1.1.1Sheep-White.png",
-      "baseName": "Sheep",
-      "sourceImage": "sheep/1.1.1Sheep-White.png",
-      "folder": "sheep",
-      "numericCode": "1.1.1",
-      "parsedType": "color_variant",
-      "complexId": "sheep",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Sheep White (Baby)",
       "img": "/data/sheep/1.1.1Sheep-White_A.png",
       "baseName": "Sheep",
@@ -8874,18 +8734,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Skeleton Horse",
-      "img": "/data/skeleton horse/1.1SkeletonHorse.png",
-      "baseName": "SkeletonHorse",
-      "sourceImage": "skeleton horse/1.1SkeletonHorse.png",
-      "folder": "skeleton horse",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Skeleton Horse  Saddled",
       "img": "/data/skeleton horse/1.2SkeletonHorse-Saddled.png",
       "baseName": "SkeletonHorse",
@@ -8965,18 +8813,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Slime  Semi large",
-      "img": "/data/slime/1Slime-Semi-large.gif",
-      "baseName": "Slime",
-      "sourceImage": "slime/1Slime-Semi-large.gif",
-      "folder": "slime",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Slime  Small",
       "img": "/data/slime/3Slime-Small.gif",
       "baseName": "Slime",
@@ -9003,18 +8839,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Snow Golem",
-      "img": "/data/snow golem/1SnowGolem.png",
-      "baseName": "SnowGolem",
-      "sourceImage": "snow golem/1SnowGolem.png",
-      "folder": "snow golem",
-      "numericCode": "1",
-      "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Snow Golem  Sheared",
       "img": "/data/snow golem/2SnowGolem-Sheared.png",
       "baseName": "SnowGolem",
@@ -9022,18 +8846,6 @@
       "folder": "snow golem",
       "numericCode": "2",
       "parsedType": "main_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Spider",
-      "img": "/data/spider/1.1Spider.png",
-      "baseName": "Spider",
-      "sourceImage": "spider/1.1Spider.png",
-      "folder": "spider",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
       "complexId": null,
       "suffixLetters": [],
       "hasTechnicalSuffix": false
@@ -9232,18 +9044,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Strider",
-      "img": "/data/strider/1.1Strider.gif",
-      "baseName": "Strider",
-      "sourceImage": "strider/1.1Strider.gif",
-      "folder": "strider",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Strider  Saddled",
       "img": "/data/strider/1.2Strider-Saddled.gif",
       "baseName": "Strider",
@@ -9428,18 +9228,6 @@
       "hasTechnicalSuffix": true
     },
     {
-      "name": "Trader Llama  Brown",
-      "img": "/data/trader llama/1.1TraderLlama-Brown.png",
-      "baseName": "TraderLlama",
-      "sourceImage": "trader llama/1.1TraderLlama-Brown.png",
-      "folder": "trader llama",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Trader Llama  Brown (Baby)",
       "img": "/data/trader llama/1.1TraderLlama-Brown_A.png",
       "baseName": "TraderLlama",
@@ -9595,21 +9383,6 @@
       "img": "/data/villager/Villager-Savanna_CF.png",
       "baseName": "Villager",
       "sourceImage": "villager/Villager-Savanna_CF.png",
-      "folder": "villager",
-      "numericCode": null,
-      "parsedType": "base",
-      "complexId": null,
-      "suffixLetters": [
-        "C",
-        "F"
-      ],
-      "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Villager  Snowy (Baby Animal, Untrapable)",
-      "img": "/data/villager/Villager-Snowy_CF.png",
-      "baseName": "Villager",
-      "sourceImage": "villager/Villager-Snowy_CF.png",
       "folder": "villager",
       "numericCode": null,
       "parsedType": "base",
@@ -10911,18 +10684,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Vindicator",
-      "img": "/data/vindicator/1.1Vindicator.png",
-      "baseName": "Vindicator",
-      "sourceImage": "vindicator/1.1Vindicator.png",
-      "folder": "vindicator",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Vindicator  Banner",
       "img": "/data/vindicator/1.2Vindicator-Banner.png",
       "baseName": "Vindicator",
@@ -11177,18 +10938,6 @@
         "A"
       ],
       "hasTechnicalSuffix": true
-    },
-    {
-      "name": "Wolf Pale",
-      "img": "/data/wolf/1.1.1.png",
-      "baseName": "Wolf",
-      "sourceImage": "wolf/1.1.1.png",
-      "folder": "wolf",
-      "numericCode": "1.1.1",
-      "parsedType": "color_variant",
-      "complexId": "wolf",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
     },
     {
       "name": "Wolf Pale  with Armor (Red)",
@@ -11724,20 +11473,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Zombie Horse man (Jockey)",
-      "img": "/data/zombie horse/ZombieHorse-man_J.png",
-      "baseName": "ZombieHorse",
-      "sourceImage": "zombie horse/ZombieHorse-man_J.png",
-      "folder": "zombie horse",
-      "numericCode": null,
-      "parsedType": "base",
-      "complexId": null,
-      "suffixLetters": [
-        "J"
-      ],
-      "hasTechnicalSuffix": true
-    },
-    {
       "name": "Zombie Horse Netherite Armor",
       "img": "/data/zombie horse/1.7.png",
       "baseName": "ZombieHorse",
@@ -11758,18 +11493,6 @@
       "numericCode": "1.2",
       "parsedType": "color_variant",
       "complexId": "zombie horse",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
-      "name": "Zombie Nautilus",
-      "img": "/data/zombie nautilus/1.1ZombieNautilus.gif",
-      "baseName": "ZombieNautilus",
-      "sourceImage": "zombie nautilus/1.1ZombieNautilus.gif",
-      "folder": "zombie nautilus",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
       "suffixLetters": [],
       "hasTechnicalSuffix": false
     },
@@ -12680,18 +12403,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Zombie Villager Plains Unemployed",
-      "img": "/data/zombie villager/1.1.png",
-      "baseName": "ZombieVillager",
-      "sourceImage": "zombie villager/1.1.png",
-      "folder": "zombie villager",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": "zombie villager",
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Zombie Villager Plains Unemployed (Baby Monster)",
       "img": "/data/zombie villager/1.1_B.png",
       "baseName": "ZombieVillager",
@@ -13494,18 +13205,6 @@
       "hasTechnicalSuffix": false
     },
     {
-      "name": "Zombified Piglin",
-      "img": "/data/zombified piglin/1.1ZombifiedPiglin.png",
-      "baseName": "ZombifiedPiglin",
-      "sourceImage": "zombified piglin/1.1ZombifiedPiglin.png",
-      "folder": "zombified piglin",
-      "numericCode": "1.1",
-      "parsedType": "complex_variant",
-      "complexId": null,
-      "suffixLetters": [],
-      "hasTechnicalSuffix": false
-    },
-    {
       "name": "Zombified Piglin  Axe",
       "img": "/data/zombified piglin/1.3ZombifiedPiglin-Axe.gif",
       "baseName": "ZombifiedPiglin",
@@ -13608,7 +13307,239 @@
     "duplicateCategories": [],
     "duplicateVariantGroups": [],
     "duplicatePhysicalNameGroups": [],
-    "syntheticMobs": [],
+    "syntheticMobs": [
+      {
+        "name": "Axolotl",
+        "img": "/data/axolotl/5Axolotl-Blue.gif",
+        "sourceImage": "axolotl/5Axolotl-Blue.gif",
+        "folder": "axolotl",
+        "synthetic": true
+      },
+      {
+        "name": "CamelHusk",
+        "img": "/data/camel husk/3.1CamelHusk-Jockey_J.png",
+        "sourceImage": "camel husk/3.1CamelHusk-Jockey_J.png",
+        "folder": "camel husk",
+        "synthetic": true
+      },
+      {
+        "name": "Cat",
+        "img": "/data/cat/11.2Cat-Black.png",
+        "sourceImage": "cat/11.2Cat-Black.png",
+        "folder": "cat",
+        "synthetic": true
+      },
+      {
+        "name": "Chicken",
+        "img": "/data/chicken/2Chicken-Cold.png",
+        "sourceImage": "chicken/2Chicken-Cold.png",
+        "folder": "chicken",
+        "synthetic": true
+      },
+      {
+        "name": "ChickenJockey",
+        "img": "/data/chicken jockey/3.4ChickenJockey-Cold-Drowned_B.webp",
+        "sourceImage": "chicken jockey/3.4ChickenJockey-Cold-Drowned_B.webp",
+        "folder": "chicken jockey",
+        "synthetic": true
+      },
+      {
+        "name": "CopperGolem",
+        "img": "/data/copper golem/2.1CopperGolem-Exposed.gif",
+        "sourceImage": "copper golem/2.1CopperGolem-Exposed.gif",
+        "folder": "copper golem",
+        "synthetic": true
+      },
+      {
+        "name": "Cow",
+        "img": "/data/cow/2Cow-Cold.png",
+        "sourceImage": "cow/2Cow-Cold.png",
+        "folder": "cow",
+        "synthetic": true
+      },
+      {
+        "name": "Frog",
+        "img": "/data/frog/3Frog-Cold.gif",
+        "sourceImage": "frog/3Frog-Cold.gif",
+        "folder": "frog",
+        "synthetic": true
+      },
+      {
+        "name": "GlowSquid",
+        "img": "/data/glow squid/GlowSquid_C.png",
+        "sourceImage": "glow squid/GlowSquid_C.png",
+        "folder": "glow squid",
+        "synthetic": true
+      },
+      {
+        "name": "HappyGhast",
+        "img": "/data/happy ghast/Ghastling_C.gif",
+        "sourceImage": "happy ghast/Ghastling_C.gif",
+        "folder": "happy ghast",
+        "synthetic": true
+      },
+      {
+        "name": "Horse",
+        "img": "/data/horse/5.1.1.png",
+        "sourceImage": "horse/5.1.1.png",
+        "folder": "horse",
+        "synthetic": true
+      },
+      {
+        "name": "IronGolem",
+        "img": "/data/iron golem/4IronGolemHigh.png",
+        "sourceImage": "iron golem/4IronGolemHigh.png",
+        "folder": "iron golem",
+        "synthetic": true
+      },
+      {
+        "name": "Llama",
+        "img": "/data/llama/1.1.1Llama-Brown_A.png",
+        "sourceImage": "llama/1.1.1Llama-Brown_A.png",
+        "folder": "llama",
+        "synthetic": true
+      },
+      {
+        "name": "MagmaCube",
+        "img": "/data/magma cube/3MagmaCube-Big.gif",
+        "sourceImage": "magma cube/3MagmaCube-Big.gif",
+        "folder": "magma cube",
+        "synthetic": true
+      },
+      {
+        "name": "Mooshroom",
+        "img": "/data/mooshroom/2Mooshroom-Brown.png",
+        "sourceImage": "mooshroom/2Mooshroom-Brown.png",
+        "folder": "mooshroom",
+        "synthetic": true
+      },
+      {
+        "name": "Parrot",
+        "img": "/data/parrot/2Parrot-Blue.png",
+        "sourceImage": "parrot/2Parrot-Blue.png",
+        "folder": "parrot",
+        "synthetic": true
+      },
+      {
+        "name": "Pig",
+        "img": "/data/pig/2.1Pig-Cold.png",
+        "sourceImage": "pig/2.1Pig-Cold.png",
+        "folder": "pig",
+        "synthetic": true
+      },
+      {
+        "name": "Piglin",
+        "img": "/data/piglin/1.2Piglin-Crossbow.gif",
+        "sourceImage": "piglin/1.2Piglin-Crossbow.gif",
+        "folder": "piglin",
+        "synthetic": true
+      },
+      {
+        "name": "PolarBear",
+        "img": "/data/polar bear/PolarBear_C.png",
+        "sourceImage": "polar bear/PolarBear_C.png",
+        "folder": "polar bear",
+        "synthetic": true
+      },
+      {
+        "name": "Rabbit",
+        "img": "/data/rabbit/3Rabbit-Black.gif",
+        "sourceImage": "rabbit/3Rabbit-Black.gif",
+        "folder": "rabbit",
+        "synthetic": true
+      },
+      {
+        "name": "Salmon",
+        "img": "/data/salmon/1.3Salmon-Large.gif",
+        "sourceImage": "salmon/1.3Salmon-Large.gif",
+        "folder": "salmon",
+        "synthetic": true
+      },
+      {
+        "name": "Sheep",
+        "img": "/data/sheep/1.1.4Sheep-Black.png",
+        "sourceImage": "sheep/1.1.4Sheep-Black.png",
+        "folder": "sheep",
+        "synthetic": true
+      },
+      {
+        "name": "SkeletonHorse",
+        "img": "/data/skeleton horse/1.2SkeletonHorse-Saddled.png",
+        "sourceImage": "skeleton horse/1.2SkeletonHorse-Saddled.png",
+        "folder": "skeleton horse",
+        "synthetic": true
+      },
+      {
+        "name": "Slime",
+        "img": "/data/slime/2Slime-Big.gif",
+        "sourceImage": "slime/2Slime-Big.gif",
+        "folder": "slime",
+        "synthetic": true
+      },
+      {
+        "name": "SnowGolem",
+        "img": "/data/snow golem/2SnowGolem-Sheared.png",
+        "sourceImage": "snow golem/2SnowGolem-Sheared.png",
+        "folder": "snow golem",
+        "synthetic": true
+      },
+      {
+        "name": "TraderLlama",
+        "img": "/data/trader llama/1.1TraderLlama-Brown_A.png",
+        "sourceImage": "trader llama/1.1TraderLlama-Brown_A.png",
+        "folder": "trader llama",
+        "synthetic": true
+      },
+      {
+        "name": "Villager",
+        "img": "/data/villager/Villager-Desert_CF.png",
+        "sourceImage": "villager/Villager-Desert_CF.png",
+        "folder": "villager",
+        "synthetic": true
+      },
+      {
+        "name": "WitherSkeleton",
+        "img": "/data/special/pumpkin/1.2WitherSkeleton_P.png",
+        "sourceImage": "special/pumpkin/1.2WitherSkeleton_P.png",
+        "folder": "special:pumpkin",
+        "synthetic": true
+      },
+      {
+        "name": "Wolf",
+        "img": "/data/wolf/2.1.1.png",
+        "sourceImage": "wolf/2.1.1.png",
+        "folder": "wolf",
+        "synthetic": true
+      },
+      {
+        "name": "ZombieHorse",
+        "img": "/data/zombie horse/1.1.png",
+        "sourceImage": "zombie horse/1.1.png",
+        "folder": "zombie horse",
+        "synthetic": true
+      },
+      {
+        "name": "ZombieNautilus",
+        "img": "/data/zombie nautilus/1.2ZombieNautilus-Copper.png",
+        "sourceImage": "zombie nautilus/1.2ZombieNautilus-Copper.png",
+        "folder": "zombie nautilus",
+        "synthetic": true
+      },
+      {
+        "name": "ZombieVillager",
+        "img": "/data/special/pumpkin/1.2ZombieVillager_P.png",
+        "sourceImage": "special/pumpkin/1.2ZombieVillager_P.png",
+        "folder": "special:pumpkin",
+        "synthetic": true
+      },
+      {
+        "name": "ZombifiedPiglin",
+        "img": "/data/zombified piglin/1.3ZombifiedPiglin-Axe.gif",
+        "sourceImage": "zombified piglin/1.3ZombifiedPiglin-Axe.gif",
+        "folder": "zombified piglin",
+        "synthetic": true
+      }
+    ],
     "variantsWithoutBaseMobAfterPlanning": []
   },
   "existingDataCheck": {
@@ -13635,17 +13566,17 @@
     },
     "previewCounts": {
       "categories": 53,
-      "mobs": 89,
-      "variants": 980,
-      "mobCategoryRelations": 222,
-      "variantCategoryRelations": 1464
+      "mobs": 122,
+      "variants": 929,
+      "mobCategoryRelations": 199,
+      "variantCategoryRelations": 1324
     },
     "differences": {
       "categories": 0,
-      "mobs": 0,
-      "variants": 0,
-      "mobCategoryRelations": 0,
-      "variantCategoryRelations": 0
+      "mobs": 33,
+      "variants": -51,
+      "mobCategoryRelations": -23,
+      "variantCategoryRelations": -140
     },
     "flags": {
       "usesInsertOrReplace": false,
