@@ -47,12 +47,8 @@ const SUFFIX_TO_FOLDER = Object.fromEntries(
   Object.entries(SpecialFolderMap).map(([folderName, suffixId]) => [suffixId, `special:${folderName}`])
 );
 
-// Lista categorie speciali per il modal — da SpecialFolderMap + SuffixConfig
-const SPECIAL_CATEGORY_LIST = Object.entries(SpecialFolderMap).map(([folderName, suffixId]) => {
-  const cfg  = SuffixConfig[suffixId];
-  const slug = folderName.replace(/\s+/g, '-');
-  return { suffixId, slug, label: cfg?.label ?? folderName, color: cfg?.color ?? 'bg-purple-600' };
-});
+// SPECIAL_CATEGORY_LIST è ora derivata dinamicamente dalle categorie DB (special: true)
+// vedi il componente MobTracker per l'uso di dbCategories.filter(c => c.special)
 
 const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
   const trackedCount = mobs.filter(m => trackedMobs[m.fileName]).length;
@@ -527,18 +523,20 @@ const MobTracker = () => {
 
             <div className="overflow-y-auto flex-1 p-4 space-y-2" style={{scrollbarWidth:'thin',scrollbarColor:'#44403c #0c0c0c'}}>
 
-              {/* ── Categorie speciali ── */}
+              {/* ── Categorie speciali (dal DB: special = true) ── */}
               <p className="text-[10px] uppercase text-stone-600 tracking-widest px-1 pb-1">Special</p>
-              {SPECIAL_CATEGORY_LIST.map(sc => (
-                <button key={sc.suffixId}
-                  onClick={()=>{ setShowCategories(false); navigate(`/${sc.slug}`); }}
+              {dbCategories.filter(c => c.special).sort((a,b) => a.priority - b.priority).map(sc => (
+                <button key={sc.id}
+                  onClick={() => { setShowCategories(false); navigate(`/${sc.slug || sc.id}`); }}
                   className="flex items-center gap-4 w-full p-4 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
                   <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
-                    <div className={`${sc.color} text-white text-[9px] px-1 py-0.5 border border-stone-900 uppercase leading-none text-center`}>{sc.label}</div>
+                    {sc.icon?.includes('/') || sc.icon?.includes('.')
+                      ? <img src={sc.icon} alt={sc.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
+                      : <div className="bg-purple-700 text-white text-[9px] px-1 py-0.5 border border-stone-900 uppercase leading-none text-center">{sc.variant}</div>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm uppercase text-purple-400">{sc.label}</p>
-                    <p className="text-xs text-stone-600 mt-0.5">Special category</p>
+                    {sc.description && <p className="text-xs text-stone-600 mt-0.5 line-clamp-1">{sc.description}</p>}
                   </div>
                   <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-lg shrink-0">→</span>
                 </button>
@@ -548,8 +546,8 @@ const MobTracker = () => {
               <div className="border-t-2 border-stone-800 my-2" />
               <p className="text-[10px] uppercase text-stone-600 tracking-widest px-1 pb-1">Standard</p>
 
-              {/* ── Categorie normali ── */}
-              {MobCategories.map(cat => {
+              {/* ── Categorie normali (escluse quelle speciali) ── */}
+              {MobCategories.filter(cat => !cat.special).map(cat => {
                 const colorMap = {
                   amber:  { border:'border-amber-800',  hover:'hover:border-amber-500',  text:'text-amber-400'  },
                   blue:   { border:'border-blue-800',   hover:'hover:border-blue-500',   text:'text-blue-400'   },

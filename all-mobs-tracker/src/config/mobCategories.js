@@ -17,7 +17,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Saddle",
     "description": " These mobs can be saddled using a Saddle. Saddling them allows the player to ride the mob. ",
     "priority": 1,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "shearable",
@@ -30,7 +31,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Shearing",
     "description": "permanently changes their appearance until they respawn or regrow.",
     "priority": 2,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "chested",
@@ -43,7 +45,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Chest#Donkey,_mule,_or_llama_pack",
     "description": "These mobs can have a chest placed on them. A chest can be added to a donkey, a mule, or a llama by pressing use on the animal.",
     "priority": 3,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "name-tag",
@@ -56,7 +59,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Name_Tag#Easter_eggs",
     "description": "These mobs obtain a special variant when given a specific name.",
     "priority": 4,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "banner",
@@ -69,7 +73,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Raid_captain",
     "description": "These mobs can have banners placed on them. You cannot give a banner to a mob.",
     "priority": 5,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "lightning",
@@ -82,7 +87,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Thunderstorm#Effects_on_mobs",
     "description": "These mobs can be struck by lightning, which may cause them to transform into a different mob or gain special properties. I did not include all the mobs that can be struck by lightning, but only those that have a unique transformation or effect when struck. (For example, Pigs become zombified piglins, but they don't have a unique icon for that, so I didn't include them in this category.)",
     "priority": 6,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "screaming",
@@ -95,7 +101,8 @@ export const MobCategories = [
     "link": "https://minecraft.wiki/w/Goat#Spawning",
     "description": "When a goat is spawned naturally, and also through breeding normal goats, it has a 2% chance of being a screaming goat. They look identical to all other goats, but they make screaming sounds and ram more often.",
     "priority": 7,
-    "variant": null
+    "variant": null,
+    "special": false
   },
   {
     "id": "color-white",
@@ -108,7 +115,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with White color variant.",
     "priority": 100,
-    "variant": "White"
+    "variant": "White",
+    "special": false
   },
   {
     "id": "color-lightgray",
@@ -121,7 +129,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with LightGray color variant.",
     "priority": 101,
-    "variant": "LightGray"
+    "variant": "LightGray",
+    "special": false
   },
   {
     "id": "color-gray",
@@ -134,7 +143,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Gray color variant.",
     "priority": 102,
-    "variant": "Gray"
+    "variant": "Gray",
+    "special": false
   },
   {
     "id": "color-black",
@@ -147,7 +157,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Black color variant.",
     "priority": 103,
-    "variant": "Black"
+    "variant": "Black",
+    "special": false
   },
   {
     "id": "color-brown",
@@ -160,7 +171,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Brown color variant.",
     "priority": 104,
-    "variant": "Brown"
+    "variant": "Brown",
+    "special": false
   },
   {
     "id": "color-red",
@@ -173,7 +185,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Red color variant.",
     "priority": 105,
-    "variant": "Red"
+    "variant": "Red",
+    "special": false
   },
   {
     "id": "color-orange",
@@ -186,7 +199,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Orange color variant.",
     "priority": 106,
-    "variant": "Orange"
+    "variant": "Orange",
+    "special": false
   },
   {
     "id": "color-yellow",
@@ -199,7 +213,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Yellow color variant.",
     "priority": 107,
-    "variant": "Yellow"
+    "variant": "Yellow",
+    "special": false
   },
   {
     "id": "color-lime",
@@ -212,7 +227,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Lime color variant.",
     "priority": 108,
-    "variant": "Lime"
+    "variant": "Lime",
+    "special": false
   },
   {
     "id": "color-green",
@@ -225,7 +241,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Green color variant.",
     "priority": 109,
-    "variant": "Green"
+    "variant": "Green",
+    "special": false
   },
   {
     "id": "color-cyan",
@@ -238,7 +255,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Cyan color variant.",
     "priority": 110,
-    "variant": "Cyan"
+    "variant": "Cyan",
+    "special": false
   },
   {
     "id": "color-lightblue",
@@ -251,7 +269,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with LightBlue color variant.",
     "priority": 111,
-    "variant": "LightBlue"
+    "variant": "LightBlue",
+    "special": false
   },
   {
     "id": "color-blue",
@@ -264,7 +283,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Blue color variant.",
     "priority": 112,
-    "variant": "Blue"
+    "variant": "Blue",
+    "special": false
   },
   {
     "id": "color-purple",
@@ -277,7 +297,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Purple color variant.",
     "priority": 113,
-    "variant": "Purple"
+    "variant": "Purple",
+    "special": false
   },
   {
     "id": "color-magenta",
@@ -290,7 +311,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Magenta color variant.",
     "priority": 114,
-    "variant": "Magenta"
+    "variant": "Magenta",
+    "special": false
   },
   {
     "id": "color-pink",
@@ -303,7 +325,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob with Pink color variant.",
     "priority": 115,
-    "variant": "Pink"
+    "variant": "Pink",
+    "special": false
   },
   {
     "id": "biome-plains",
@@ -316,7 +339,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Plains biome.",
     "priority": 116,
-    "variant": "Plains"
+    "variant": "Plains",
+    "special": false
   },
   {
     "id": "biome-desert",
@@ -329,7 +353,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Desert biome.",
     "priority": 117,
-    "variant": "Desert"
+    "variant": "Desert",
+    "special": false
   },
   {
     "id": "biome-jungle",
@@ -342,7 +367,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Jungle biome.",
     "priority": 118,
-    "variant": "Jungle"
+    "variant": "Jungle",
+    "special": false
   },
   {
     "id": "biome-savanna",
@@ -355,7 +381,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Savanna biome.",
     "priority": 119,
-    "variant": "Savanna"
+    "variant": "Savanna",
+    "special": false
   },
   {
     "id": "biome-snow",
@@ -368,7 +395,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Snow biome.",
     "priority": 120,
-    "variant": "Snow"
+    "variant": "Snow",
+    "special": false
   },
   {
     "id": "biome-swamp",
@@ -381,7 +409,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Swamp biome.",
     "priority": 121,
-    "variant": "Swamp"
+    "variant": "Swamp",
+    "special": false
   },
   {
     "id": "biome-taiga",
@@ -394,7 +423,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob from Taiga biome.",
     "priority": 122,
-    "variant": "Taiga"
+    "variant": "Taiga",
+    "special": false
   },
   {
     "id": "profession-unemployed",
@@ -407,7 +437,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Unemployed profession.",
     "priority": 123,
-    "variant": "Unemployed"
+    "variant": "Unemployed",
+    "special": false
   },
   {
     "id": "profession-nitwit",
@@ -420,7 +451,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Nitwit profession.",
     "priority": 124,
-    "variant": "Nitwit"
+    "variant": "Nitwit",
+    "special": false
   },
   {
     "id": "profession-armorer",
@@ -433,7 +465,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Armorer profession.",
     "priority": 125,
-    "variant": "Armorer"
+    "variant": "Armorer",
+    "special": false
   },
   {
     "id": "profession-butcher",
@@ -446,7 +479,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Butcher profession.",
     "priority": 126,
-    "variant": "Butcher"
+    "variant": "Butcher",
+    "special": false
   },
   {
     "id": "profession-cartographer",
@@ -459,7 +493,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Cartographer profession.",
     "priority": 127,
-    "variant": "Cartographer"
+    "variant": "Cartographer",
+    "special": false
   },
   {
     "id": "profession-cleric",
@@ -472,7 +507,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Cleric profession.",
     "priority": 128,
-    "variant": "Cleric"
+    "variant": "Cleric",
+    "special": false
   },
   {
     "id": "profession-farmer",
@@ -485,7 +521,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Farmer profession.",
     "priority": 129,
-    "variant": "Farmer"
+    "variant": "Farmer",
+    "special": false
   },
   {
     "id": "profession-fisherman",
@@ -498,7 +535,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Fisherman profession.",
     "priority": 130,
-    "variant": "Fisherman"
+    "variant": "Fisherman",
+    "special": false
   },
   {
     "id": "profession-fletcher",
@@ -511,7 +549,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Fletcher profession.",
     "priority": 131,
-    "variant": "Fletcher"
+    "variant": "Fletcher",
+    "special": false
   },
   {
     "id": "profession-leatherworker",
@@ -524,7 +563,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Leatherworker profession.",
     "priority": 132,
-    "variant": "Leatherworker"
+    "variant": "Leatherworker",
+    "special": false
   },
   {
     "id": "profession-librarian",
@@ -537,7 +577,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Librarian profession.",
     "priority": 133,
-    "variant": "Librarian"
+    "variant": "Librarian",
+    "special": false
   },
   {
     "id": "profession-mason",
@@ -550,7 +591,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Mason profession.",
     "priority": 134,
-    "variant": "Mason"
+    "variant": "Mason",
+    "special": false
   },
   {
     "id": "profession-shepherd",
@@ -563,7 +605,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Shepherd profession.",
     "priority": 135,
-    "variant": "Shepherd"
+    "variant": "Shepherd",
+    "special": false
   },
   {
     "id": "profession-toolsmith",
@@ -576,7 +619,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Toolsmith profession.",
     "priority": 136,
-    "variant": "Toolsmith"
+    "variant": "Toolsmith",
+    "special": false
   },
   {
     "id": "profession-weaponsmith",
@@ -589,7 +633,8 @@ export const MobCategories = [
     "link": "",
     "description": "Villager with Weaponsmith profession.",
     "priority": 137,
-    "variant": "Weaponsmith"
+    "variant": "Weaponsmith",
+    "special": false
   },
   {
     "id": "special-baby-breed",
@@ -602,7 +647,8 @@ export const MobCategories = [
     "link": "",
     "description": "Baby variant obtained through breeding.",
     "priority": 138,
-    "variant": "A"
+    "variant": "A",
+    "special": true
   },
   {
     "id": "special-baby-monster",
@@ -615,7 +661,8 @@ export const MobCategories = [
     "link": "",
     "description": "Baby variant of monster mobs.",
     "priority": 139,
-    "variant": "B"
+    "variant": "B",
+    "special": true
   },
   {
     "id": "special-baby-animal",
@@ -628,7 +675,8 @@ export const MobCategories = [
     "link": "",
     "description": "Baby variant of animal mobs.",
     "priority": 140,
-    "variant": "C"
+    "variant": "C",
+    "special": true
   },
   {
     "id": "special-pumpkin",
@@ -641,7 +689,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob wearing a pumpkin or jack o lantern.",
     "priority": 141,
-    "variant": "P"
+    "variant": "P",
+    "special": true
   },
   {
     "id": "special-jockey",
@@ -654,7 +703,8 @@ export const MobCategories = [
     "link": "",
     "description": "Jockey mob combination.",
     "priority": 142,
-    "variant": "J"
+    "variant": "J",
+    "special": true
   },
   {
     "id": "special-unobtainable",
@@ -667,7 +717,8 @@ export const MobCategories = [
     "link": "",
     "description": "Unobtainable mob variant in normal survival.",
     "priority": 143,
-    "variant": "U"
+    "variant": "U",
+    "special": false
   },
   {
     "id": "special-untrapable",
@@ -680,7 +731,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob that cannot be trapped in typical mob traps.",
     "priority": 144,
-    "variant": "F"
+    "variant": "F",
+    "special": false
   },
   {
     "id": "special-texture-error",
@@ -693,7 +745,8 @@ export const MobCategories = [
     "link": "",
     "description": "Mob variant with texture discrepancies.",
     "priority": 145,
-    "variant": "T"
+    "variant": "T",
+    "special": false
   }
 ];
 

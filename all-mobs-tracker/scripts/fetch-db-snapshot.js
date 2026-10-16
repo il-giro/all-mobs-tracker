@@ -25,7 +25,7 @@ function queryD1(command) {
 
 console.log('Fetching database data from Cloudflare D1...');
 
-const categoriesRaw = queryD1('SELECT id, name, icon, color, link, description, priority, variant FROM CATEGORIES ORDER BY priority ASC, id ASC;');
+const categoriesRaw = queryD1('SELECT id, name, icon, color, link, description, priority, variant, special FROM CATEGORIES ORDER BY priority ASC, id ASC;');
 console.log(`- Categories: ${categoriesRaw.length}`);
 
 const mobsRaw = queryD1('SELECT m.id, m.name, m.img, m.link, m.description, GROUP_CONCAT(mc.category_id) as category_ids FROM MOBS m LEFT JOIN MOB_CATEGORIES mc ON m.id = mc.mob_id GROUP BY m.id ORDER BY m.id ASC;');

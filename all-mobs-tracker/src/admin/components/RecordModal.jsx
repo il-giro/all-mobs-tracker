@@ -158,6 +158,28 @@ function RecordModal({ table, columns, record, metadata, onSave, onClose }) {
 
     const isRequired = col.notnull === 1 && !col.dflt_value;
 
+    // Campo speciale 'special' (BOOLEAN / INTEGER 0 o 1)
+    if (col.name === 'special') {
+      const isChecked = value === 1 || value === true || value === '1';
+      return (
+        <div key={col.name} className="mb-4 flex items-center gap-3 bg-gray-850 p-3 rounded-lg border border-gray-750">
+          <input
+            type="checkbox"
+            id="field_special"
+            checked={isChecked}
+            onChange={(e) => handleChange(col.name, e.target.checked ? 1 : 0)}
+            className="w-5 h-5 text-purple-600 bg-gray-800 border-gray-700 rounded focus:ring-purple-500 cursor-pointer"
+          />
+          <label htmlFor="field_special" className="text-sm font-medium text-gray-200 cursor-pointer select-none">
+            Categoria Speciale (special = {isChecked ? '1' : '0'})
+            <span className="block text-xs text-gray-500 font-normal mt-0.5">
+              Se attivo, la categoria viene gestita come variante speciale separata e appare nella sezione speciale.
+            </span>
+          </label>
+        </div>
+      );
+    }
+
     // 1. Campo mob_id (per MOB_CATEGORIES e VARIANTS)
     if (col.name === 'mob_id' && Object.keys(localMobs).length > 0) {
       const selectedMob = localMobs[value];

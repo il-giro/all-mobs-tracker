@@ -546,6 +546,17 @@ function TableExplorer({ table }) {
       return <span className="font-medium text-white">{value}</span>;
     }
 
+    if (columnName === 'special') {
+      const isSpecial = value === 1 || value === true || value === '1';
+      return isSpecial ? (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-900/60 text-purple-300 border border-purple-700">
+          ★ Special
+        </span>
+      ) : (
+        <span className="text-gray-600 text-xs">—</span>
+      );
+    }
+
     if (typeof value === 'boolean') {
       return value ? '✓' : '✗';
     }

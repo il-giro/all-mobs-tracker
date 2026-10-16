@@ -7,11 +7,20 @@ import { getSpecialCategoryDesc } from '../../config/mobDescriptions';
 import Footer from '../../components/Footer';
 import useTrackerData from '../../utils/mobDatabase';
 
-// ─── slug ↔ suffixId ─────────────────────────────────────────────────────────
-// 'baby-breed' → 'A',  'jockey' → 'J'
-export const slugToSuffixId = (slug) => {
-  const key = slug.replace(/-/g, ' ').toLowerCase();
-  return SpecialFolderMap[key] ?? null;
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+// Trova la categoria speciale per slug tra le categorie del DB (con fallback su SpecialFolderMap)
+export const slugToSuffixId = (slug, categories = MobCategories) => {
+  const clean = String(slug || '').toLowerCase().trim();
+  const cat = (categories || []).find(c => c.special && (
+    c.id === clean ||
+    c.slug === clean ||
+    c.id === `special-${clean}` ||
+    c.slug === `special-${clean}` ||
+    (c.id && clean === String(c.id).replace(/^special-/, '')) ||
+    (c.slug && clean === String(c.slug).replace(/^special-/, ''))
+  ));
+  if (cat?.variant) return cat.variant;
+  return SpecialFolderMap[clean.replace(/-/g, ' ')] ?? null;
 };
 
 // ─── Hook tracciamento ────────────────────────────────────────────────────────
@@ -122,22 +131,39 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
 const SpecialCategoryPage = () => {
   const { slug }   = useParams();
   const navigate   = useNavigate();
-  const suffixId   = slugToSuffixId(slug ?? '');
-  const config     = suffixId ? SuffixConfig[suffixId] : null;
-  const { allMobs, loading } = useTrackerData();
+  const { allMobs, categories: dbCategories, loading } = useTrackerData();
   const [tracked, captured, captureMode, toggle] = useTrackedMobs();
   const [selectedMob, setSelectedMob] = useState(null);
   const [cardSize, setCardSize]       = useState(120);
+
+  // Trova la categoria speciale dal DB (special: true, slug corrispondente)
+  const dbCategory = useMemo(() => {
+    const clean = String(slug || '').toLowerCase().trim();
+    return (dbCategories || []).find(c => c.special && (
+      c.slug === clean ||
+      c.id === clean ||
+      String(c.dbId) === clean ||
+      c.slug === `special-${clean}` ||
+      c.id === `special-${clean}` ||
+      (c.slug && clean === String(c.slug).replace(/^special-/, '')) ||
+      (c.id && clean === String(c.id).replace(/^special-/, ''))
+    )) ?? null;
+  }, [dbCategories, slug]);
+
+  // suffixId = campo variant della categoria DB (es. 'A', 'J', ecc.)
+  const suffixId = dbCategory?.variant ?? slugToSuffixId(slug ?? '', dbCategories?.length ? dbCategories : MobCategories);
+  const config   = suffixId ? SuffixConfig[suffixId] : null;
 
   const mobs = useMemo(() => {
     if (!suffixId || !allMobs.length) return [];
     return allMobs
       .filter(mob =>
+        (dbCategory?.dbId && mob.categoryIds?.includes(dbCategory.dbId)) ||
         mob.specialSuffixId === suffixId ||
         mob.activeSuffixes?.includes(suffixId)
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [suffixId, allMobs]);
+  }, [suffixId, dbCategory, allMobs]);
 
   if (!config) {
     return (
@@ -168,7 +194,8 @@ const SpecialCategoryPage = () => {
   };
   const c = CM[colorName] ?? CM.purple;
 
-  const label = config.label;
+  const label = dbCategory?.label || dbCategory?.name || config.label;
+  const description = dbCategory?.description || '';
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
@@ -190,7 +217,10 @@ const SpecialCategoryPage = () => {
 
             <div className="flex-1 min-w-0">
               <h1 className={`text-4xl uppercase ${c.text} leading-none`}>{label}</h1>
-              <p className="text-stone-600 text-xs uppercase mt-1">Special category</p>
+              <p className="text-stone-500 text-xs uppercase mt-1">Special category</p>
+              {description && (
+                <p className="text-stone-400 text-xs mt-2 max-w-xl leading-relaxed">{description}</p>
+              )}
 
               <div className="flex items-center gap-3 mt-3 flex-wrap">
                 {loading ? (
@@ -251,10 +281,10 @@ const SpecialCategoryPage = () => {
                   {label}
                 </div>
 
-                {/* Categorie normali */}
-                {vCats.length > 0 && (
+                {/* Categorie normali (escluse quelle speciali per evitare duplicati) */}
+                {vCats.filter(cat => !cat.special).length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {vCats.map(cat => (
+                    {vCats.filter(cat => !cat.special).map(cat => (
                       <button key={cat.id} onClick={() => { setSelectedMob(null); navigate(`/categories/${cat.id}`); }}
                         className="flex items-center gap-1.5 border-2 border-stone-700 hover:border-stone-500 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors">
                         <span className="text-xs uppercase text-stone-300">{cat.label}</span>

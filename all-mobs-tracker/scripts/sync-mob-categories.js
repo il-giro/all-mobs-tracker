@@ -49,7 +49,8 @@ const categories = snap.categories.map(c => {
     link: c.link === '.' ? '' : c.link,
     description: c.description === '.' ? '' : c.description,
     priority: c.priority,
-    variant: c.variant
+    variant: c.variant,
+    special: !!c.special
   };
 });
 

@@ -538,7 +538,7 @@ export default {
     if (url.pathname === '/api/tracker-data' && request.method === 'GET') {
       try {
         const [categoriesRes, mobsRes, variantsRes] = await Promise.all([
-          env.DB.prepare('SELECT id, name, icon, color, link, description, priority, variant FROM CATEGORIES ORDER BY priority ASC, id ASC').all(),
+          env.DB.prepare('SELECT id, name, icon, color, link, description, priority, variant, special FROM CATEGORIES ORDER BY priority ASC, id ASC').all(),
           env.DB.prepare(`
             SELECT m.id, m.name, m.img, m.link, m.description,
                    GROUP_CONCAT(mc.category_id) as category_ids
@@ -595,7 +595,7 @@ export default {
     // API pubblica: lista categorie
     if (url.pathname === '/api/categories' && request.method === 'GET') {
       try {
-        const result = await env.DB.prepare('SELECT id, name, icon, color, link, description, priority, variant FROM CATEGORIES ORDER BY priority ASC, id ASC').all();
+        const result = await env.DB.prepare('SELECT id, name, icon, color, link, description, priority, variant, special FROM CATEGORIES ORDER BY priority ASC, id ASC').all();
         const categories = (result.results || []).map(c => ({
           ...c,
           slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')

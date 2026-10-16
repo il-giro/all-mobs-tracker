@@ -317,11 +317,11 @@ const MobPage = () => {
                   {categories.map(cat => (
                     <Link
                       key={cat.id}
-                      to={`/categories/${cat.id}`}
-                      className="flex items-center gap-1.5 border-2 border-stone-700 hover:border-stone-500 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors"
+                      to={cat.special ? `/${cat.slug || cat.id}` : `/categories/${cat.id}`}
+                      className={`flex items-center gap-1.5 border-2 ${cat.special ? 'border-purple-900 hover:border-purple-600' : 'border-stone-700 hover:border-stone-500'} bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors`}
                     >
                       <CategoryIcon icon={cat.icon} label={cat.label} className="w-4 h-4" />
-                      <span className="text-xs uppercase text-stone-300">{cat.label}</span>
+                      <span className={`text-xs uppercase ${cat.special ? 'text-purple-300' : 'text-stone-300'}`}>{cat.label}</span>
                     </Link>
                   ))}
                 </div>
@@ -386,11 +386,14 @@ const MobPage = () => {
                     {vCats.map(cat => (
                       <button
                         key={cat.id}
-                        onClick={() => { setSelectedVariant(null); navigate(`/categories/${cat.id}`); }}
-                        className="flex items-center gap-1.5 border-2 border-stone-700 hover:border-stone-500 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors"
+                        onClick={() => {
+                          setSelectedVariant(null);
+                          navigate(cat.special ? `/${cat.slug || cat.id}` : `/categories/${cat.id}`);
+                        }}
+                        className={`flex items-center gap-1.5 border-2 ${cat.special ? 'border-purple-900 hover:border-purple-600' : 'border-stone-700 hover:border-stone-500'} bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors`}
                       >
                         <CategoryIcon icon={cat.icon} label={cat.label} className="w-4 h-4" />
-                        <span className="text-xs uppercase text-stone-300">{cat.label}</span>
+                        <span className={`text-xs uppercase ${cat.special ? 'text-purple-300' : 'text-stone-300'}`}>{cat.label}</span>
                       </button>
                     ))}
                   </div>

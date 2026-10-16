@@ -16,9 +16,11 @@ const TOOLTIP_EVENT = 'mobcard:tooltip';
 const TOOLTIP_W = 220;
 const TOOLTIP_H = 480;
 
-// suffixId → slug della pagina speciale
-// es. 'A' → 'baby-breed'
+// suffixId → slug della pagina speciale (usa le categorie DB se disponibili)
+// es. 'A' → 'special-baby-breed'
 const suffixIdToSlug = (suffixId) => {
+  const dbSpecial = MobCategories.find(c => c.special && c.variant === suffixId);
+  if (dbSpecial) return dbSpecial.slug || dbSpecial.id;
   const entry = Object.entries(SpecialFolderMap).find(([, v]) => v === suffixId);
   return entry ? entry[0].replace(/\s+/g, '-') : null;
 };
@@ -144,7 +146,12 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
 
   const navigateToCategory = (categoryId) => {
     setTooltipPos(null); isOpen.current = false;
-    navigate(`/categories/${categoryId}`);
+    const cat = MobCategories.find(c => c.id === categoryId);
+    if (cat?.special) {
+      navigate(`/${cat.slug || cat.id}`);
+    } else {
+      navigate(`/categories/${categoryId}`);
+    }
   };
 
   const navigateToSpecial = (slug) => {

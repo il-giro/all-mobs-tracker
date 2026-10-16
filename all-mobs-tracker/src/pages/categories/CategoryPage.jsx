@@ -94,6 +94,13 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
   const [selectedMob, setSelectedMob] = useState(null);
   const [cardSize, setCardSize]       = useState(120);
 
+  // Se la categoria è contrassegnata come special, reindirizza alla pagina speciale (/:slug)
+  useEffect(() => {
+    if (category?.special) {
+      navigate(`/${category.slug || category.id}`, { replace: true });
+    }
+  }, [category, navigate]);
+
   const mobs = React.useMemo(() => {
     if (!category || !allMobs.length) return [];
     return allMobs.filter(mob => {
@@ -188,13 +195,26 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
         const vTracked  = !!tracked[vm.fileName];
         const vCaptured = !!captured[vm.fileName];
         const vDesc     = getMobDesc(vm);
-        const vCats     = getMobCategories(vm, MobCategories);
-        // Categorie speciali — suffix del mob che hanno una pagina
-        const vSpecial  = (vm.activeSuffixes ?? [])
+        const vCatsNormal  = vCats.filter(c => !c.special);
+        const vCatsSpecial = vCats.filter(c => c.special);
+        const specialSuffixIdsFromCats = new Set(vCatsSpecial.map(c => c.variant).filter(Boolean));
+
+        // Categorie speciali aggiuntive da suffix non coperte da vCatsSpecial
+        const additionalSpecial = (vm.activeSuffixes ?? [])
           .concat(vm.specialSuffixId ? [vm.specialSuffixId] : [])
-          .filter((id, i, a) => a.indexOf(id) === i)
-          .map(id => ({ suffixId: id, cfg: SuffixConfig[id], slug: Object.entries(SpecialFolderMap).find(([,v]) => v === id)?.[0]?.replace(/\s+/g, '-') }))
+          .filter((id, i, a) => a.indexOf(id) === i && !specialSuffixIdsFromCats.has(id))
+          .map(id => {
+            const dbCat = MobCategories.find(c => c.special && c.variant === id);
+            const slug = dbCat ? (dbCat.slug || dbCat.id) : Object.entries(SpecialFolderMap).find(([, v]) => v === id)?.[0]?.replace(/\s+/g, '-');
+            return {
+              suffixId: id,
+              cfg: SuffixConfig[id],
+              label: dbCat?.label || SuffixConfig[id]?.label || id,
+              slug
+            };
+          })
           .filter(s => s.cfg && s.slug);
+
         const suffixDisplay = vm.activeSuffixes?.length > 0
           ? (() => { const l = [...new Set(vm.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))]; return l.length ? `(${l.join(', ')})` : ''; })()
           : '';
@@ -225,9 +245,9 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
                 <p className="text-sm uppercase text-stone-200 leading-tight">{vm.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}</p>
 
                 {/* Categorie normali */}
-                {vCats.length > 0 && (
+                {vCatsNormal.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {vCats.map(cat => (
+                    {vCatsNormal.map(cat => (
                       <button key={cat.id} onClick={() => { setSelectedMob(null); navigate(`/categories/${cat.id}`); }}
                         className="flex items-center gap-1.5 border-2 border-stone-700 hover:border-stone-500 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors">
                         <CatIcon icon={cat.icon} label={cat.label} className="w-4 h-4" />
@@ -237,14 +257,21 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
                   </div>
                 )}
 
-                {/* Categorie speciali (suffix) */}
-                {vSpecial.length > 0 && (
+                {/* Categorie speciali (dal DB e suffix) */}
+                {(vCatsSpecial.length > 0 || additionalSpecial.length > 0) && (
                   <div className="flex flex-wrap gap-2">
-                    {vSpecial.map(s => (
+                    {vCatsSpecial.map(sc => (
+                      <button key={sc.id} onClick={() => { setSelectedMob(null); navigate(`/${sc.slug || sc.id}`); }}
+                        className="flex items-center gap-1.5 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors">
+                        <div className="bg-purple-700 text-white text-[8px] px-1 py-0.5 border border-stone-900 leading-none uppercase shrink-0">{sc.variant || 'SP'}</div>
+                        <span className="text-xs uppercase text-purple-300">{sc.label}</span>
+                      </button>
+                    ))}
+                    {additionalSpecial.map(s => (
                       <button key={s.suffixId} onClick={() => { setSelectedMob(null); navigate(`/${s.slug}`); }}
-                        className={`flex items-center gap-1.5 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors`}>
+                        className="flex items-center gap-1.5 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors">
                         <div className={`${s.cfg.color} text-white text-[8px] px-1 py-0.5 border border-stone-900 leading-none uppercase shrink-0`}>{s.cfg.label}</div>
-                        <span className="text-xs uppercase text-purple-300">{s.cfg.label}</span>
+                        <span className="text-xs uppercase text-purple-300">{s.label}</span>
                       </button>
                     ))}
                   </div>

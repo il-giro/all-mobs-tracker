@@ -66,6 +66,7 @@ export function buildTrackerDataset(categoriesRaw, mobsRaw, variantsRaw) {
       slug,
       dbId: cat.id,
       label: cat.name,
+      special: !!cat.special,
     };
     categoryMap[cat.id] = obj;
     categoryMap[slug] = obj;

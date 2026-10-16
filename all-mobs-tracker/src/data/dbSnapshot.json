@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-15T12:35:40.384Z",
+  "timestamp": "2026-10-16T08:44:16.083Z",
   "categories": [
     {
       "id": 1,
@@ -10,6 +10,7 @@
       "description": " These mobs can be saddled using a Saddle. Saddling them allows the player to ride the mob. ",
       "priority": 1,
       "variant": null,
+      "special": 0,
       "slug": "saddled"
     },
     {
@@ -21,6 +22,7 @@
       "description": "permanently changes their appearance until they respawn or regrow.",
       "priority": 2,
       "variant": null,
+      "special": 0,
       "slug": "shearable"
     },
     {
@@ -32,6 +34,7 @@
       "description": "These mobs can have a chest placed on them. A chest can be added to a donkey, a mule, or a llama by pressing use on the animal.",
       "priority": 3,
       "variant": null,
+      "special": 0,
       "slug": "chested"
     },
     {
@@ -43,6 +46,7 @@
       "description": "These mobs obtain a special variant when given a specific name.",
       "priority": 4,
       "variant": null,
+      "special": 0,
       "slug": "name-tag"
     },
     {
@@ -54,6 +58,7 @@
       "description": "These mobs can have banners placed on them. You cannot give a banner to a mob.",
       "priority": 5,
       "variant": null,
+      "special": 0,
       "slug": "banner"
     },
     {
@@ -65,6 +70,7 @@
       "description": "These mobs can be struck by lightning, which may cause them to transform into a different mob or gain special properties. I did not include all the mobs that can be struck by lightning, but only those that have a unique transformation or effect when struck. (For example, Pigs become zombified piglins, but they don't have a unique icon for that, so I didn't include them in this category.)",
       "priority": 6,
       "variant": null,
+      "special": 0,
       "slug": "lightning"
     },
     {
@@ -76,6 +82,7 @@
       "description": "When a goat is spawned naturally, and also through breeding normal goats, it has a 2% chance of being a screaming goat. They look identical to all other goats, but they make screaming sounds and ram more often.",
       "priority": 7,
       "variant": null,
+      "special": 0,
       "slug": "screaming"
     },
     {
@@ -87,6 +94,7 @@
       "description": "Mob with White color variant.",
       "priority": 100,
       "variant": "White",
+      "special": 0,
       "slug": "color-white"
     },
     {
@@ -98,6 +106,7 @@
       "description": "Mob with LightGray color variant.",
       "priority": 101,
       "variant": "LightGray",
+      "special": 0,
       "slug": "color-lightgray"
     },
     {
@@ -109,6 +118,7 @@
       "description": "Mob with Gray color variant.",
       "priority": 102,
       "variant": "Gray",
+      "special": 0,
       "slug": "color-gray"
     },
     {
@@ -120,6 +130,7 @@
       "description": "Mob with Black color variant.",
       "priority": 103,
       "variant": "Black",
+      "special": 0,
       "slug": "color-black"
     },
     {
@@ -131,6 +142,7 @@
       "description": "Mob with Brown color variant.",
       "priority": 104,
       "variant": "Brown",
+      "special": 0,
       "slug": "color-brown"
     },
     {
@@ -142,6 +154,7 @@
       "description": "Mob with Red color variant.",
       "priority": 105,
       "variant": "Red",
+      "special": 0,
       "slug": "color-red"
     },
     {
@@ -153,6 +166,7 @@
       "description": "Mob with Orange color variant.",
       "priority": 106,
       "variant": "Orange",
+      "special": 0,
       "slug": "color-orange"
     },
     {
@@ -164,6 +178,7 @@
       "description": "Mob with Yellow color variant.",
       "priority": 107,
       "variant": "Yellow",
+      "special": 0,
       "slug": "color-yellow"
     },
     {
@@ -175,6 +190,7 @@
       "description": "Mob with Lime color variant.",
       "priority": 108,
       "variant": "Lime",
+      "special": 0,
       "slug": "color-lime"
     },
     {
@@ -186,6 +202,7 @@
       "description": "Mob with Green color variant.",
       "priority": 109,
       "variant": "Green",
+      "special": 0,
       "slug": "color-green"
     },
     {
@@ -197,6 +214,7 @@
       "description": "Mob with Cyan color variant.",
       "priority": 110,
       "variant": "Cyan",
+      "special": 0,
       "slug": "color-cyan"
     },
     {
@@ -208,6 +226,7 @@
       "description": "Mob with LightBlue color variant.",
       "priority": 111,
       "variant": "LightBlue",
+      "special": 0,
       "slug": "color-lightblue"
     },
     {
@@ -219,6 +238,7 @@
       "description": "Mob with Blue color variant.",
       "priority": 112,
       "variant": "Blue",
+      "special": 0,
       "slug": "color-blue"
     },
     {
@@ -230,6 +250,7 @@
       "description": "Mob with Purple color variant.",
       "priority": 113,
       "variant": "Purple",
+      "special": 0,
       "slug": "color-purple"
     },
     {
@@ -241,6 +262,7 @@
       "description": "Mob with Magenta color variant.",
       "priority": 114,
       "variant": "Magenta",
+      "special": 0,
       "slug": "color-magenta"
     },
     {
@@ -252,6 +274,7 @@
       "description": "Mob with Pink color variant.",
       "priority": 115,
       "variant": "Pink",
+      "special": 0,
       "slug": "color-pink"
     },
     {
@@ -263,6 +286,7 @@
       "description": "Mob from Plains biome.",
       "priority": 116,
       "variant": "Plains",
+      "special": 0,
       "slug": "biome-plains"
     },
     {
@@ -274,6 +298,7 @@
       "description": "Mob from Desert biome.",
       "priority": 117,
       "variant": "Desert",
+      "special": 0,
       "slug": "biome-desert"
     },
     {
@@ -285,6 +310,7 @@
       "description": "Mob from Jungle biome.",
       "priority": 118,
       "variant": "Jungle",
+      "special": 0,
       "slug": "biome-jungle"
     },
     {
@@ -296,6 +322,7 @@
       "description": "Mob from Savanna biome.",
       "priority": 119,
       "variant": "Savanna",
+      "special": 0,
       "slug": "biome-savanna"
     },
     {
@@ -307,6 +334,7 @@
       "description": "Mob from Snow biome.",
       "priority": 120,
       "variant": "Snow",
+      "special": 0,
       "slug": "biome-snow"
     },
     {
@@ -318,6 +346,7 @@
       "description": "Mob from Swamp biome.",
       "priority": 121,
       "variant": "Swamp",
+      "special": 0,
       "slug": "biome-swamp"
     },
     {
@@ -329,6 +358,7 @@
       "description": "Mob from Taiga biome.",
       "priority": 122,
       "variant": "Taiga",
+      "special": 0,
       "slug": "biome-taiga"
     },
     {
@@ -340,6 +370,7 @@
       "description": "Villager with Unemployed profession.",
       "priority": 123,
       "variant": "Unemployed",
+      "special": 0,
       "slug": "profession-unemployed"
     },
     {
@@ -351,6 +382,7 @@
       "description": "Villager with Nitwit profession.",
       "priority": 124,
       "variant": "Nitwit",
+      "special": 0,
       "slug": "profession-nitwit"
     },
     {
@@ -362,6 +394,7 @@
       "description": "Villager with Armorer profession.",
       "priority": 125,
       "variant": "Armorer",
+      "special": 0,
       "slug": "profession-armorer"
     },
     {
@@ -373,6 +406,7 @@
       "description": "Villager with Butcher profession.",
       "priority": 126,
       "variant": "Butcher",
+      "special": 0,
       "slug": "profession-butcher"
     },
     {
@@ -384,6 +418,7 @@
       "description": "Villager with Cartographer profession.",
       "priority": 127,
       "variant": "Cartographer",
+      "special": 0,
       "slug": "profession-cartographer"
     },
     {
@@ -395,6 +430,7 @@
       "description": "Villager with Cleric profession.",
       "priority": 128,
       "variant": "Cleric",
+      "special": 0,
       "slug": "profession-cleric"
     },
     {
@@ -406,6 +442,7 @@
       "description": "Villager with Farmer profession.",
       "priority": 129,
       "variant": "Farmer",
+      "special": 0,
       "slug": "profession-farmer"
     },
     {
@@ -417,6 +454,7 @@
       "description": "Villager with Fisherman profession.",
       "priority": 130,
       "variant": "Fisherman",
+      "special": 0,
       "slug": "profession-fisherman"
     },
     {
@@ -428,6 +466,7 @@
       "description": "Villager with Fletcher profession.",
       "priority": 131,
       "variant": "Fletcher",
+      "special": 0,
       "slug": "profession-fletcher"
     },
     {
@@ -439,6 +478,7 @@
       "description": "Villager with Leatherworker profession.",
       "priority": 132,
       "variant": "Leatherworker",
+      "special": 0,
       "slug": "profession-leatherworker"
     },
     {
@@ -450,6 +490,7 @@
       "description": "Villager with Librarian profession.",
       "priority": 133,
       "variant": "Librarian",
+      "special": 0,
       "slug": "profession-librarian"
     },
     {
@@ -461,6 +502,7 @@
       "description": "Villager with Mason profession.",
       "priority": 134,
       "variant": "Mason",
+      "special": 0,
       "slug": "profession-mason"
     },
     {
@@ -472,6 +514,7 @@
       "description": "Villager with Shepherd profession.",
       "priority": 135,
       "variant": "Shepherd",
+      "special": 0,
       "slug": "profession-shepherd"
     },
     {
@@ -483,6 +526,7 @@
       "description": "Villager with Toolsmith profession.",
       "priority": 136,
       "variant": "Toolsmith",
+      "special": 0,
       "slug": "profession-toolsmith"
     },
     {
@@ -494,6 +538,7 @@
       "description": "Villager with Weaponsmith profession.",
       "priority": 137,
       "variant": "Weaponsmith",
+      "special": 0,
       "slug": "profession-weaponsmith"
     },
     {
@@ -505,6 +550,7 @@
       "description": "Baby variant obtained through breeding.",
       "priority": 138,
       "variant": "A",
+      "special": 1,
       "slug": "special-baby-breed"
     },
     {
@@ -516,6 +562,7 @@
       "description": "Baby variant of monster mobs.",
       "priority": 139,
       "variant": "B",
+      "special": 1,
       "slug": "special-baby-monster"
     },
     {
@@ -527,6 +574,7 @@
       "description": "Baby variant of animal mobs.",
       "priority": 140,
       "variant": "C",
+      "special": 1,
       "slug": "special-baby-animal"
     },
     {
@@ -538,6 +586,7 @@
       "description": "Mob wearing a pumpkin or jack o lantern.",
       "priority": 141,
       "variant": "P",
+      "special": 1,
       "slug": "special-pumpkin"
     },
     {
@@ -549,6 +598,7 @@
       "description": "Jockey mob combination.",
       "priority": 142,
       "variant": "J",
+      "special": 1,
       "slug": "special-jockey"
     },
     {
@@ -560,6 +610,7 @@
       "description": "Unobtainable mob variant in normal survival.",
       "priority": 143,
       "variant": "U",
+      "special": 0,
       "slug": "special-unobtainable"
     },
     {
@@ -571,6 +622,7 @@
       "description": "Mob that cannot be trapped in typical mob traps.",
       "priority": 144,
       "variant": "F",
+      "special": 0,
       "slug": "special-untrapable"
     },
     {
@@ -582,6 +634,7 @@
       "description": "Mob variant with texture discrepancies.",
       "priority": 145,
       "variant": "T",
+      "special": 0,
       "slug": "special-texture-error"
     }
   ],
