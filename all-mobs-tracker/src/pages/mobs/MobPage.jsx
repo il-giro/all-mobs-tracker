@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { SuffixConfig, SuffixPriority } from '../../config/mobConfig';
-import { getMobDescription, getMobLink } from '../../config/mobDescriptions';
+import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
+import { getMobDescription, getMobLink, getVariantDescription, mobNameToSlug } from '../../config/mobDescriptions';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
 import Footer from '../../components/Footer';
 import useTrackerData from '../../utils/mobDatabase';
-import { mobNameToSlug } from '../../config/mobDescriptions';
 
 // ─── Hook: tracciamento mob ───────────────────────────────────────────────────
 const useTrackedMobs = () => {
@@ -89,9 +88,12 @@ const VariantCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImag
     : '';
 
   return (
-    <div className={`group border-4 bg-stone-800 transition-all select-none ${borderClass}`}>
+    <div
+      onClick={() => onToggle(mob.fileName)}
+      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onImageClick(mob); }}
+      className={`group border-4 bg-stone-800 transition-all select-none cursor-pointer ${borderClass}`}>
       <div
-        onClick={() => onImageClick(mob)}
+        onClick={(e) => { e.stopPropagation(); onImageClick(mob); }}
         className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer"
       >
         <img src={mob.image} alt={mob.name} draggable={false}
@@ -114,7 +116,7 @@ const VariantCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImag
                 </div>
               </div>
             )}
-            {[...iconMap.values()].map(icon => (
+            {[...iconMap.values()].filter(i => !i.tooltipOnly).map(icon => (
               <MobIcon key={icon.resolverId} icon={icon} />
             ))}
           </>
@@ -138,7 +140,7 @@ const VariantCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImag
       </div>
 
       <div
-        onClick={() => onToggle(mob.fileName)}
+        onClick={(e) => { e.stopPropagation(); onToggle(mob.fileName); }}
         className={`p-1 text-center border-t-4 cursor-pointer transition-colors
           ${isCaptured ? 'bg-green-900 border-green-700 hover:bg-green-800'
           : isTracked  ? 'bg-yellow-900 border-yellow-700 hover:bg-yellow-800'
@@ -224,7 +226,22 @@ const MobPage = () => {
 
   const isTrackedMain  = !!tracked[mainMob.fileName];
   const isCapturedMain = !!captured[mainMob.fileName];
-  const categories     = getMobCategories(mainMob, MobCategories);
+  const categories     = useMemo(() => {
+    const catMap = new Map();
+    if (mainMob) {
+      for (const c of getMobCategories(mainMob, MobCategories)) {
+        catMap.set(c.id, c);
+      }
+    }
+    for (const m of mobGroup) {
+      for (const c of getMobCategories(m, MobCategories)) {
+        if (!c.id.startsWith('color-') && !c.id.startsWith('biome-') && !c.id.startsWith('profession-')) {
+          if (!catMap.has(c.id)) catMap.set(c.id, c);
+        }
+      }
+    }
+    return [...catMap.values()];
+  }, [mainMob, mobGroup]);
 
   const capturedCount = variants.filter(m => !!captured[m.fileName]).length;
   const total         = variants.length;
@@ -244,6 +261,8 @@ const MobPage = () => {
             {/* Immagine principale + toggle */}
             <div
               onClick={() => toggle(mainMob.fileName)}
+              onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedVariant(mainMob); }}
+              title="Click to toggle, right-click for details"
               className={`shrink-0 w-32 h-32 flex items-center justify-center bg-[#181818] border-4 cursor-pointer relative transition-all
                 ${isCapturedMain ? 'border-green-600 hover:border-green-400'
                 : isTrackedMain  ? 'border-yellow-500 hover:border-yellow-400'
@@ -338,6 +357,24 @@ const MobPage = () => {
         const vTracked  = !!tracked[vm.fileName];
         const vCaptured = !!captured[vm.fileName];
         const vCats     = getMobCategories(vm, MobCategories);
+        const vCatsSpecial = vCats.filter(c => c.special);
+        const specialSuffixIdsFromCats = new Set(vCatsSpecial.map(c => c.variant).filter(Boolean));
+
+        const additionalSpecial = (vm.activeSuffixes ?? [])
+          .concat(vm.specialSuffixId ? [vm.specialSuffixId] : [])
+          .filter((id, i, a) => a.indexOf(id) === i && !specialSuffixIdsFromCats.has(id))
+          .map(id => {
+            const dbCat = MobCategories.find(c => c.special && c.variant === id);
+            const targetSlug = dbCat ? (dbCat.slug || dbCat.id) : Object.entries(SpecialFolderMap).find(([, v]) => v === id)?.[0]?.replace(/\s+/g, '-');
+            return {
+              suffixId: id,
+              cfg: SuffixConfig[id],
+              label: dbCat?.label || SuffixConfig[id]?.label || id,
+              slug: targetSlug
+            };
+          })
+          .filter(s => s.cfg && s.slug);
+
         const suffixDisplay = vm.activeSuffixes?.length > 0
           ? (() => {
               const labels = [...new Set(vm.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))];
@@ -381,7 +418,7 @@ const MobPage = () => {
                 </p>
 
                 {/* Categorie cliccabili */}
-                {vCats.length > 0 && (
+                {(vCats.length > 0 || additionalSpecial.length > 0) && (
                   <div className="flex flex-wrap gap-2">
                     {vCats.map(cat => (
                       <button
@@ -394,6 +431,21 @@ const MobPage = () => {
                       >
                         <CategoryIcon icon={cat.icon} label={cat.label} className="w-4 h-4" />
                         <span className={`text-xs uppercase ${cat.special ? 'text-purple-300' : 'text-stone-300'}`}>{cat.label}</span>
+                      </button>
+                    ))}
+                    {additionalSpecial.map(s => (
+                      <button
+                        key={s.suffixId}
+                        onClick={() => {
+                          setSelectedVariant(null);
+                          navigate(`/${s.slug}`);
+                        }}
+                        className="flex items-center gap-1.5 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 px-2 py-1 transition-colors"
+                      >
+                        <div className={`${s.cfg.color} text-white text-[8px] px-1 py-0.5 border border-stone-900 leading-none uppercase shrink-0`}>
+                          {s.cfg.label}
+                        </div>
+                        <span className="text-xs uppercase text-purple-300">{s.label}</span>
                       </button>
                     ))}
                   </div>
