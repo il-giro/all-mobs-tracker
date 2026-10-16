@@ -91,8 +91,11 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
     : '';
 
   return (
-    <div className={`group border-4 bg-stone-800 transition-all select-none ${borderClass}`}>
-      <div onClick={() => onImageClick(mob)} className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer">
+    <div
+      onClick={() => onToggle(mob.fileName)}
+      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onImageClick(mob); }}
+      className={`group border-4 bg-stone-800 transition-all select-none cursor-pointer ${borderClass}`}>
+      <div onClick={(e) => { e.stopPropagation(); onImageClick(mob); }} className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer">
         <img src={mob.image} alt={mob.name} draggable={false}
           className={`max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform ${imgClass}`} />
         {!isTracked && !isCaptured && (
@@ -114,7 +117,7 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
         {isCaptured  && <div className="absolute inset-0 flex items-center justify-center z-10"><span className="text-green-500 text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">✔</span></div>}
         {!isCaptured && isTracked && <div className="absolute inset-0 flex items-center justify-center z-10"><span className="text-yellow-400 text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">👁</span></div>}
       </div>
-      <div onClick={() => onToggle(mob.fileName)}
+      <div onClick={(e) => { e.stopPropagation(); onToggle(mob.fileName); }}
         className={`p-1 text-center border-t-4 cursor-pointer transition-colors
           ${isCaptured ? 'bg-green-900 border-green-700 hover:bg-green-800'
           : isTracked  ? 'bg-yellow-900 border-yellow-700 hover:bg-yellow-800'

@@ -112,6 +112,34 @@ const MobTracker = () => {
   const [showSettings, setShowSettings]     = useState(false);
   const [showStats, setShowStats]           = useState(false);
   const [showCategories, setShowCategories] = useState(false);
+  const [openCatSections, setOpenCatSections] = useState({ biomes: false, jobs: false, colors: false });
+  const toggleCatSection = (sec) => setOpenCatSections(prev => ({ ...prev, [sec]: !prev[sec] }));
+
+  const specialCategories = useMemo(() => {
+    return dbCategories.filter(c => c.special).sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
+  }, [dbCategories]);
+
+  const { standardCategories, biomeCategories, jobCategories, colorCategories } = useMemo(() => {
+    const std = [];
+    const bio = [];
+    const job = [];
+    const col = [];
+
+    for (const cat of MobCategories) {
+      if (cat.special) continue;
+      if (cat.id.startsWith('biome-')) {
+        bio.push(cat);
+      } else if (cat.id.startsWith('profession-')) {
+        job.push(cat);
+      } else if (cat.id.startsWith('color-')) {
+        col.push(cat);
+      } else {
+        std.push(cat);
+      }
+    }
+    return { standardCategories: std, biomeCategories: bio, jobCategories: job, colorCategories: col };
+  }, []);
+
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [sortBy, setSortBy]                 = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
   const [sortOpen, setSortOpen]             = useState(false);
@@ -524,58 +552,177 @@ const MobTracker = () => {
             <div className="overflow-y-auto flex-1 p-4 space-y-2" style={{scrollbarWidth:'thin',scrollbarColor:'#44403c #0c0c0c'}}>
 
               {/* ── Categorie speciali (dal DB: special = true) ── */}
-              <p className="text-[10px] uppercase text-stone-600 tracking-widest px-1 pb-1">Special</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {dbCategories.filter(c => c.special).sort((a,b) => a.priority - b.priority).map(sc => (
-                  <button key={sc.id}
-                    onClick={() => { setShowCategories(false); navigate(`/${sc.slug || sc.id}`); }}
-                    className="flex items-center gap-3 p-3 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
-                    <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
-                      {sc.icon?.includes('/') || sc.icon?.includes('.')
-                        ? <img src={sc.icon} alt={sc.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
-                        : <div className="bg-purple-700 text-white text-[9px] px-1 py-0.5 border border-stone-900 uppercase leading-none text-center">{sc.variant || 'SP'}</div>}
+              {specialCategories.length > 0 && (
+                <>
+                  <p className="text-[10px] uppercase text-purple-400 font-semibold tracking-widest px-1 pb-1">Special Categories</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                    {specialCategories.map(sc => (
+                      <button key={sc.id}
+                        onClick={() => { setShowCategories(false); navigate(`/${sc.slug || sc.id}`); }}
+                        className="flex items-center gap-3 p-3 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
+                        <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
+                          {sc.icon?.includes('/') || sc.icon?.includes('.')
+                            ? <img src={sc.icon} alt={sc.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
+                            : <div className="bg-purple-700 text-white text-[9px] px-1 py-0.5 border border-stone-900 uppercase leading-none text-center">{sc.variant || 'SP'}</div>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm uppercase text-purple-400 font-semibold truncate">{sc.label}</p>
+                          {sc.description && <p className="text-xs text-stone-500 mt-0.5 line-clamp-1">{sc.description}</p>}
+                        </div>
+                        <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-base shrink-0">→</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* ── Categorie standard / generali ── */}
+              {standardCategories.length > 0 && (
+                <>
+                  <div className="border-t-2 border-stone-800 my-2" />
+                  <p className="text-[10px] uppercase text-stone-400 font-semibold tracking-widest px-1 pb-1">Standard Categories</p>
+                  <div className="space-y-2 mb-3">
+                    {standardCategories.map(cat => {
+                      const colorMap = {
+                        amber:  { border:'border-amber-800',  hover:'hover:border-amber-500',  text:'text-amber-400'  },
+                        blue:   { border:'border-blue-800',   hover:'hover:border-blue-500',   text:'text-blue-400'   },
+                        green:  { border:'border-green-800',  hover:'hover:border-green-500',  text:'text-green-400'  },
+                        red:    { border:'border-red-800',    hover:'hover:border-red-500',    text:'text-red-400'    },
+                        purple: { border:'border-purple-800', hover:'hover:border-purple-500', text:'text-purple-400' },
+                        cyan:   { border:'border-cyan-800',   hover:'hover:border-cyan-500',   text:'text-cyan-400'   },
+                        white:  { border:'border-stone-600',  hover:'hover:border-stone-400',  text:'text-stone-300'  },
+                      };
+                      const c = colorMap[cat.color] ?? colorMap.amber;
+                      return (
+                        <button key={cat.id} onClick={()=>{ setShowCategories(false); navigate(`/categories/${cat.id}`); }}
+                          className={`flex items-center gap-4 w-full p-3 border-2 ${c.border} ${c.hover} bg-stone-800 hover:bg-stone-700 transition-all group text-left`}>
+                          <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
+                            {cat.icon?.includes('/')||cat.icon?.includes('.')
+                              ? <img src={cat.icon} alt={cat.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
+                              : <span className={`text-2xl ${c.text}`}>{cat.icon}</span>}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm uppercase ${c.text}`}>{cat.label}</p>
+                            {cat.description && <p className="text-xs text-stone-500 leading-relaxed mt-0.5 line-clamp-2">{cat.description}</p>}
+                          </div>
+                          <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-lg shrink-0">→</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {/* ── Menu a tendina per Biomi, Professioni e Colori ── */}
+              <div className="border-t-2 border-stone-800 my-2 pt-2 space-y-2">
+
+                {/* Biomi */}
+                <div className="border-2 border-green-900 bg-stone-900/60 overflow-hidden">
+                  <button
+                    onClick={() => toggleCatSection('biomes')}
+                    className="w-full flex items-center justify-between p-3.5 bg-stone-800/80 hover:bg-stone-700 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">🌿</span>
+                      <span className="text-sm uppercase font-semibold text-green-400 tracking-wider">
+                        Biomi ({biomeCategories.length})
+                      </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm uppercase text-purple-400 font-semibold truncate">{sc.label}</p>
-                      {sc.description && <p className="text-xs text-stone-500 mt-0.5 line-clamp-1">{sc.description}</p>}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs uppercase text-stone-500">{openCatSections.biomes ? 'Chiudi' : 'Apri'}</span>
+                      <span className="text-stone-400 text-xs">{openCatSections.biomes ? '▲' : '▼'}</span>
                     </div>
-                    <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-base shrink-0">→</span>
                   </button>
-                ))}
+                  {openCatSections.biomes && (
+                    <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 border-t-2 border-green-900/60 bg-stone-900/40">
+                      {biomeCategories.map(cat => (
+                        <button key={cat.id} onClick={() => { setShowCategories(false); navigate(`/categories/${cat.id}`); }}
+                          className="flex items-center gap-3 p-2.5 border-2 border-green-900/80 hover:border-green-500 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
+                          <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-[#181818] border border-stone-700">
+                            <img src={cat.icon} alt={cat.label} className="w-6 h-6 object-contain pixelated" draggable={false} />
+                          </div>
+                          <span className="text-xs uppercase text-stone-200 group-hover:text-green-300 font-medium flex-1 truncate">
+                            {cat.variant || cat.label.replace(/^Biome\s*-\s*/i, '')}
+                          </span>
+                          <span className="text-stone-500 group-hover:text-stone-300 text-xs">→</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Professioni / Lavori */}
+                <div className="border-2 border-amber-900 bg-stone-900/60 overflow-hidden">
+                  <button
+                    onClick={() => toggleCatSection('jobs')}
+                    className="w-full flex items-center justify-between p-3.5 bg-stone-800/80 hover:bg-stone-700 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">⚒</span>
+                      <span className="text-sm uppercase font-semibold text-amber-400 tracking-wider">
+                        Lavori / Professioni ({jobCategories.length})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs uppercase text-stone-500">{openCatSections.jobs ? 'Chiudi' : 'Apri'}</span>
+                      <span className="text-stone-400 text-xs">{openCatSections.jobs ? '▲' : '▼'}</span>
+                    </div>
+                  </button>
+                  {openCatSections.jobs && (
+                    <div className="p-3 grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 gap-2 border-t-2 border-amber-900/60 bg-stone-900/40">
+                      {jobCategories.map(cat => (
+                        <button key={cat.id} onClick={() => { setShowCategories(false); navigate(`/categories/${cat.id}`); }}
+                          className="flex items-center gap-2.5 p-2 border-2 border-amber-900/80 hover:border-amber-500 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
+                          <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-[#181818] border border-stone-700">
+                            {cat.icon
+                              ? <img src={cat.icon} alt={cat.label} className="w-6 h-6 object-contain pixelated" draggable={false} />
+                              : <span className="text-xs text-amber-500 font-mono">?</span>}
+                          </div>
+                          <span className="text-xs uppercase text-stone-200 group-hover:text-amber-300 font-medium flex-1 truncate">
+                            {cat.variant || cat.label.replace(/^Profession\s*-\s*/i, '')}
+                          </span>
+                          <span className="text-stone-500 group-hover:text-stone-300 text-xs">→</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Colori */}
+                <div className="border-2 border-blue-900 bg-stone-900/60 overflow-hidden">
+                  <button
+                    onClick={() => toggleCatSection('colors')}
+                    className="w-full flex items-center justify-between p-3.5 bg-stone-800/80 hover:bg-stone-700 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">🎨</span>
+                      <span className="text-sm uppercase font-semibold text-blue-400 tracking-wider">
+                        Colori ({colorCategories.length})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs uppercase text-stone-500">{openCatSections.colors ? 'Chiudi' : 'Apri'}</span>
+                      <span className="text-stone-400 text-xs">{openCatSections.colors ? '▲' : '▼'}</span>
+                    </div>
+                  </button>
+                  {openCatSections.colors && (
+                    <div className="p-3 grid grid-cols-2 sm:grid-cols-4 gap-2 border-t-2 border-blue-900/60 bg-stone-900/40">
+                      {colorCategories.map(cat => (
+                        <button key={cat.id} onClick={() => { setShowCategories(false); navigate(`/categories/${cat.id}`); }}
+                          className="flex items-center gap-2 p-2 border-2 border-stone-700 hover:border-blue-400 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
+                          <div className="w-7 h-7 shrink-0 flex items-center justify-center bg-[#181818] border border-stone-700">
+                            <img src={cat.icon} alt={cat.label} className="w-5 h-5 object-contain pixelated" draggable={false} />
+                          </div>
+                          <span className="text-xs uppercase text-stone-200 group-hover:text-blue-300 font-medium flex-1 truncate">
+                            {cat.variant || cat.label.replace(/^Color\s*-\s*/i, '')}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
               </div>
-
-              {/* ── Separatore ── */}
-              <div className="border-t-2 border-stone-800 my-2" />
-              <p className="text-[10px] uppercase text-stone-600 tracking-widest px-1 pb-1">Standard</p>
-
-              {/* ── Categorie normali (escluse quelle speciali) ── */}
-              {MobCategories.filter(cat => !cat.special).map(cat => {
-                const colorMap = {
-                  amber:  { border:'border-amber-800',  hover:'hover:border-amber-500',  text:'text-amber-400'  },
-                  blue:   { border:'border-blue-800',   hover:'hover:border-blue-500',   text:'text-blue-400'   },
-                  green:  { border:'border-green-800',  hover:'hover:border-green-500',  text:'text-green-400'  },
-                  red:    { border:'border-red-800',    hover:'hover:border-red-500',    text:'text-red-400'    },
-                  purple: { border:'border-purple-800', hover:'hover:border-purple-500', text:'text-purple-400' },
-                  cyan:   { border:'border-cyan-800',   hover:'hover:border-cyan-500',   text:'text-cyan-400'   },
-                  white:  { border:'border-stone-600',  hover:'hover:border-stone-400',  text:'text-stone-300'  },
-                };
-                const c = colorMap[cat.color] ?? colorMap.amber;
-                return (
-                  <button key={cat.id} onClick={()=>{ setShowCategories(false); navigate(`/categories/${cat.id}`); }}
-                    className={`flex items-center gap-4 w-full p-4 border-2 ${c.border} ${c.hover} bg-stone-800 hover:bg-stone-700 transition-all group text-left`}>
-                    <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
-                      {cat.icon?.includes('/')||cat.icon?.includes('.')
-                        ? <img src={cat.icon} alt={cat.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
-                        : <span className={`text-2xl ${c.text}`}>{cat.icon}</span>}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm uppercase ${c.text}`}>{cat.label}</p>
-                      {cat.description && <p className="text-xs text-stone-500 leading-relaxed mt-1 line-clamp-2">{cat.description}</p>}
-                    </div>
-                    <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-lg shrink-0">→</span>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>

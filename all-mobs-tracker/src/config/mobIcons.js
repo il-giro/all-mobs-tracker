@@ -80,31 +80,31 @@ export const SIZE_CLASSES = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const VillagerBiomes = {
-  1: { label: 'Plains',  icon: '/icons/biomes/Plains.png'       },
-  2: { label: 'Desert',  icon: '/icons/biomes/Desert.png'       },
-  3: { label: 'Jungle',  icon: '/icons/biomes/Jungle.png'       },
-  4: { label: 'Savanna', icon: '/icons/biomes/Savanna.png'      },
-  5: { label: 'Snow',    icon: '/icons/biomes/SnowyPlains.png'  },
-  6: { label: 'Swamp',   icon: '/icons/biomes/Swamp.png'        },
-  7: { label: 'Taiga',   icon: '/icons/biomes/Taiga.png'        },
+  1: { label: 'Plains',  icon: '/icons/biomes/Plains.png',      categoryId: 'biome-plains'  },
+  2: { label: 'Desert',  icon: '/icons/biomes/Desert.png',      categoryId: 'biome-desert'  },
+  3: { label: 'Jungle',  icon: '/icons/biomes/Jungle.png',      categoryId: 'biome-jungle'  },
+  4: { label: 'Savanna', icon: '/icons/biomes/Savanna.png',     categoryId: 'biome-savanna' },
+  5: { label: 'Snow',    icon: '/icons/biomes/SnowyPlains.png', categoryId: 'biome-snow'    },
+  6: { label: 'Swamp',   icon: '/icons/biomes/Swamp.png',       categoryId: 'biome-swamp'   },
+  7: { label: 'Taiga',   icon: '/icons/biomes/Taiga.png',       categoryId: 'biome-taiga'   },
 };
 
 export const VillagerJobs = {
-  1:  { label: 'Unemployed',    icon: null },
-  2:  { label: 'Nitwit',        icon: null },
-  3:  { label: 'Armorer',       icon: '/icons/job site/blast-furnace.png'     },
-  4:  { label: 'Butcher',       icon: '/icons/job site/smoker.png'            },
-  5:  { label: 'Cartographer',  icon: '/icons/job site/cartography-table.png' },
-  6:  { label: 'Cleric',        icon: '/icons/job site/brewing-stand.png'     },
-  7:  { label: 'Farmer',        icon: '/icons/job site/composter.png'         },
-  8:  { label: 'Fisherman',     icon: '/icons/job site/barrel.png'            },
-  9:  { label: 'Fletcher',      icon: '/icons/job site/fletching-table.png'   },
-  10: { label: 'Leatherworker', icon: '/icons/job site/cauldron.png'          },
-  11: { label: 'Librarian',     icon: '/icons/job site/lectern.png'           },
-  12: { label: 'Mason',         icon: '/icons/job site/stonecutter.png'       },
-  13: { label: 'Shepherd',      icon: '/icons/job site/loom.png'              },
-  14: { label: 'Toolsmith',     icon: '/icons/job site/smithing-table.png'    },
-  15: { label: 'Weaponsmith',   icon: '/icons/job site/grindstone.png'        },
+  1:  { label: 'Unemployed',    icon: null,                                   categoryId: 'profession-unemployed'    },
+  2:  { label: 'Nitwit',        icon: null,                                   categoryId: 'profession-nitwit'        },
+  3:  { label: 'Armorer',       icon: '/icons/job site/blast-furnace.png',     categoryId: 'profession-armorer'       },
+  4:  { label: 'Butcher',       icon: '/icons/job site/smoker.png',            categoryId: 'profession-butcher'       },
+  5:  { label: 'Cartographer',  icon: '/icons/job site/cartography-table.png', categoryId: 'profession-cartographer' },
+  6:  { label: 'Cleric',        icon: '/icons/job site/brewing-stand.png',     categoryId: 'profession-cleric'        },
+  7:  { label: 'Farmer',        icon: '/icons/job site/composter.png',         categoryId: 'profession-farmer'        },
+  8:  { label: 'Fisherman',     icon: '/icons/job site/barrel.png',            categoryId: 'profession-fisherman'     },
+  9:  { label: 'Fletcher',      icon: '/icons/job site/fletching-table.png',   categoryId: 'profession-fletcher'      },
+  10: { label: 'Leatherworker', icon: '/icons/job site/cauldron.png',          categoryId: 'profession-leatherworker' },
+  11: { label: 'Librarian',     icon: '/icons/job site/lectern.png',           categoryId: 'profession-librarian'     },
+  12: { label: 'Mason',         icon: '/icons/job site/stonecutter.png',       categoryId: 'profession-mason'         },
+  13: { label: 'Shepherd',      icon: '/icons/job site/loom.png',              categoryId: 'profession-shepherd'      },
+  14: { label: 'Toolsmith',     icon: '/icons/job site/smithing-table.png',    categoryId: 'profession-toolsmith'     },
+  15: { label: 'Weaponsmith',   icon: '/icons/job site/grindstone.png',        categoryId: 'profession-weaponsmith'   },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,11 +123,12 @@ export const MOB_ICON_RESOLVERS = [
       const biomeData = VillagerBiomes[mob.num1] ?? null;
       if (!biomeData?.icon) return null;
       return [{
-        src:       biomeData.icon,
-        alt:       biomeData.label,
-        position:  POSITIONS.BOTTOM_RIGHT,
-        label:     biomeData.label,
-        labelRole: 'biome',
+        src:        biomeData.icon,
+        alt:        biomeData.label,
+        position:   POSITIONS.BOTTOM_RIGHT,
+        label:      biomeData.label,
+        labelRole:  'biome',
+        categoryId: biomeData.categoryId,
       }];
     },
   },
@@ -140,14 +141,26 @@ export const MOB_ICON_RESOLVERS = [
       const config = ComplexConfig.find(c => c.id === mob.complexId);
       if (!config?.useVillagerIcons) return null;
       const jobData = VillagerJobs[mob.num2] ?? null;
-      if (!jobData?.icon) return null;
-      const hasSuffix = mob.activeSuffixes.length > 0;
+      if (!jobData) return null;
+      if (!jobData.icon) {
+        return [{
+          src:         '/icons/mobs/VillagerFace.png',
+          alt:         jobData.label,
+          position:    POSITIONS.BOTTOM_LEFT,
+          label:       jobData.label,
+          labelRole:   'job',
+          categoryId:  jobData.categoryId,
+          tooltipOnly: true,
+        }];
+      }
+      const hasSuffix = mob.activeSuffixes?.length > 0;
       return [{
-        src:       jobData.icon,
-        alt:       jobData.label,
-        position:  hasSuffix ? POSITIONS.TOP_RIGHT : POSITIONS.BOTTOM_LEFT,
-        label:     jobData.label,
-        labelRole: 'job',
+        src:        jobData.icon,
+        alt:        jobData.label,
+        position:   hasSuffix ? POSITIONS.TOP_RIGHT : POSITIONS.BOTTOM_LEFT,
+        label:      jobData.label,
+        labelRole:  'job',
+        categoryId: jobData.categoryId,
       }];
     },
   },
@@ -177,13 +190,23 @@ export const MOB_ICON_RESOLVERS = [
     resolve(mob) {
       const folder = mob.folder?.toLowerCase();
       const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: 'green', 8: 'light-blue', 9: 'lime', 10: 'magenta', 11: 'orange', 12: 'pink', 13: 'purple', 14: 'red', 15: 'light-gray', 16: 'white', 17: 'yellow' };
+      const toColorCatId = (cName) => `color-${cName.replace(/-/g, '')}`;
 
       // ── Sheep ──────────────────────────────────────────────────────────────
       if (folder === 'sheep') {
         const sheepColors = { 1: 'white', 2: 'light-gray', 3: 'gray', 4: 'black', 5: 'brown', 6: 'red', 7: 'orange', 8: 'yellow', 9: 'lime', 10: 'green', 11: 'cyan', 12: 'light-blue', 13: 'blue', 14: 'purple', 15: 'magenta', 16: 'pink' };
         const colorName = sheepColors[mob.num3];
         if (!colorName) return null;
-        return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'color', fallbackHide: true }];
+        return [{
+          src:          `/icons/items/${colorName}-wool.png`,
+          alt:          colorName,
+          position:     POSITIONS.BOTTOM_RIGHT,
+          size:         'md',
+          label:        colorName.replace(/-/g, ' '),
+          labelRole:    'color',
+          categoryId:   toColorCatId(colorName),
+          fallbackHide: true,
+        }];
       }
 
       // ── Llama ──────────────────────────────────────────────────────────────
@@ -191,7 +214,16 @@ export const MOB_ICON_RESOLVERS = [
         if (!mob.num3 || mob.num3 === 1) return null;
         const colorName = colorMap[mob.num3];
         if (!colorName) return null;
-        return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: 'carpet', fallbackHide: true }];
+        return [{
+          src:          `/icons/items/${colorName}-wool.png`,
+          alt:          colorName,
+          position:     POSITIONS.BOTTOM_RIGHT,
+          size:         'md',
+          label:        colorName.replace(/-/g, ' '),
+          labelRole:    'carpet',
+          categoryId:   toColorCatId(colorName),
+          fallbackHide: true,
+        }];
       }
 
       // ── Wolf ───────────────────────────────────────────────────────────────
@@ -199,7 +231,16 @@ export const MOB_ICON_RESOLVERS = [
         if (mob.num2 === 1 || !mob.num3 || mob.num3 === 1) return null;
         const colorName = colorMap[mob.num3];
         if (!colorName) return null;
-        return [{ src: `/icons/items/${colorName}-wool.png`, alt: colorName, position: POSITIONS.BOTTOM_RIGHT, size: 'md', label: colorName.replace(/-/g, ' '), labelRole: mob.num2 === 3 ? 'armor' : 'collar', fallbackHide: true }];
+        return [{
+          src:          `/icons/items/${colorName}-wool.png`,
+          alt:          colorName,
+          position:     POSITIONS.BOTTOM_RIGHT,
+          size:         'md',
+          label:        colorName.replace(/-/g, ' '),
+          labelRole:    mob.num2 === 3 ? 'armor' : 'collar',
+          categoryId:   toColorCatId(colorName),
+          fallbackHide: true,
+        }];
       }
 
       return null;
@@ -441,24 +482,27 @@ export function hasVillagerIcons(mob) {
 export function getMobCategories(mob, categories) {
   if (!mob) return [];
   const targetCategories = categories || [];
+  const categoryIds = new Set();
 
-  // Se il mob ha già categorie assegnate dal database
+  // Categorie dal database se presenti
   if (Array.isArray(mob.categories) && mob.categories.length > 0) {
-    if (targetCategories.length === 0) return mob.categories;
-    const targetSet = new Set(targetCategories.map(c => c.id ?? c.dbId));
-    const matched = mob.categories.filter(c => targetSet.has(c.id) || targetSet.has(c.dbId));
-    if (matched.length > 0) return matched;
-    return mob.categories;
+    for (const c of mob.categories) {
+      if (c.id) categoryIds.add(c.id);
+      if (c.dbId) {
+        const found = targetCategories.find(tc => tc.dbId === c.dbId);
+        if (found) categoryIds.add(found.id);
+      }
+    }
   }
 
   if (Array.isArray(mob.categoryIds) && mob.categoryIds.length > 0) {
-    const idSet = new Set(mob.categoryIds);
-    const matched = targetCategories.filter(cat => idSet.has(cat.dbId) || idSet.has(cat.id));
-    if (matched.length > 0) return matched;
+    for (const id of mob.categoryIds) {
+      const found = targetCategories.find(tc => tc.dbId === id || tc.id === id);
+      if (found) categoryIds.add(found.id);
+    }
   }
 
-  // Fallback basato sui resolver icona esistenti
-  const categoryIds = new Set();
+  // Categorie derivate dai resolver icona
   for (const resolver of MOB_ICON_RESOLVERS) {
     const icons = resolver.resolve(mob);
     if (!icons) continue;
@@ -466,5 +510,6 @@ export function getMobCategories(mob, categories) {
       if (icon.categoryId) categoryIds.add(icon.categoryId);
     }
   }
+
   return targetCategories.filter(cat => categoryIds.has(cat.id));
 }

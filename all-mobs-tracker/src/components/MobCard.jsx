@@ -110,6 +110,9 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const isVillager     = hasVillagerIcons(mob);
   const iconMap        = resolveIcons(mob);
   const tooltipIcons   = [...iconMap.values()].filter(icon => icon.label);
+  const allMobCats     = getMobCategories(mob, MobCategories);
+  const coveredCatIds  = new Set(tooltipIcons.map(i => i.categoryId).filter(Boolean));
+  const extraCategories = allMobCats.filter(c => !c.special && !coveredCatIds.has(c.id));
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => { const labels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))]; return labels.length > 0 ? `(${labels.join(', ')})` : ''; })()
@@ -224,6 +227,23 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
               {tooltipIcons.map(icon => (
                 <TooltipIconRow key={icon.resolverId} icon={icon} onNavigate={navigateToCategory} />
+              ))}
+            </div>
+          )}
+
+          {/* Categorie DB aggiuntive */}
+          {extraCategories.length > 0 && (
+            <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
+              <span className="text-stone-500 text-[9px] uppercase px-1 mb-0.5">Categories</span>
+              {extraCategories.map(cat => (
+                <button key={cat.id} onMouseDown={e => { e.stopPropagation(); navigateToCategory(cat.id); }}
+                  className="flex items-center gap-2 border border-stone-700 hover:border-stone-400 bg-stone-900 hover:bg-stone-700 px-1.5 py-1 transition-colors w-full text-left">
+                  {cat.icon && (
+                    <img src={cat.icon} alt={cat.label} draggable={false} className="w-5 h-5 object-contain pixelated shrink-0" />
+                  )}
+                  <span className="text-xs uppercase flex-1 text-stone-200">{cat.label || cat.name}</span>
+                  <span className="text-[9px] uppercase ml-auto text-stone-500">→</span>
+                </button>
               ))}
             </div>
           )}

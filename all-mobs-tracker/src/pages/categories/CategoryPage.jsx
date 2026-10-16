@@ -43,9 +43,12 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
     : '';
 
   return (
-    <div className={`group border-4 bg-stone-800 transition-all select-none ${borderClass}`}>
+    <div
+      onClick={() => onToggle(mob.fileName)}
+      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onImageClick(mob); }}
+      className={`group border-4 bg-stone-800 transition-all select-none cursor-pointer ${borderClass}`}>
       {/* Immagine → apre popup */}
-      <div onClick={() => onImageClick(mob)} className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer">
+      <div onClick={(e) => { e.stopPropagation(); onImageClick(mob); }} className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer">
         <img src={mob.image} alt={mob.name} draggable={false}
           className={`max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform ${imgClass}`} />
 
@@ -61,7 +64,7 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
                 <div className={`${topSuffix.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none whitespace-nowrap`}>{topSuffix.label}</div>
               </div>
             )}
-            {[...iconMap.values()].map(icon => <MobIcon key={icon.resolverId} icon={icon} />)}
+            {[...iconMap.values()].filter(i => !i.tooltipOnly).map(icon => <MobIcon key={icon.resolverId} icon={icon} />)}
           </>
         )}
         {[...iconMap.values()].filter(i => i.alwaysVisible).map(icon => <MobIcon key={`av_${icon.resolverId}`} icon={icon} />)}
@@ -70,7 +73,7 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
       </div>
 
       {/* Nome → toggle */}
-      <div onClick={() => onToggle(mob.fileName)}
+      <div onClick={(e) => { e.stopPropagation(); onToggle(mob.fileName); }}
         className={`p-1 text-center border-t-4 cursor-pointer transition-colors
           ${isCaptured ? 'bg-green-900 border-green-700 hover:bg-green-800'
           : isTracked  ? 'bg-yellow-900 border-yellow-700 hover:bg-yellow-800'
@@ -226,6 +229,7 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
         const vTracked  = !!tracked[vm.fileName];
         const vCaptured = !!captured[vm.fileName];
         const vDesc     = getMobDesc(vm);
+        const vCats     = getMobCategories(vm, MobCategories);
         const vCatsNormal  = vCats.filter(c => !c.special);
         const vCatsSpecial = vCats.filter(c => c.special);
         const specialSuffixIdsFromCats = new Set(vCatsSpecial.map(c => c.variant).filter(Boolean));
