@@ -96,7 +96,7 @@ const VariantCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImag
         onClick={(e) => { e.stopPropagation(); onImageClick(mob); }}
         className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer"
       >
-        <img src={mob.image} alt={mob.name} draggable={false}
+        <img src={mob.image} alt={mob.name} loading="lazy" decoding="async" draggable={false}
           className={`max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform ${imgClass}`} />
 
         {/* Badge e icone — nascosti se tracciato/catturato */}

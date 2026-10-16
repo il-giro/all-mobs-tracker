@@ -171,7 +171,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
       className={`mob-card group bg-stone-800 border-4 transition-all cursor-pointer overflow-visible ${borderClass}`}>
 
       <div className={`aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden ${imgOpacity}`}>
-        <img src={mob.image} alt={mob.name} draggable={false} onDragStart={e => e.preventDefault()}
+        <img src={mob.image} alt={mob.name} loading="lazy" decoding="async" draggable={false} onDragStart={e => e.preventDefault()}
           className="max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform select-none" />
 
         {!isTracked && !isCaptured && (

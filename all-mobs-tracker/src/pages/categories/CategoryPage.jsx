@@ -49,7 +49,7 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
       className={`group border-4 bg-stone-800 transition-all select-none cursor-pointer ${borderClass}`}>
       {/* Immagine → apre popup */}
       <div onClick={(e) => { e.stopPropagation(); onImageClick(mob); }} className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden cursor-pointer">
-        <img src={mob.image} alt={mob.name} draggable={false}
+        <img src={mob.image} alt={mob.name} loading="lazy" decoding="async" draggable={false}
           className={`max-w-full max-h-full object-contain pixelated group-hover:scale-110 transition-transform ${imgClass}`} />
 
         {!isTracked && !isCaptured && (

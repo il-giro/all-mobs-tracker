@@ -1,0 +1,45 @@
+export const FISH_TYPES = [
+  { name: 'Kob',       shape: 0, pattern: 0 },
+  { name: 'Sunstreak', shape: 0, pattern: 1 },
+  { name: 'Snooper',   shape: 0, pattern: 2 },
+  { name: 'Dasher',    shape: 0, pattern: 3 },
+  { name: 'Brinely',   shape: 0, pattern: 4 },
+  { name: 'Spotty',    shape: 0, pattern: 5 },
+  { name: 'Flopper',   shape: 1, pattern: 0 },
+  { name: 'Stripey',   shape: 1, pattern: 1 },
+  { name: 'Glitter',   shape: 1, pattern: 2 },
+  { name: 'Blockfish', shape: 1, pattern: 3 },
+  { name: 'Betty',     shape: 1, pattern: 4 },
+  { name: 'Clayfish',  shape: 1, pattern: 5 },
+];
+
+export const COLOR_NAMES = [
+  'White','Orange','Magenta','Light Blue','Yellow','Lime',
+  'Pink','Gray','Light Gray','Cyan','Purple','Blue',
+  'Brown','Green','Red','Black',
+];
+
+export const OFFICIAL_NAMES = new Map([
+  ['7_1_7',   'Anemone'],
+  ['6_7_7',   'Black Tang'],
+  ['6_7_11',  'Blue Tang'],
+  ['11_0_7',  'Butterflyfish'],
+  ['1_11_7',  'Cichlid'],
+  ['0_1_0',   'Clownfish'],
+  ['5_6_3',   'Cotton Candy Betta'],
+  ['9_10_4',  'Dottyback'],
+  ['11_0_14', 'Emperor Red Snapper'],
+  ['5_0_4',   'Goatfish'],
+  ['8_0_7',   'Moorish Idol'],
+  ['11_0_1',  'Ornate Butterflyfish'],
+  ['3_9_6',   'Parrotfish'],
+  ['4_5_3',   'Queen Angelfish'],
+  ['10_14_0', 'Red Cichlid'],
+  ['2_7_14',  'Red Lipped Blenny'],
+  ['9_14_0',  'Red Snapper'],
+  ['6_0_4',   'Threadfin'],
+  ['0_14_0',  'Tomato Clownfish'],
+  ['1_7_0',   'Triggerfish'],
+  ['3_9_4',   'Yellowtail Parrotfish'],
+  ['6_4_4',   'Yellow Tang'],
+]);

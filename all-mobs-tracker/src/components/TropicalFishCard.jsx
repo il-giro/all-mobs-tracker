@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { getFishRenderer, FISH_TYPES, COLOR_NAMES } from '../utils/FishRenderer';
+import { OFFICIAL_NAMES } from '../utils/fishConstants';
 
 const COLOR_BADGES = [
   'bg-white text-black', 'bg-orange-500', 'bg-purple-400', 'bg-blue-300 text-black',
@@ -9,30 +10,6 @@ const COLOR_BADGES = [
   'bg-amber-900', 'bg-green-800', 'bg-red-700', 'bg-stone-900',
 ];
 
-export const OFFICIAL_NAMES = new Map([
-  ['7_1_7',   'Anemone'],
-  ['6_7_7',   'Black Tang'],
-  ['6_7_11',  'Blue Tang'],
-  ['11_0_7',  'Butterflyfish'],
-  ['1_11_7',  'Cichlid'],
-  ['0_1_0',   'Clownfish'],
-  ['5_6_3',   'Cotton Candy Betta'],
-  ['9_10_4',  'Dottyback'],
-  ['11_0_14', 'Emperor Red Snapper'],
-  ['5_0_4',   'Goatfish'],
-  ['8_0_7',   'Moorish Idol'],
-  ['11_0_1',  'Ornate Butterflyfish'],
-  ['3_9_6',   'Parrotfish'],
-  ['4_5_3',   'Queen Angelfish'],
-  ['10_14_0', 'Red Cichlid'],
-  ['2_7_14',  'Red Lipped Blenny'],
-  ['9_14_0',  'Red Snapper'],
-  ['6_0_4',   'Threadfin'],
-  ['0_14_0',  'Tomato Clownfish'],
-  ['1_7_0',   'Triggerfish'],
-  ['3_9_4',   'Yellowtail Parrotfish'],
-  ['6_4_4',   'Yellow Tang'],
-]);
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {

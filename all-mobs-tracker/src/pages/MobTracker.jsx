@@ -1,10 +1,8 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Settings from '../components/Settings';
 import MobCard from '../components/MobCard';
-import TropicalFishCard from '../components/TropicalFishCard';
-import { FISH_TYPES, COLOR_NAMES } from '../utils/FishRenderer';
-import { OFFICIAL_NAMES } from '../components/TropicalFishCard';
+import { FISH_TYPES, COLOR_NAMES, OFFICIAL_NAMES } from '../utils/fishConstants';
 import Stats from '../components/Stats';
 import { parseFileName } from '../utils/mobParser';
 import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
@@ -12,6 +10,9 @@ import { VillagerBiomes, VillagerJobs } from '../config/mobIcons';
 import { MobCategories } from '../config/mobCategories';
 import Footer from '../components/Footer';
 import useTrackerData from '../utils/mobDatabase';
+
+const TropicalFishCard   = lazy(() => import('../components/TropicalFishCard'));
+const ShareProgressModal = lazy(() => import('../components/ShareProgressModal'));
 
 const ALL_FISH = (() => {
   const fish = [];
@@ -63,7 +64,7 @@ const FolderCard = ({ folderKey, mobs, trackedMobs, isOpen, onToggle }) => {
         ? isSpecial ? 'border-purple-400 bg-purple-950/80' : 'border-blue-400 bg-blue-950/80'
         : isSpecial ? 'border-purple-700 bg-stone-800 hover:border-purple-400' : 'border-blue-700 bg-stone-800 hover:border-blue-400'}`}>
       <div className="aspect-square p-2 flex items-center justify-center bg-[#181818] relative overflow-hidden">
-        {firstMob && <img src={firstMob.image} alt={label} draggable={false} className="max-w-full max-h-full object-contain pixelated opacity-60 group-hover:opacity-80 transition-opacity select-none" />}
+        {firstMob && <img src={firstMob.image} alt={label} loading="lazy" decoding="async" draggable={false} className="max-w-full max-h-full object-contain pixelated opacity-60 group-hover:opacity-80 transition-opacity select-none" />}
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
           <span className={`text-2xl leading-none ${isSpecial ? 'text-purple-300' : 'text-blue-300'}`}>{isOpen ? '▼' : '▶'}</span>
         </div>
@@ -112,6 +113,7 @@ const MobTracker = () => {
   const [showSettings, setShowSettings]     = useState(false);
   const [showStats, setShowStats]           = useState(false);
   const [showCategories, setShowCategories] = useState(false);
+  const [showShare, setShowShare]           = useState(false);
   const [openCatSections, setOpenCatSections] = useState({ biomes: false, jobs: false, colors: false });
   const toggleCatSection = (sec) => setOpenCatSections(prev => ({ ...prev, [sec]: !prev[sec] }));
 
@@ -529,6 +531,18 @@ const MobTracker = () => {
         </div>
       )}
 
+      {showShare && (
+        <Suspense fallback={null}>
+          <ShareProgressModal
+            onClose={() => setShowShare(false)}
+            allMobs={allMobs}
+            trackedMobs={trackedMobs}
+            capturedMobs={capturedMobs}
+            captureMode={captureMode}
+          />
+        </Suspense>
+      )}
+
       {showSettings && (
         <Settings variantMode={variantMode} setVariantMode={setVariantMode} filters={filters} toggleFilter={(id)=>setFilters(p=>({...p,[id]:!p[id]}))} setFilters={setFilters}
           showAllFish={showAllFish} setShowAllFish={setShowAllFish} folderList={folderList}
@@ -763,6 +777,9 @@ const MobTracker = () => {
                 </div>
                 <div className="flex gap-3 shrink-0">
                   <button onClick={()=>setShowCategories(v=>!v)} className={`px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 ${showCategories?'bg-amber-700 hover:bg-amber-600':'bg-stone-700 hover:bg-stone-600'}`}>Categories</button>
+                  <button onClick={()=>setShowShare(true)} className="bg-emerald-800 hover:bg-emerald-700 px-5 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 text-emerald-200 flex items-center gap-2">
+                    <span>🏆</span><span className="hidden sm:inline">Condividi</span>
+                  </button>
                   <button onClick={()=>setShowSettings(true)} className="bg-stone-700 hover:bg-stone-600 px-6 py-2 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0">Settings</button>
                 </div>
               </div>
@@ -852,11 +869,13 @@ const MobTracker = () => {
               </div>
               <div className="p-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-12 gap-2" style={{position:'relative',zIndex:1}}>
-                  {displayedFish.map(fish=>(
-                    <div key={fish.id} data-mob-id={fish.id}>
-                      <TropicalFishCard fish={fish} isTracked={trackedMobs[fish.id]} onToggle={()=>toggleMob(fish.id)} />
-                    </div>
-                  ))}
+                  <Suspense fallback={<div className="col-span-full flex items-center justify-center py-8 text-stone-500"><div className="w-8 h-8 border-4 border-stone-700 border-t-cyan-400 rounded-full animate-spin" /></div>}>
+                    {displayedFish.map(fish=>(
+                      <div key={fish.id} data-mob-id={fish.id}>
+                        <TropicalFishCard fish={fish} isTracked={trackedMobs[fish.id]} onToggle={()=>toggleMob(fish.id)} />
+                      </div>
+                    ))}
+                  </Suspense>
                 </div>
               </div>
             </div>

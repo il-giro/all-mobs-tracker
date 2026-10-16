@@ -9,6 +9,13 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         admin: resolve(__dirname, 'admin.html')
+      },
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) return 'three';
+          if (id.includes('node_modules/react-dom')) return 'react-dom';
+          if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/react-router')) return 'router';
+        }
       }
     }
   },
