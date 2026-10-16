@@ -4,7 +4,7 @@ import { CategoryMap, MobCategories, getCategoryById } from '../../config/mobCat
 import { parseFileName } from '../../utils/mobParser';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
-import { mobNameToSlug } from '../../config/mobDescriptions';
+import { mobNameToSlug } from '../../utils/mobParser';
 import Footer from '../../components/Footer';
 import useTrackerData from '../../utils/mobDatabase';
 
@@ -169,8 +169,6 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
   };
   const c = CM[col] ?? CM.amber;
 
-  // Descrizione per mob dalla config categoria
-  const getMobDesc = (mob) => category.mobDescriptions?.[mob.fileName] ?? null;
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">

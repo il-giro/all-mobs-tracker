@@ -85,3 +85,7 @@ export const parseFileName = (fileName, path) => {
   data.name = data.name.replace(/-/g, ' ').replace(/([A-Z])/g, ' $1').trim();
   return data;
 };
+
+export function mobNameToSlug(name) {
+  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}

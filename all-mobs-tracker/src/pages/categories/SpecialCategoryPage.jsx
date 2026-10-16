@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
-import { getSpecialCategoryDesc } from '../../config/mobDescriptions';
 import Footer from '../../components/Footer';
 import useTrackerData from '../../utils/mobDatabase';
 

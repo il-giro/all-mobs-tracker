@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
-import { getMobDescription, getMobLink, getVariantDescription, mobNameToSlug } from '../../config/mobDescriptions';
+import { mobNameToSlug } from '../../utils/mobParser';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
 import Footer from '../../components/Footer';
@@ -181,8 +181,8 @@ const MobPage = () => {
   const mainMob  = mobGroup[0] ?? null;
   const variants = mobGroup;
 
-  const description = slug ? getMobDescription(slug) : null;
-  const wikiLink    = slug ? getMobLink(slug) : null;
+  const description = mainMob?.description || null;
+  const wikiLink    = mainMob?.link || null;
 
 
   // Favicon dinamica
@@ -351,7 +351,7 @@ const MobPage = () => {
       {/* Modal variante */}
       {selectedVariant && (() => {
         const vm        = selectedVariant;
-        const vDesc     = getVariantDescription(slug, vm.fileName);
+        const vDesc     = vm.description || null;
         const vTracked  = !!tracked[vm.fileName];
         const vCaptured = !!captured[vm.fileName];
         const vCats     = getMobCategories(vm, MobCategories);

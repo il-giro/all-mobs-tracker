@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../config/mobConfig';
 import { MobCategories } from '../config/mobCategories';
 import { resolveIcons, hasVillagerIcons, getMobCategories, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
-import { mobNameToSlug } from '../config/mobDescriptions';
+import { mobNameToSlug } from '../utils/mobParser';
 
 if (typeof window !== 'undefined') {
   document.addEventListener('contextmenu', (e) => {
