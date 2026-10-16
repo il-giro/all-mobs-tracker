@@ -5,6 +5,7 @@ import { mobNameToSlug } from '../../utils/mobParser';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
 import Footer from '../../components/Footer';
+import FormattedDescription from '../../components/FormattedDescription';
 import useTrackerData from '../../utils/mobDatabase';
 
 // ─── Hook: tracciamento mob ───────────────────────────────────────────────────
@@ -450,10 +451,13 @@ const MobPage = () => {
                 )}
 
                 {/* Descrizione variante */}
-                {vDesc
-                  ? <p className="text-stone-400 text-xs leading-relaxed border-t border-stone-700 pt-3">{vDesc}</p>
-                  : <p className="text-stone-600 text-xs uppercase">No description available.</p>
-                }
+                {vDesc ? (
+                  <div className="border-t border-stone-700 pt-3 max-h-48 overflow-y-auto">
+                    <FormattedDescription content={vDesc} />
+                  </div>
+                ) : (
+                  <p className="text-stone-600 text-xs uppercase">No description available.</p>
+                )}
 
                 {/* Toggle + chiudi */}
                 <div className="flex gap-3 pt-2">
@@ -484,39 +488,7 @@ const MobPage = () => {
         {description && (
           <section className="bg-stone-900/60 border-2 border-stone-700 p-5">
             <p className="text-[10px] uppercase tracking-widest text-stone-500 mb-3">Informations</p>
-            <div className="text-stone-300 text-sm leading-relaxed space-y-2">
-              {Array.isArray(description)
-                ? description.map((block, i) => {
-                    if (typeof block === 'string') {
-                      if (block === '\n') return <div key={i} className="h-2" />;
-                      if (block === '---') return <hr key={i} className="border-stone-700 my-1" />;
-                      if (block.startsWith('## ')) return (
-                        <p key={i} className="text-stone-400 text-xs uppercase tracking-widest pt-1">
-                          {block.slice(3)}
-                        </p>
-                      );
-                      return <p key={i}>{block}</p>;
-                    }
-                    const iconMap = {
-                      youtube: { src: 'https://www.youtube.com/favicon.ico', alt: 'YouTube' },
-                      reddit:  { src: 'https://www.reddit.com/favicon.ico',  alt: 'Reddit'  },
-                      wiki:    { src: '/icons/wiki.ico',                     alt: 'Wiki'    },
-                      modrinth: { src: 'https://modrinth.com/favicon-light.ico',                 alt: 'Modrinth' },
-                      twitch:  { src: 'https://static.twitchsvc.net/assets/uploads/favicon.ico', alt: 'Twitch' },
-                    };
-                    const ico = block.icon ? iconMap[block.icon] : null;
-                    return (
-                      <a key={i} href={block.href} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-green-400 hover:text-green-300 underline underline-offset-2 transition-colors">
-                        {ico && <img src={ico.src} alt={ico.alt} className="w-4 h-4 object-contain shrink-0" />}
-                        {block.text}
-                        <span className="text-[10px] no-underline">↗</span>
-                      </a>
-                    );
-                  })
-                : <p>{description}</p>
-              }
-            </div>
+            <FormattedDescription content={description} />
           </section>
         )}
 

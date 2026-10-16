@@ -3,7 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mobConfig';
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { MobCategories } from '../../config/mobCategories';
+import { mobNameToSlug } from '../../utils/mobParser';
 import Footer from '../../components/Footer';
+import FormattedDescription from '../../components/FormattedDescription';
 import useTrackerData from '../../utils/mobDatabase';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -296,10 +298,14 @@ const SpecialCategoryPage = () => {
                 )}
 
                 {(() => {
-                  const desc = getSpecialCategoryDesc(slug, vm.fileName);
-                  return desc
-                    ? <p className="text-stone-400 text-xs leading-relaxed border-t border-stone-700 pt-3">{desc}</p>
-                    : <p className="text-stone-600 text-xs uppercase border-t border-stone-700 pt-3">No description for this entry.</p>;
+                  const desc = vm.description || null;
+                  return desc ? (
+                    <div className="border-t border-stone-700 pt-3 max-h-48 overflow-y-auto">
+                      <FormattedDescription content={desc} />
+                    </div>
+                  ) : (
+                    <p className="text-stone-600 text-xs uppercase border-t border-stone-700 pt-3">No description for this entry.</p>
+                  );
                 })()}
 
                 <div className="flex gap-3 pt-2">

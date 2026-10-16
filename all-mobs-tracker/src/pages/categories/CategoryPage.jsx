@@ -6,6 +6,7 @@ import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../../config/mob
 import { getMobCategories, resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../../config/mobIcons';
 import { mobNameToSlug } from '../../utils/mobParser';
 import Footer from '../../components/Footer';
+import FormattedDescription from '../../components/FormattedDescription';
 import useTrackerData from '../../utils/mobDatabase';
 
 // ─── Icona categoria ──────────────────────────────────────────────────────────
@@ -225,8 +226,7 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
       {selectedMob && (() => {
         const vm        = selectedMob;
         const vTracked  = !!tracked[vm.fileName];
-        const vCaptured = !!captured[vm.fileName];
-        const vDesc     = getMobDesc(vm);
+        const vDesc     = vm.description || null;
         const vCats     = getMobCategories(vm, MobCategories);
         const vCatsNormal  = vCats.filter(c => !c.special);
         const vCatsSpecial = vCats.filter(c => c.special);
@@ -311,10 +311,13 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
                 )}
 
                 {/* Descrizione categoria-specifica */}
-                {vDesc
-                  ? <p className="text-stone-400 text-xs leading-relaxed border-t border-stone-700 pt-3">{vDesc}</p>
-                  : <p className="text-stone-600 text-xs uppercase">No description for this entry.</p>
-                }
+                {vDesc ? (
+                  <div className="border-t border-stone-700 pt-3 max-h-48 overflow-y-auto">
+                    <FormattedDescription content={vDesc} />
+                  </div>
+                ) : (
+                  <p className="text-stone-600 text-xs uppercase">No description for this entry.</p>
+                )}
 
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => { toggle(vm.fileName); setSelectedMob(null); }}
