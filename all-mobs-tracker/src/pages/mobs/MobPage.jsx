@@ -205,7 +205,22 @@ const MobPage = () => {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [cardSize, setCardSize] = useState(120);
 
-  const navigateToVariant = (_mob) => {};
+  const categories = useMemo(() => {
+    const catMap = new Map();
+    if (mainMob) {
+      for (const c of getMobCategories(mainMob, MobCategories)) {
+        catMap.set(c.id, c);
+      }
+    }
+    for (const m of mobGroup) {
+      for (const c of getMobCategories(m, MobCategories)) {
+        if (!c.id.startsWith('color-') && !c.id.startsWith('biome-') && !c.id.startsWith('profession-')) {
+          if (!catMap.has(c.id)) catMap.set(c.id, c);
+        }
+      }
+    }
+    return [...catMap.values()];
+  }, [mainMob, mobGroup]);
 
   if (loading) {
     return (
@@ -226,26 +241,9 @@ const MobPage = () => {
 
   const isTrackedMain  = !!tracked[mainMob.fileName];
   const isCapturedMain = !!captured[mainMob.fileName];
-  const categories     = useMemo(() => {
-    const catMap = new Map();
-    if (mainMob) {
-      for (const c of getMobCategories(mainMob, MobCategories)) {
-        catMap.set(c.id, c);
-      }
-    }
-    for (const m of mobGroup) {
-      for (const c of getMobCategories(m, MobCategories)) {
-        if (!c.id.startsWith('color-') && !c.id.startsWith('biome-') && !c.id.startsWith('profession-')) {
-          if (!catMap.has(c.id)) catMap.set(c.id, c);
-        }
-      }
-    }
-    return [...catMap.values()];
-  }, [mainMob, mobGroup]);
-
-  const capturedCount = variants.filter(m => !!captured[m.fileName]).length;
-  const total         = variants.length;
-  const pct           = total > 0 ? Math.round((capturedCount / total) * 100) : 0;
+  const capturedCount  = variants.filter(m => !!captured[m.fileName]).length;
+  const total          = variants.length;
+  const pct            = total > 0 ? Math.round((capturedCount / total) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-[#111] text-stone-100 flex flex-col">
