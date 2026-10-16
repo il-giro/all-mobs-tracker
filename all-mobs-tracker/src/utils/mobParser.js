@@ -46,8 +46,10 @@ export const parseFileName = (fileName, path) => {
               .replace(/([A-Z])/g, ' $1')
               .trim();
             data.name = rawName;
-          } else {
+          } else if (typeof config.formatName === 'function') {
             data.name = config.formatName(match);
+          } else {
+            data.name = cleanName;
           }
 
           return data;

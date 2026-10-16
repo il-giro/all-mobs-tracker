@@ -22,8 +22,9 @@ export const SpecialFolderMap = {
   'untrapable':    'F',
 };
 
-// NOTA: pathIncludes deve essere una stringa UNIVOCA che non sia sottostringa di altri path.
-// Il parser controlla i ComplexConfig in ordine: metti i più specifici PRIMA.
+// NOTA: ComplexConfig gestisce le varianti complesse con icone speciali (Villager e Zombie Villager).
+// I nomi, le categorie e le icone di tutte le altre varianti (es. llama, wolf, horse, sheep)
+// sono ora interamente gestite dal database.
 export const ComplexConfig = [
   {
     id: 'zombie villager',
@@ -35,12 +36,6 @@ export const ComplexConfig = [
     defaultShow: false,
     isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
     useVillagerIcons: true,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
-      const biomes = { 1: 'Plains', 2: 'Desert', 3: 'Jungle', 4: 'Savanna', 5: 'Snow', 6: 'Swamp', 7: 'Taiga' };
-      const jobs = { 1: 'Unemployed', 2: 'Nitwit', 3: 'Armorer', 4: 'Butcher', 5: 'Cartographer', 6: 'Cleric', 7: 'Farmer', 8: 'Fisherman', 9: 'Fletcher', 10: 'Leatherworker', 11: 'Librarian', 12: 'Mason', 13: 'Shepherd', 14: 'Toolsmith', 15: 'Weaponsmith' };
-      return `Zombie Villager ${biomes[n1] || n1} ${jobs[n2] || n2}`;
-    },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]) })
   },
   {
@@ -53,127 +48,6 @@ export const ComplexConfig = [
     defaultShow: false,
     isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
     useVillagerIcons: true,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
-      const biomes = { 1: 'Plains', 2: 'Desert', 3: 'Jungle', 4: 'Savanna', 5: 'Snow', 6: 'Swamp', 7: 'Taiga' };
-      const jobs = { 1: 'Unemployed', 2: 'Nitwit', 3: 'Armorer', 4: 'Butcher', 5: 'Cartographer', 6: 'Cleric', 7: 'Farmer', 8: 'Fisherman', 9: 'Fletcher', 10: 'Leatherworker', 11: 'Librarian', 12: 'Mason', 13: 'Shepherd', 14: 'Toolsmith', 15: 'Weaponsmith' };
-      return `Villager ${biomes[n1] || n1} ${jobs[n2] || n2}`;
-    },
     extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]) })
-  },
-  {
-    id: 'horse',
-    label: 'Varianti Cavalli',
-    pathIncludes: '/horse/',
-    regex: /^(\d+)\.(\d+)\.(\d+)$/,
-    type: 'color_variant',
-    badgeColor: 'bg-blue-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const colors = { 1: 'White', 2: 'Creamy', 3: 'Chestnut', 4: 'Brown', 5: 'Black', 6: 'Gray', 7: 'Dark Brown' };
-      const markings = { 1: '', 2: 'White Stockings', 3: 'White Field', 4: 'White Dots', 5: 'Black Dots' };
-      const equip = { 1: '', 2: 'Saddle', 3: 'Leather Armor', 4: 'Iron Armor', 5: 'Gold Armor', 6: 'Diamond Armor', 7: 'Netherite Armor', 8: 'Saddle + Leather Armor', 9: 'Saddle + Iron Armor', 10: 'Saddle + Gold Armor', 11: 'Saddle + Diamond Armor', 12: 'Saddle + Netherite Armor', 13: 'Copper Armor', 14: 'Saddle + Copper Armor'  };
-      return `Horse ${colors[n1] || ''} ${markings[n2] || ''} ${equip[n3] || ''}`.replace(/\s+/g, ' ').trim();
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
-  },
-  {
-    id: 'llama',
-    label: 'Varianti Llama',
-    pathIncludes: '/llama/',
-    regex: /^(\d+)\.(\d+)\.(\d+)/,
-    type: 'color_variant',
-    badgeColor: 'bg-yellow-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const type = { 1: 'Brown', 2: 'Creamy', 3: 'Gray', 4: 'White' };
-      const carpetColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
-      return `Llama ${type[n1] || ''}` + (carpetColor != 1 ? " (" : "") + ` ${carpetColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (carpetColor != 1 ? ")" : "") + (n2 === 2 ? ' with Chest' : '');
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
-  },
-  {
-    id: 'sheep',
-    label: 'Varianti Sheep',
-    pathIncludes: '/sheep/',
-    regex: /^(\d+)\.(\d+)\.(\d+)/,
-    type: 'color_variant',
-    badgeColor: 'bg-gray-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const color = { 1: 'White', 2: 'LightGray', 3: 'Gray', 4: 'Black', 5: 'Brown', 6: 'Red', 7: 'Orange', 8: 'Yellow', 9: 'Lime', 10: 'Green', 11: 'Cyan', 12: 'LightBlue', 13: 'Blue', 14: 'Purple', 15: 'Magenta', 16: 'Pink', 17: 'jeb_' };
-      return `Sheep ${color[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 === 2 ? ' (Sheared)' : '');
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
-  },
-  {
-    id: 'nautilus',
-    label: 'Varianti Nautilus',
-    pathIncludes: '/nautilus/',
-    regex: /^(\d+)\.(\d+)/,
-    type: 'complex_variant',
-    badgeColor: 'bg-orange-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
-    useFileName: true,
-    formatName: () => '',
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]) })
-  },
-  {
-    id: 'wolf',
-    label: 'Varianti Wolf',
-    pathIncludes: '/wolf/',
-    regex: /^(\d+)\.(\d+)\.(\d+)/,
-    type: 'color_variant',
-    badgeColor: 'bg-gray-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const type = { 1: 'Pale', 2: 'Ashen', 3: 'Black', 4: 'Chestnut', 5: 'Rusty', 6: 'Snowy', 7: 'Spotted', 8: 'Striped', 9: 'Woods' };
-      const armor = { 1: '', 2: 'Collar', 3: 'Armor' };
-      const collarColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 9: 'Lime', 10: 'Magenta', 11: 'Orange', 12: 'Pink', 13: 'Purple', 14: 'Red', 15: 'Silver', 16: 'White', 17: 'Yellow' };
-      return `Wolf ${type[n1] || ''} ` + (n2 != 1 ? ' with ' + armor[n2] + ' (' : '') + ` ${collarColor[n3] || ''}`.replace(/\s+/g, ' ').trim() + (n2 != 1 ? ')' : '');
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
-  },
-  {
-    id: 'happy ghast',
-    label: 'Happy Ghast',
-    pathIncludes: '/happy ghast/',
-    regex: /^(\d+)\.(\d+)\.(\d+)/,
-    type: 'color_variant',
-    badgeColor: 'bg-pink-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2, n3) => n1 === 1 && n2 === 1 && n3 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]), n3 = parseInt(match[3]);
-      const variant = { 1: '', 2: 'Harnessed', 3: 'Leashed' };
-      const saddleColor = { 1: '', 2: 'Black', 3: 'Blue', 4: 'Brown', 5: 'Cyan', 6: 'Gray', 7: 'Green', 8: 'Light Blue', 10: 'Lime', 11: 'Magenta', 12: 'Orange', 13: 'Pink', 14: 'Purple', 15: 'Red', 9: 'Light Gray', 16: 'White', 17: 'Yellow' };
-      return `Happy Ghast ${variant[n2] || ''} ` + (n2 != 1 ? `${saddleColor[n3] || ''}`.replace(/\s+/g, ' ').trim() : '');
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2]), num3: parseInt(match[3]) })
-  },
-  {
-    id: 'zombie horse',
-    label: 'Varianti Cavalli Zombie',
-    pathIncludes: '/zombie horse/',
-    regex: /^(\d+)\.(\d+)$/,
-    type: 'color_variant',
-    badgeColor: 'bg-blue-600',
-    defaultShow: false,
-    isBaseCondition: (n1, n2) => n1 === 1 && n2 === 1,
-    formatName: (match) => {
-      const n1 = parseInt(match[1]), n2 = parseInt(match[2]);
-      const equip = { 1: '', 2: 'Saddle', 3: 'Leather Armor', 4: 'Iron Armor', 5: 'Gold Armor', 6: 'Diamond Armor', 7: 'Netherite Armor', 8: 'Saddle + Leather Armor', 9: 'Saddle + Iron Armor', 10: 'Saddle + Gold Armor', 11: 'Saddle + Diamond Armor', 12: 'Saddle + Netherite Armor', 13: 'Copper Armor', 14: 'Saddle + Copper Armor'  };
-      return `Zombie Horse ${equip[n2] || ''}`.replace(/\s+/g, ' ').trim();
-    },
-    extractNums: (match) => ({ num1: parseInt(match[1]), num2: parseInt(match[2])})
-  },
+  }
 ];
