@@ -572,6 +572,10 @@ export default {
           category_ids: v.category_ids ? v.category_ids.split(',').map(Number) : []
         }));
 
+        const cacheControl = url.searchParams.get('bust')
+          ? 'no-cache, no-store, must-revalidate'
+          : 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400';
+
         return Response.json({
           success: true,
           categories,
@@ -581,7 +585,7 @@ export default {
           headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': cacheControl
           }
         });
       } catch (error) {

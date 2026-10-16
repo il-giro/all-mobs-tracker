@@ -202,6 +202,12 @@ function TableExplorer({ table }) {
     return clean;
   };
 
+  const clearPublicCache = () => {
+    try {
+      localStorage.removeItem('mobTracker_d1_cache');
+    } catch (e) {}
+  };
+
   const handleCreate = async (values) => {
     try {
       const cleanValues = cleanRecordForBackend(values);
@@ -214,6 +220,7 @@ function TableExplorer({ table }) {
       const result = await response.json();
 
       if (result.success) {
+        clearPublicCache();
         setShowCreateModal(false);
         setDuplicatingRecord(null);
         loadData();
@@ -237,6 +244,7 @@ function TableExplorer({ table }) {
       const result = await response.json();
 
       if (result.success) {
+        clearPublicCache();
         setEditingRecord(null);
         loadData();
       } else {
@@ -266,6 +274,7 @@ function TableExplorer({ table }) {
       const result = await response.json();
 
       if (result.success) {
+        clearPublicCache();
         setDeletingRecord(null);
         loadData();
         showNotification('Record eliminato con successo');
@@ -293,6 +302,7 @@ function TableExplorer({ table }) {
       const result = await response.json();
 
       if (result.success) {
+        clearPublicCache();
         setShowBulkDeleteModal(false);
         setSelectedRecords(new Set());
         await loadData();
@@ -323,6 +333,7 @@ function TableExplorer({ table }) {
       const result = await response.json();
 
       if (result.success) {
+        clearPublicCache();
         setShowBulkCategoryModal(false);
         setSelectedRecords(new Set());
         showNotification(`Categoria assegnata con successo a ${targetIds.length} elementi!`);

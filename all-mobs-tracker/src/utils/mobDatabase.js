@@ -89,29 +89,84 @@ export function buildTrackerDataset(categoriesRaw, mobsRaw, variantsRaw) {
   };
 }
 
-// Inizializzazione sincrona immediata dallo snapshot locale del database
-const initialData = buildTrackerDataset(
-  initialSnapshot.categories,
-  initialSnapshot.mobs,
-  initialSnapshot.variants
-);
+export const DB_CACHE_KEY = 'mobTracker_d1_cache';
+export const DB_CACHE_TTL = 1000 * 60 * 60 * 24; // 24 ore di validità cache
+
+/**
+ * Legge in modo sicuro la cache da localStorage.
+ */
+function getStoredCache() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(DB_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.data && parsed.timestamp) {
+      return parsed;
+    }
+  } catch (err) {
+    console.warn('Errore lettura cache D1:', err);
+  }
+  return null;
+}
+
+/**
+ * Invalida esplicitamente la cache salvata in localStorage.
+ */
+export function invalidateDbCache() {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(DB_CACHE_KEY);
+    } catch (e) {}
+  }
+}
+
+// Inizializzazione sincrona: usa la cache salvata se presente, altrimenti lo snapshot bundled
+const initialStored = getStoredCache();
+const initialData = initialStored
+  ? buildTrackerDataset(initialStored.data.categories, initialStored.data.mobs, initialStored.data.variants)
+  : buildTrackerDataset(initialSnapshot.categories, initialSnapshot.mobs, initialSnapshot.variants);
 
 let cachedData = initialData;
 
 /**
  * Carica i dati aggiornati del tracker dal database tramite API Worker.
+ * Se force = false e la cache locale è recente (< 24h), ritorna immediatamente la cache senza effettuare chiamate di rete.
  */
-export async function fetchTrackerData() {
+export async function fetchTrackerData(force = false) {
+  const stored = getStoredCache();
+  const now = Date.now();
+
+  // Se abbiamo già dati in cache freschi e non è forzato il refresh, non consuma richieste di lettura
+  if (!force && stored && (now - stored.timestamp < DB_CACHE_TTL)) {
+    return cachedData;
+  }
+
   try {
-    const res = await fetch('/api/tracker-data');
+    const url = force ? `/api/tracker-data?bust=${now}` : '/api/tracker-data';
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.success && data.categories && data.mobs && data.variants) {
       cachedData = buildTrackerDataset(data.categories, data.mobs, data.variants);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(DB_CACHE_KEY, JSON.stringify({
+            timestamp: now,
+            data: {
+              categories: data.categories,
+              mobs: data.mobs,
+              variants: data.variants
+            }
+          }));
+        } catch (e) {
+          console.warn('Impossibile salvare in localStorage:', e);
+        }
+      }
       return cachedData;
     }
   } catch (err) {
-    console.warn('Caricamento live da /api/tracker-data non riuscito, uso snapshot D1:', err);
+    console.warn('Caricamento live da /api/tracker-data non riuscito, uso cache/snapshot locale:', err);
   }
   return cachedData;
 }
@@ -128,8 +183,19 @@ export function useTrackerData() {
     isMounted.current = true;
     let isCancelled = false;
 
+    const stored = getStoredCache();
+    const isCacheFresh = stored && (Date.now() - stored.timestamp < DB_CACHE_TTL);
+
+    // Se la cache è fresca, non effettua chiamate né imposta loading
+    if (isCacheFresh) {
+      return;
+    }
+
     async function load() {
-      setLoading(true);
+      // Se non abbiamo ancora mob nel cachedData, mostra brevemente il caricamento
+      if (!cachedData?.allMobs?.length) {
+        setLoading(true);
+      }
       const updated = await fetchTrackerData();
       if (!isCancelled && isMounted.current) {
         setData(updated);
@@ -148,9 +214,9 @@ export function useTrackerData() {
   return {
     ...data,
     loading,
-    refresh: async () => {
+    refresh: async (force = true) => {
       setLoading(true);
-      const updated = await fetchTrackerData();
+      const updated = await fetchTrackerData(force);
       if (isMounted.current) {
         setData(updated);
         setLoading(false);

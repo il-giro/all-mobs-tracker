@@ -526,6 +526,26 @@ const Settings = ({
                     </button>
                   </section>
 
+                  <section className="bg-stone-800/50 p-5 border-2 border-stone-700 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-green-400 uppercase font-semibold">Cache Database</p>
+                      <span className="text-[10px] uppercase bg-green-950 text-green-300 border border-green-800 px-2 py-0.5">Attiva (24h)</span>
+                    </div>
+                    <p className="text-xs text-stone-400 leading-relaxed">
+                      I dati dei mob e delle categorie sono salvati nella cache locale del browser. Questo azzera i tempi di caricamento ed evita di consumare le richieste di lettura verso il database Cloudflare D1 ad ogni ricaricamento della pagina.
+                    </p>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem('mobTracker_d1_cache');
+                        alert('Cache database svuotata. La pagina verrà ricaricata scaricando i dati aggiornati dal database.');
+                        window.location.reload();
+                      }}
+                      className="w-full bg-blue-900 hover:bg-blue-800 text-blue-200 text-sm py-3 border-b-4 border-black uppercase transition-transform active:translate-y-1 active:border-b-0 border-2 border-blue-700 mt-2 font-medium"
+                    >
+                      🔄 Svuota cache e risincronizza database
+                    </button>
+                  </section>
+
                   <section className="bg-stone-800/50 p-5 border-2 border-red-900 space-y-3">
                     <p className="text-sm text-red-400 uppercase">Pericoloso</p>
                     <p className="text-xs text-stone-500">Rimuove tutti i progressi. Non reversibile.</p>
