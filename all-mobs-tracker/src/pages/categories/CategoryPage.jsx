@@ -83,6 +83,37 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
   );
 };
 
+// ─── Hook tracciamento ────────────────────────────────────────────────────────
+const useTrackedMobs = () => {
+  const [tracked,  setTracked]  = useState(() => JSON.parse(localStorage.getItem('mobTracker_saves')    || '{}'));
+  const [captured, setCaptured] = useState(() => JSON.parse(localStorage.getItem('mobTracker_captured') || '{}'));
+  const captureMode = localStorage.getItem('mobTracker_captureMode') === 'true';
+
+  const toggle = (fileName) => {
+    if (captureMode) {
+      const wasTracked = !!tracked[fileName], wasCaptured = !!captured[fileName];
+      if (!wasTracked && !wasCaptured) {
+        setTracked(p  => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+      } else if (wasTracked && !wasCaptured) {
+        setCaptured(p => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      } else {
+        setTracked(p  => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+        setCaptured(p => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      }
+    } else {
+      const wasCaptured = !!captured[fileName];
+      if (wasCaptured) {
+        setTracked(p  => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+        setCaptured(p => { const n = { ...p }; delete n[fileName]; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      } else {
+        setTracked(p  => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_saves',    JSON.stringify(n)); return n; });
+        setCaptured(p => { const n = { ...p, [fileName]: true }; localStorage.setItem('mobTracker_captured', JSON.stringify(n)); return n; });
+      }
+    }
+  };
+  return [tracked, captured, captureMode, toggle];
+};
+
 // ─── Pagina categoria ─────────────────────────────────────────────────────────
 const CategoryPage = ({ categoryId: propId } = {}) => {
   const { id: paramId }  = useParams();

@@ -525,22 +525,24 @@ const MobTracker = () => {
 
               {/* ── Categorie speciali (dal DB: special = true) ── */}
               <p className="text-[10px] uppercase text-stone-600 tracking-widest px-1 pb-1">Special</p>
-              {dbCategories.filter(c => c.special).sort((a,b) => a.priority - b.priority).map(sc => (
-                <button key={sc.id}
-                  onClick={() => { setShowCategories(false); navigate(`/${sc.slug || sc.id}`); }}
-                  className="flex items-center gap-4 w-full p-4 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
-                  <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
-                    {sc.icon?.includes('/') || sc.icon?.includes('.')
-                      ? <img src={sc.icon} alt={sc.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
-                      : <div className="bg-purple-700 text-white text-[9px] px-1 py-0.5 border border-stone-900 uppercase leading-none text-center">{sc.variant}</div>}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm uppercase text-purple-400">{sc.label}</p>
-                    {sc.description && <p className="text-xs text-stone-600 mt-0.5 line-clamp-1">{sc.description}</p>}
-                  </div>
-                  <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-lg shrink-0">→</span>
-                </button>
-              ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {dbCategories.filter(c => c.special).sort((a,b) => a.priority - b.priority).map(sc => (
+                  <button key={sc.id}
+                    onClick={() => { setShowCategories(false); navigate(`/${sc.slug || sc.id}`); }}
+                    className="flex items-center gap-3 p-3 border-2 border-purple-900 hover:border-purple-600 bg-stone-800 hover:bg-stone-700 transition-all group text-left">
+                    <div className="w-10 h-10 shrink-0 flex items-center justify-center bg-[#181818] border-2 border-stone-700">
+                      {sc.icon?.includes('/') || sc.icon?.includes('.')
+                        ? <img src={sc.icon} alt={sc.label} className="w-7 h-7 object-contain pixelated" draggable={false} />
+                        : <div className="bg-purple-700 text-white text-[9px] px-1 py-0.5 border border-stone-900 uppercase leading-none text-center">{sc.variant || 'SP'}</div>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm uppercase text-purple-400 font-semibold truncate">{sc.label}</p>
+                      {sc.description && <p className="text-xs text-stone-500 mt-0.5 line-clamp-1">{sc.description}</p>}
+                    </div>
+                    <span className="text-stone-600 group-hover:text-stone-300 transition-colors text-base shrink-0">→</span>
+                  </button>
+                ))}
+              </div>
 
               {/* ── Separatore ── */}
               <div className="border-t-2 border-stone-800 my-2" />
