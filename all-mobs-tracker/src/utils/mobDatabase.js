@@ -33,8 +33,17 @@ export function transformDbRecord(record, isVariant, categoryMap = {}) {
   const categoryIds = Array.isArray(record.category_ids) ? record.category_ids : [];
   const categories = categoryIds.map(cid => categoryMap[cid]).filter(Boolean);
 
+  // Costruisci activeSuffixes SOLO dalle categorie speciali del DB (campo variant)
+  // ignorando completamente i suffissi estratti dal nome del file
+  const activeSuffixesFromDb = categories
+    .filter(cat => cat && cat.variant && /^[A-Z]$/.test(cat.variant))
+    .map(cat => cat.variant);
+
   return {
     ...parsed,
+    // Sovrascriviamo activeSuffixes e suffixBadges con quelli del DB
+    activeSuffixes: activeSuffixesFromDb,
+    suffixBadges: [],
     id: record.id,
     dbId: record.id,
     mobId: isVariant ? record.mob_id : record.id,

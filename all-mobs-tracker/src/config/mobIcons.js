@@ -169,9 +169,11 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'holding-item',
     resolve(mob) {
-      const match = mob.image?.match(/[Hh]olding-([A-Za-z]+(?:-[A-Za-z]+)*)/);
-      if (!match) return null;
-      const itemName = match[1].toLowerCase();
+      // Leggi dal database: mob.categories dovrebbe contenere la categoria
+      if (!mob.categories?.length) return null;
+      const holdingCat = mob.categories.find(c => c.id?.startsWith('holding-'));
+      if (!holdingCat) return null;
+      const itemName = holdingCat.id.replace('holding-', '');
       return [{
         src:          `/icons/items/${itemName}.png`,
         alt:          itemName,
@@ -179,6 +181,7 @@ export const MOB_ICON_RESOLVERS = [
         size:         'md',
         label:        itemName.replace(/-/g, ' '),
         labelRole:    'holds',
+        categoryId:   holdingCat.id,
         fallbackHide: true,
       }];
     },
@@ -188,62 +191,29 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'color',
     resolve(mob) {
-      const folder = mob.folder?.toLowerCase();
-      const colorMap = { 2: 'black', 3: 'blue', 4: 'brown', 5: 'cyan', 6: 'gray', 7: 'green', 8: 'light-blue', 9: 'lime', 10: 'magenta', 11: 'orange', 12: 'pink', 13: 'purple', 14: 'red', 15: 'light-gray', 16: 'white', 17: 'yellow' };
-      const toColorCatId = (cName) => `color-${cName.replace(/-/g, '')}`;
+      // Leggi dal database: mob.categories dovrebbe contenere la categoria di colore
+      if (!mob.categories?.length) return null;
+      const colorCat = mob.categories.find(c => c.id?.startsWith('color-'));
+      if (!colorCat) return null;
 
-      // ── Sheep ──────────────────────────────────────────────────────────────
-      if (folder === 'sheep') {
-        const sheepColors = { 1: 'white', 2: 'light-gray', 3: 'gray', 4: 'black', 5: 'brown', 6: 'red', 7: 'orange', 8: 'yellow', 9: 'lime', 10: 'green', 11: 'cyan', 12: 'light-blue', 13: 'blue', 14: 'purple', 15: 'magenta', 16: 'pink' };
-        const colorName = sheepColors[mob.num3];
-        if (!colorName) return null;
-        return [{
-          src:          `/icons/items/${colorName}-wool.png`,
-          alt:          colorName,
-          position:     POSITIONS.BOTTOM_RIGHT,
-          size:         'md',
-          label:        colorName.replace(/-/g, ' '),
-          labelRole:    'color',
-          categoryId:   toColorCatId(colorName),
-          fallbackHide: true,
-        }];
-      }
+      // id è tipo "color-lightgray" → "lightgray"; mappa i casi speciali con trattino
+      const rawId = colorCat.id.replace('color-', ''); // es. "lightgray", "lightblue"
+      const woolNameMap = {
+        lightgray:  'light-gray',
+        lightblue:  'light-blue',
+      };
+      const woolName = woolNameMap[rawId] ?? rawId; // es. "light-gray", "red", "blue"
 
-      // ── Llama ──────────────────────────────────────────────────────────────
-      if (folder === 'llama') {
-        if (!mob.num3 || mob.num3 === 1) return null;
-        const colorName = colorMap[mob.num3];
-        if (!colorName) return null;
-        return [{
-          src:          `/icons/items/${colorName}-wool.png`,
-          alt:          colorName,
-          position:     POSITIONS.BOTTOM_RIGHT,
-          size:         'md',
-          label:        colorName.replace(/-/g, ' '),
-          labelRole:    'carpet',
-          categoryId:   toColorCatId(colorName),
-          fallbackHide: true,
-        }];
-      }
-
-      // ── Wolf ───────────────────────────────────────────────────────────────
-      if (folder === 'wolf') {
-        if (mob.num2 === 1 || !mob.num3 || mob.num3 === 1) return null;
-        const colorName = colorMap[mob.num3];
-        if (!colorName) return null;
-        return [{
-          src:          `/icons/items/${colorName}-wool.png`,
-          alt:          colorName,
-          position:     POSITIONS.BOTTOM_RIGHT,
-          size:         'md',
-          label:        colorName.replace(/-/g, ' '),
-          labelRole:    mob.num2 === 3 ? 'armor' : 'collar',
-          categoryId:   toColorCatId(colorName),
-          fallbackHide: true,
-        }];
-      }
-
-      return null;
+      return [{
+        src:          `/icons/items/${woolName}-wool.png`,
+        alt:          woolName,
+        position:     POSITIONS.BOTTOM_RIGHT,
+        size:         'md',
+        label:        woolName.replace(/-/g, ' '),
+        labelRole:    'color',
+        categoryId:   colorCat.id,
+        fallbackHide: true,
+      }];
     },
   },
 
@@ -251,7 +221,10 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'sheared',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('sheared')) return null;
+      // Leggi dal database
+      if (!mob.categories?.length) return null;
+      const shearedCat = mob.categories.find(c => c.id === 'shearable');
+      if (!shearedCat) return null;
       return [{
         src:          '/icons/items/shears.png',
         alt:          'Sheared',
@@ -269,7 +242,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'poppy',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('poppy') || !mob.image?.toLowerCase().includes('coppergolem')) return null;
+      // Leggi dal database per la categoria 'poppy'
+      if (!mob.categories?.some(c => c.id === 'poppy')) return null;
       return [{
         src:          '/icons/items/poppy.png',
         alt:          'Poppy',
@@ -277,6 +251,7 @@ export const MOB_ICON_RESOLVERS = [
         size:         'md',
         label:        'Poppy',
         labelRole:    'status',
+        categoryId:   'poppy',
         fallbackHide: true,
       }];
     },
@@ -286,7 +261,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'saddle',
     resolve(mob) {
-      if (!mob.name?.toLowerCase().includes('saddle')) return null;
+      // Leggi dal database per la categoria 'saddled'
+      if (!mob.categories?.some(c => c.id === 'saddled')) return null;
       return [{
         src:          '/icons/items/saddle.png',
         alt:          'Saddle',
@@ -304,7 +280,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'chested',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('chest')) return null;
+      // Leggi dal database per la categoria 'chested'
+      if (!mob.categories?.some(c => c.id === 'chested')) return null;
       return [{
         src:          '/icons/items/chest.png',
         alt:          'Chested',
@@ -322,7 +299,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'banner',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('banner')) return null;
+      // Leggi dal database per la categoria 'banner'
+      if (!mob.categories?.some(c => c.id === 'banner')) return null;
       return [{
         src:          '/icons/items/ominous-banner.png',
         alt:          'Banner',
@@ -340,7 +318,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'screaming',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('screaming') || !mob.image?.toLowerCase().includes('goat')) return null;
+      // Leggi dal database per la categoria 'screaming'
+      if (!mob.categories?.some(c => c.id === 'screaming')) return null;
       return [{
         src:          '/icons/items/screaming.png',
         alt:          'Screaming',
@@ -358,8 +337,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'name-tag',
     resolve(mob) {
-      const specialNames = ['Toast', 'Johnny', 'jeb_'];
-      if (!specialNames.some(name => mob.image?.includes(name))) return null;
+      // Leggi dal database per la categoria 'name-tag'
+      if (!mob.categories?.some(c => c.id === 'name-tag')) return null;
       return [{
         src:          '/icons/items/name-tag.png',
         alt:          'Name Tag',
@@ -377,8 +356,8 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'lightning',
     resolve(mob) {
-      const specialNames = ['Skeleton Horse man', 'Mooshroom  Brown', 'Creeper  Charged'];
-        if (!specialNames.some(name => mob.name === name)) return null;
+      // Leggi dal database per la categoria 'lightning'
+      if (!mob.categories?.some(c => c.id === 'lightning')) return null;
       return [{
         src:          '/icons/items/lightning.png',
         alt:          'Lightning',
@@ -396,14 +375,27 @@ export const MOB_ICON_RESOLVERS = [
   {
     id: 'damaged-iron-golem',
     resolve(mob) {
-      if (!mob.image?.toLowerCase().includes('iron golem')) return null;
-    return [{
-        src:          mob.image.toLowerCase().includes('high') ? '/icons/letters/h.png' : (mob.image.toLowerCase().includes('medium') ? '/icons/letters/m.png' : (mob.image.toLowerCase().includes('low') ? '/icons/letters/l.png' : '/icons/letters/n.png')) ,
+      // Leggi dal database per le categorie di danno Iron Golem
+      if (!mob.categories?.length) return null;
+      const damageCat = mob.categories.find(c =>
+        c.id === 'iron-golem-high' || c.id === 'iron-golem-medium' ||
+        c.id === 'iron-golem-low'  || c.id === 'iron-golem-none'
+      );
+      if (!damageCat) return null;
+      const iconMap = {
+        'iron-golem-high':   '/icons/letters/h.png',
+        'iron-golem-medium': '/icons/letters/m.png',
+        'iron-golem-low':    '/icons/letters/l.png',
+        'iron-golem-none':   '/icons/letters/n.png',
+      };
+      return [{
+        src:          iconMap[damageCat.id] ?? '/icons/letters/n.png',
         alt:          'Damaged',
         position:     POSITIONS.BOTTOM_RIGHT,
         size:         'md',
         label:        'Damaged',
         labelRole:    'status',
+        categoryId:   damageCat.id,
         fallbackHide: true,
       }];
     },
