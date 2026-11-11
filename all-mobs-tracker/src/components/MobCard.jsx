@@ -109,10 +109,13 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const isVillager     = hasVillagerIcons(mob);
   const iconMap        = resolveIcons(mob);
-  const tooltipIcons   = [...iconMap.values()].filter(icon => icon.label);
+
+  // Categorie dal DB - queste sono TUTTE le categorie, ignorando i resolver
   const allMobCats     = getMobCategories(mob, MobCategories);
-  const coveredCatIds  = new Set(tooltipIcons.map(i => i.categoryId).filter(Boolean));
-  const extraCategories = allMobCats.filter(c => !c.special && !coveredCatIds.has(c.id));
+
+  // Separa categorie normali da quelle speciali
+  const normalCategories = allMobCats.filter(c => !c.special);
+  const specialCategories = allMobCats.filter(c => c.special);
 
   const suffixDisplay = mob.activeSuffixes.length > 0
     ? (() => { const labels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))]; return labels.length > 0 ? `(${labels.join(', ')})` : ''; })()
@@ -222,20 +225,11 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             {mob.name}{suffixDisplay ? ` ${suffixDisplay}` : ''}
           </p>
 
-          {/* Icone cliccabili (categorie normali) */}
-          {tooltipIcons.length > 0 && (
-            <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
-              {tooltipIcons.map(icon => (
-                <TooltipIconRow key={icon.resolverId} icon={icon} onNavigate={navigateToCategory} />
-              ))}
-            </div>
-          )}
-
-          {/* Categorie DB aggiuntive */}
-          {extraCategories.length > 0 && (
+          {/* Categorie normali dal DB */}
+          {normalCategories.length > 0 && (
             <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
               <span className="text-stone-500 text-[9px] uppercase px-1 mb-0.5">Categories</span>
-              {extraCategories.map(cat => (
+              {normalCategories.map(cat => (
                 <button key={cat.id} onMouseDown={e => { e.stopPropagation(); navigateToCategory(cat.id); }}
                   className="flex items-center gap-2 border border-stone-700 hover:border-stone-400 bg-stone-900 hover:bg-stone-700 px-1.5 py-1 transition-colors w-full text-left">
                   {cat.icon && (
@@ -248,10 +242,27 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             </div>
           )}
 
-          {/* Suffix badges cliccabili → pagine speciali */}
-          {allBadges.length > 0 && (
+          {/* Categorie speciali dal DB */}
+          {specialCategories.length > 0 && (
             <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
               <span className="text-stone-500 text-[9px] uppercase px-1 mb-0.5">Special categories</span>
+              {specialCategories.map(sc => (
+                <button key={sc.id} onMouseDown={e => { e.stopPropagation(); navigateToCategory(sc.id); }}
+                  className="flex items-center gap-2 border border-stone-700 hover:border-purple-500 bg-stone-900 hover:bg-stone-700 px-1.5 py-1 transition-colors w-full text-left">
+                  {sc.icon && (
+                    <img src={sc.icon} alt={sc.label} draggable={false} className="w-5 h-5 object-contain pixelated shrink-0" />
+                  )}
+                  <span className="text-xs uppercase flex-1 text-purple-300">{sc.label || sc.name}</span>
+                  <span className="text-[9px] uppercase ml-auto text-stone-500">→</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Suffix badges aggiuntivi (se ci sono suffix che non sono nel DB come categoria) */}
+          {allBadges.length > 0 && (
+            <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
+              <span className="text-stone-500 text-[9px] uppercase px-1 mb-0.5">Special badges</span>
               {allBadges.map(b => (
                 <SuffixBadgeRow key={b.suffixId} badge={b} suffixId={b.suffixId} onNavigate={navigateToSpecial} />
               ))}
@@ -266,8 +277,8 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             </div>
           )}
 
-          {!hasAnyBadge && !isVillager && tooltipIcons.length === 0 && (
-            <p className="text-stone-500 text-xs uppercase">No badges</p>
+          {normalCategories.length === 0 && specialCategories.length === 0 && allBadges.length === 0 && !mob.complexBadge && (
+            <p className="text-stone-500 text-xs uppercase">No categories</p>
           )}
         </div>,
         document.body
