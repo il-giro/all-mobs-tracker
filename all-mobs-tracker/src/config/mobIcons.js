@@ -470,9 +470,9 @@ export function hasVillagerIcons(mob) {
 }
 
 /**
- * Restituisce le categorie a cui appartiene un mob, basandosi sui resolver.
- * Un mob appartiene a una categoria se almeno un resolver con categoryId
- * restituisce un'icona per quel mob.
+ * Restituisce le categorie a cui appartiene un mob, basandosi SOLO sul database.
+ * Le icone (bioma, job, colore, ecc.) sono gestite dai resolver ma NON creano
+ * categorie duplicate: le categorie vengono prese unicamente da mob.categories.
  *
  * Usato in CategoryPage per filtrare dinamicamente i mob.
  *
@@ -483,34 +483,25 @@ export function hasVillagerIcons(mob) {
 export function getMobCategories(mob, categories) {
   if (!mob) return [];
   const targetCategories = categories || [];
-  const categoryIds = new Set();
 
-  // Categorie dal database se presenti
-  if (Array.isArray(mob.categories) && mob.categories.length > 0) {
-    for (const c of mob.categories) {
-      if (c.id) categoryIds.add(c.id);
-      if (c.dbId) {
-        const found = targetCategories.find(tc => tc.dbId === c.dbId);
-        if (found) categoryIds.add(found.id);
+  // Usa SOLO le categorie dal database (mob.categories)
+  if (!Array.isArray(mob.categories) || mob.categories.length === 0) {
+    return [];
+  }
+
+  const categoryIds = new Set();
+  for (const c of mob.categories) {
+    if (c && typeof c.id === 'string') {
+      categoryIds.add(c.id);
+    }
+    // Mappa anche dbId all'id corrispondente se presente in targetCategories
+    if (c && typeof c.dbId === 'number') {
+      const found = targetCategories.find(tc => tc.dbId === c.dbId);
+      if (found && typeof found.id === 'string') {
+        categoryIds.add(found.id);
       }
     }
   }
 
-  if (Array.isArray(mob.categoryIds) && mob.categoryIds.length > 0) {
-    for (const id of mob.categoryIds) {
-      const found = targetCategories.find(tc => tc.dbId === id || tc.id === id);
-      if (found) categoryIds.add(found.id);
-    }
-  }
-
-  // Categorie derivate dai resolver icona
-  for (const resolver of MOB_ICON_RESOLVERS) {
-    const icons = resolver.resolve(mob);
-    if (!icons) continue;
-    for (const icon of icons) {
-      if (icon.categoryId) categoryIds.add(icon.categoryId);
-    }
-  }
-
-  return targetCategories.filter(cat => categoryIds.has(cat.id));
+  return targetCategories.filter(cat => typeof cat.id === 'string' && categoryIds.has(cat.id));
 }
