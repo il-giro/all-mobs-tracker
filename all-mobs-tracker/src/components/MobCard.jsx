@@ -105,8 +105,6 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
 
   const topSuffixId    = SuffixPriority.find(id => mob.activeSuffixes.includes(id));
   const topSuffixBadge = topSuffixId ? SuffixConfig[topSuffixId] : null;
-  const allBadges      = SuffixPriority.filter(id => mob.activeSuffixes.includes(id)).map(id => ({ ...SuffixConfig[id], suffixId: id }));
-  const hasAnyBadge    = allBadges.length > 0 || !!mob.complexBadge;
   const isVillager     = hasVillagerIcons(mob);
   const iconMap        = resolveIcons(mob);
 
@@ -259,16 +257,6 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             </div>
           )}
 
-          {/* Suffix badges aggiuntivi (se ci sono suffix che non sono nel DB come categoria) */}
-          {allBadges.length > 0 && (
-            <div className="flex flex-col gap-1 mb-2 pb-2 border-b-2 border-stone-700">
-              <span className="text-stone-500 text-[9px] uppercase px-1 mb-0.5">Special badges</span>
-              {allBadges.map(b => (
-                <SuffixBadgeRow key={b.suffixId} badge={b} suffixId={b.suffixId} onNavigate={navigateToSpecial} />
-              ))}
-            </div>
-          )}
-
           {/* Complex badge */}
           {mob.complexBadge && (
             <div className="flex items-center gap-2 mb-2 pb-2 border-b-2 border-stone-700">
@@ -277,7 +265,7 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
             </div>
           )}
 
-          {normalCategories.length === 0 && specialCategories.length === 0 && allBadges.length === 0 && !mob.complexBadge && (
+          {normalCategories.length === 0 && specialCategories.length === 0 && !mob.complexBadge && (
             <p className="text-stone-500 text-xs uppercase">No categories</p>
           )}
         </div>,
