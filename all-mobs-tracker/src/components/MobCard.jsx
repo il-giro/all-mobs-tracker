@@ -115,8 +115,8 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const normalCategories = allMobCats.filter(c => !c.special);
   const specialCategories = allMobCats.filter(c => c.special);
 
-  const suffixDisplay = mob.activeSuffixes.length > 0
-    ? (() => { const labels = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))]; return labels.length > 0 ? `(${labels.join(', ')})` : ''; })()
+  const suffixDisplay = specialCategories.length > 0
+    ? `(${specialCategories.map(c => c.label.replace(/^Special\s*-\s*/i, '')).join(', ')})`
     : '';
 
   useEffect(() => {
@@ -182,9 +182,19 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>{mob.complexBadge.label}</div>
               </div>
             )}
+            {/* Badge dalla categoria speciale con priorità più alta (special=true, variant) */}
             {topSuffixBadge && (
               <div className={isVillager ? 'absolute bottom-1 left-1/2 -translate-x-1/2 z-20' : 'absolute top-1 right-1 z-20'}>
                 <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md whitespace-nowrap`}>{topSuffixBadge.label}</div>
+              </div>
+            )}
+            {/* Badge dalla prima categoria normale che ha colorHex (es. saddled, chested...) */}
+            {!topSuffixBadge && !mob.complexBadge && normalCategories.length > 0 && normalCategories[0].colorHex && (
+              <div className="absolute top-1 right-1 z-20">
+                <div className="text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md whitespace-nowrap text-white"
+                  style={{ backgroundColor: normalCategories[0].colorHex }}>
+                  {normalCategories[0].label}
+                </div>
               </div>
             )}
             {[...iconMap.values()].filter(i => !i.tooltipOnly).map(icon => <MobIcon key={icon.resolverId} icon={icon} />)}

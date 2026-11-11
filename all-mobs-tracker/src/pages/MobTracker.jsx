@@ -127,9 +127,8 @@ const MobTracker = () => {
     const job = [];
     const col = [];
 
-    // Usa dbCategories (dal database) invece di MobCategories hardcoded
-    for (const cat of dbCategories) {
-      if (!cat || typeof cat.id !== 'string') continue;
+    // MobCategories è già sincronizzato col DB e ha id testuali corretti
+    for (const cat of MobCategories) {
       if (cat.special) continue;
       if (cat.id.startsWith('biome-')) {
         bio.push(cat);
@@ -142,7 +141,7 @@ const MobTracker = () => {
       }
     }
     return { standardCategories: std, biomeCategories: bio, jobCategories: job, colorCategories: col };
-  }, [dbCategories]);
+  }, []);
 
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [sortBy, setSortBy]                 = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
