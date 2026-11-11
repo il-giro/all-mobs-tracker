@@ -138,10 +138,12 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
 
   const mobs = React.useMemo(() => {
     if (!category || !allMobs.length) return [];
+    // Filtra SOLO basandosi sulle categorie del database (mob.categories)
     return allMobs.filter(mob => {
-      if (mob.categoryIds && mob.categoryIds.includes(category.dbId)) return true;
-      if (mob.categories && mob.categories.some(c => c.id === id || c.dbId === category.dbId)) return true;
-      return getMobCategories(mob, MobCategories).some(c => c.id === id);
+      if (!Array.isArray(mob.categories)) return false;
+      return mob.categories.some(c =>
+        c && (c.id === id || c.id === category.id || c.dbId === category.dbId)
+      );
     }).sort((a, b) => a.name.localeCompare(b.name));
   }, [category, allMobs, id]);
 
