@@ -129,6 +129,7 @@ const MobTracker = () => {
 
     // Usa dbCategories (dal database) invece di MobCategories hardcoded
     for (const cat of dbCategories) {
+      if (!cat || typeof cat.id !== 'string') continue;
       if (cat.special) continue;
       if (cat.id.startsWith('biome-')) {
         bio.push(cat);
