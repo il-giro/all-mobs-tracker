@@ -111,9 +111,9 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   // Categorie dal DB - queste sono TUTTE le categorie, ignorando i resolver
   const allMobCats     = getMobCategories(mob, MobCategories);
 
-  // Separa categorie normali da quelle speciali
-  const normalCategories = allMobCats.filter(c => !c.special);
-  const specialCategories = allMobCats.filter(c => c.special);
+  // Separa categorie normali da quelle speciali (o con variant lettera singola = suffix badge)
+  const normalCategories  = allMobCats.filter(c => !c.special && !/^[A-Z]$/.test(c.variant));
+  const specialCategories = allMobCats.filter(c =>  c.special ||  /^[A-Z]$/.test(c.variant));
 
   const suffixDisplay = specialCategories.length > 0
     ? `(${specialCategories.map(c => c.label.replace(/^Special\s*-\s*/i, '')).join(', ')})`

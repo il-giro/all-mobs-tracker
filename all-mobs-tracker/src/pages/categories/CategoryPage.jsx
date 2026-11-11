@@ -230,8 +230,8 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
         const vTracked  = !!tracked[vm.fileName];
         const vDesc     = vm.description || null;
         const vCats     = getMobCategories(vm, MobCategories);
-        const vCatsNormal  = vCats.filter(c => !c.special);
-        const vCatsSpecial = vCats.filter(c => c.special);
+        const vCatsNormal  = vCats.filter(c => !c.special && !/^[A-Z]$/.test(c.variant));
+        const vCatsSpecial = vCats.filter(c =>  c.special ||  /^[A-Z]$/.test(c.variant));
         const specialSuffixIdsFromCats = new Set(vCatsSpecial.map(c => c.variant).filter(Boolean));
 
         // Categorie speciali aggiuntive da suffix non coperte da vCatsSpecial

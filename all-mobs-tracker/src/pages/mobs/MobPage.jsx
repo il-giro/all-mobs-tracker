@@ -356,7 +356,7 @@ const MobPage = () => {
         const vTracked  = !!tracked[vm.fileName];
         const vCaptured = !!captured[vm.fileName];
         const vCats     = getMobCategories(vm, MobCategories);
-        const vCatsSpecial = vCats.filter(c => c.special);
+        const vCatsSpecial = vCats.filter(c => c.special || /^[A-Z]$/.test(c.variant));
         const specialSuffixIdsFromCats = new Set(vCatsSpecial.map(c => c.variant).filter(Boolean));
 
         const additionalSpecial = (vm.activeSuffixes ?? [])
