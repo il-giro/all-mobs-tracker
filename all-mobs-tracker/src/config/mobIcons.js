@@ -170,8 +170,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'holding-item',
     resolve(mob) {
       // Leggi dal database: mob.categories dovrebbe contenere la categoria
-      if (!mob.categories?.length) return null;
-      const holdingCat = mob.categories.find(c => c.id?.startsWith('holding-'));
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      const holdingCat = mob.categories.find(c => c && typeof c.id === 'string' && c.id.startsWith('holding-'));
       if (!holdingCat) return null;
       const itemName = holdingCat.id.replace('holding-', '');
       return [{
@@ -192,8 +192,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'color',
     resolve(mob) {
       // Leggi dal database: mob.categories dovrebbe contenere la categoria di colore
-      if (!mob.categories?.length) return null;
-      const colorCat = mob.categories.find(c => c.id?.startsWith('color-'));
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      const colorCat = mob.categories.find(c => c && typeof c.id === 'string' && c.id.startsWith('color-'));
       if (!colorCat) return null;
 
       // id è tipo "color-lightgray" → "lightgray"; mappa i casi speciali con trattino
@@ -222,8 +222,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'sheared',
     resolve(mob) {
       // Leggi dal database
-      if (!mob.categories?.length) return null;
-      const shearedCat = mob.categories.find(c => c.id === 'shearable');
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      const shearedCat = mob.categories.find(c => c && typeof c.id === 'string' && c.id === 'shearable');
       if (!shearedCat) return null;
       return [{
         src:          '/icons/items/shears.png',
@@ -243,7 +243,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'poppy',
     resolve(mob) {
       // Leggi dal database per la categoria 'poppy'
-      if (!mob.categories?.some(c => c.id === 'poppy')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'poppy')) return null;
       return [{
         src:          '/icons/items/poppy.png',
         alt:          'Poppy',
@@ -262,7 +263,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'saddle',
     resolve(mob) {
       // Leggi dal database per la categoria 'saddled'
-      if (!mob.categories?.some(c => c.id === 'saddled')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'saddled')) return null;
       return [{
         src:          '/icons/items/saddle.png',
         alt:          'Saddle',
@@ -281,7 +283,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'chested',
     resolve(mob) {
       // Leggi dal database per la categoria 'chested'
-      if (!mob.categories?.some(c => c.id === 'chested')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'chested')) return null;
       return [{
         src:          '/icons/items/chest.png',
         alt:          'Chested',
@@ -300,7 +303,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'banner',
     resolve(mob) {
       // Leggi dal database per la categoria 'banner'
-      if (!mob.categories?.some(c => c.id === 'banner')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'banner')) return null;
       return [{
         src:          '/icons/items/ominous-banner.png',
         alt:          'Banner',
@@ -319,7 +323,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'screaming',
     resolve(mob) {
       // Leggi dal database per la categoria 'screaming'
-      if (!mob.categories?.some(c => c.id === 'screaming')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'screaming')) return null;
       return [{
         src:          '/icons/items/screaming.png',
         alt:          'Screaming',
@@ -338,7 +343,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'name-tag',
     resolve(mob) {
       // Leggi dal database per la categoria 'name-tag'
-      if (!mob.categories?.some(c => c.id === 'name-tag')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'name-tag')) return null;
       return [{
         src:          '/icons/items/name-tag.png',
         alt:          'Name Tag',
@@ -357,7 +363,8 @@ export const MOB_ICON_RESOLVERS = [
     id: 'lightning',
     resolve(mob) {
       // Leggi dal database per la categoria 'lightning'
-      if (!mob.categories?.some(c => c.id === 'lightning')) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
+      if (!mob.categories.some(c => c && typeof c.id === 'string' && c.id === 'lightning')) return null;
       return [{
         src:          '/icons/items/lightning.png',
         alt:          'Lightning',
@@ -376,10 +383,12 @@ export const MOB_ICON_RESOLVERS = [
     id: 'damaged-iron-golem',
     resolve(mob) {
       // Leggi dal database per le categorie di danno Iron Golem
-      if (!mob.categories?.length) return null;
+      if (!Array.isArray(mob.categories) || mob.categories.length === 0) return null;
       const damageCat = mob.categories.find(c =>
-        c.id === 'iron-golem-high' || c.id === 'iron-golem-medium' ||
-        c.id === 'iron-golem-low'  || c.id === 'iron-golem-none'
+        c && typeof c.id === 'string' && (
+          c.id === 'iron-golem-high' || c.id === 'iron-golem-medium' ||
+          c.id === 'iron-golem-low'  || c.id === 'iron-golem-none'
+        )
       );
       if (!damageCat) return null;
       const iconMap = {
