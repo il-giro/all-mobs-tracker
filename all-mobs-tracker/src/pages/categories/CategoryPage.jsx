@@ -47,6 +47,11 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, cardSize, onToggle, 
   const iconMap     = resolveIcons(mob);
   const topSuffixId = SuffixPriority.find(id => mob.activeSuffixes?.includes(id));
   const topSuffix   = topSuffixId ? SuffixConfig[topSuffixId] : null;
+  const badgeClass = cardSize <= 80
+    ? 'text-[6px] px-1 py-0 border'
+    : cardSize <= 100
+      ? 'text-[8px] px-1 py-0.5 border'
+      : 'text-[10px] px-2 py-1 border-2';
   const suffixDisplay = mob.activeSuffixes?.length > 0
     ? (() => { const l = [...new Set(mob.activeSuffixes.map(id => SuffixConfig[id]?.shortLabel).filter(Boolean))]; return l.length ? `(${l.join(', ')})` : ''; })()
     : '';
@@ -65,12 +70,12 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, cardSize, onToggle, 
           <>
             {mob.complexBadge && (
               <div className="absolute top-1 left-1 z-20">
-                <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none`}>{mob.complexBadge.label}</div>
+                <div className={`${mob.complexBadge.color} ${badgeClass} border-stone-900 leading-none whitespace-nowrap`}>{mob.complexBadge.label}</div>
               </div>
             )}
             {topSuffix && (
               <div className={isVillager ? 'absolute bottom-1 left-1/2 -translate-x-1/2 z-20' : 'absolute top-1 right-1 z-20'}>
-                <div className={`${topSuffix.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none whitespace-nowrap`}>{topSuffix.label}</div>
+                <div className={`${topSuffix.color} ${badgeClass} border-stone-900 leading-none whitespace-nowrap`}>{topSuffix.label}</div>
               </div>
             )}
             {[...iconMap.values()].filter(i => !i.tooltipOnly).map(icon => <MobIcon key={icon.resolverId} icon={icon} cardSize={cardSize} />)}
