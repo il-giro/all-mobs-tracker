@@ -69,15 +69,19 @@ export function transformDbRecord(record, isVariant, categoryMap = {}) {
 export function buildTrackerDataset(categoriesRaw, mobsRaw, variantsRaw) {
   const categoryMap = {};
   const categories = (categoriesRaw || []).map(cat => {
+    const dbId = cat.id;
     const slug = cat.slug || cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     const obj = {
       ...cat,
+      // Lo slug è l'identificativo UI e di routing; l'id numerico rimane dbId.
+      id: slug,
       slug,
-      dbId: cat.id,
+      dbId,
       label: cat.name,
       special: !!cat.special,
     };
-    categoryMap[cat.id] = obj;
+    categoryMap[dbId] = obj;
+    categoryMap[String(dbId)] = obj;
     categoryMap[slug] = obj;
     categoryMap[cat.name] = obj;
     return obj;

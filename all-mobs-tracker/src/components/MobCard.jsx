@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { SuffixConfig, SuffixPriority, SpecialFolderMap } from '../config/mobConfig';
-import { MobCategories } from '../config/mobCategories';
-import { resolveIcons, hasVillagerIcons, getMobCategories, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
+import { resolveIcons, hasVillagerIcons, POSITION_CLASSES, SIZE_CLASSES } from '../config/mobIcons';
 import { mobNameToSlug } from '../utils/mobParser';
 
 if (typeof window !== 'undefined') {
@@ -15,15 +13,6 @@ if (typeof window !== 'undefined') {
 const TOOLTIP_EVENT = 'mobcard:tooltip';
 const TOOLTIP_W = 220;
 const TOOLTIP_H = 480;
-
-// suffixId → slug della pagina speciale (usa le categorie DB se disponibili)
-// es. 'A' → 'special-baby-breed'
-const suffixIdToSlug = (suffixId) => {
-  const dbSpecial = MobCategories.find(c => c.special && c.variant === suffixId);
-  if (dbSpecial) return dbSpecial.slug || dbSpecial.id;
-  const entry = Object.entries(SpecialFolderMap).find(([, v]) => v === suffixId);
-  return entry ? entry[0].replace(/\s+/g, '-') : null;
-};
 
 const calcPos = (rect) => {
   let x = rect.right + 8 + TOOLTIP_W < window.innerWidth
@@ -49,53 +38,6 @@ const MobIcon = ({ icon }) => {
   );
 };
 
-const TooltipIconRow = ({ icon, onNavigate }) => {
-  const [visible, setVisible] = useState(true);
-  const isLink = !!icon.categoryId;
-  if (!visible) return null;
-  const inner = (
-    <>
-      <img src={icon.src} alt={icon.alt} draggable={false}
-        onError={icon.fallbackHide ? () => setVisible(false) : undefined}
-        className="w-5 h-5 object-contain pixelated shrink-0" />
-      <span className={`text-xs uppercase flex-1 ${isLink ? 'text-stone-200' : 'text-stone-300'}`}>{icon.label}</span>
-      <span className="text-[9px] uppercase ml-auto text-stone-500">{isLink ? '→' : (icon.labelRole ?? '')}</span>
-    </>
-  );
-  if (isLink) {
-    return (
-      <button onMouseDown={e => { e.stopPropagation(); onNavigate(icon.categoryId); }}
-        className="flex items-center gap-2 border border-stone-700 hover:border-stone-400 bg-stone-900 hover:bg-stone-700 px-1.5 py-1 transition-colors w-full text-left">
-        {inner}
-      </button>
-    );
-  }
-  return <div className="flex items-center gap-2 px-1.5 py-1">{inner}</div>;
-};
-
-// ─── Badge suffix cliccabile → pagina speciale ────────────────────────────────
-const SuffixBadgeRow = ({ badge, suffixId, onNavigate }) => {
-  const slug = suffixIdToSlug(suffixId);
-  const inner = (
-    <>
-      <div className={`${badge.color} text-white text-[9px] px-1.5 py-0.5 border border-stone-900 leading-none uppercase shrink-0`}>
-        {badge.label}
-      </div>
-      <span className="text-xs uppercase flex-1 text-stone-300">{badge.label}</span>
-      {slug && <span className="text-[9px] text-stone-500 ml-auto">→</span>}
-    </>
-  );
-  if (slug) {
-    return (
-      <button onMouseDown={e => { e.stopPropagation(); onNavigate(slug); }}
-        className="flex items-center gap-2 border border-stone-700 hover:border-purple-500 bg-stone-900 hover:bg-stone-700 px-1.5 py-1 transition-colors w-full text-left">
-        {inner}
-      </button>
-    );
-  }
-  return <div className="flex items-center gap-2 px-1.5 py-1">{inner}</div>;
-};
-
 const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectionMode, onToggle, 'data-mob-id': dataMobId }) => {
   const [tooltipPos, setTooltipPos] = useState(null);
   const navigate   = useNavigate();
@@ -103,17 +45,16 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
   const instanceId = useRef(Math.random());
   const isOpen     = useRef(false);
 
-  const topSuffixId    = SuffixPriority.find(id => mob.activeSuffixes.includes(id));
-  const topSuffixBadge = topSuffixId ? SuffixConfig[topSuffixId] : null;
-  const isVillager     = hasVillagerIcons(mob);
-  const iconMap        = resolveIcons(mob);
+  const isVillager = hasVillagerIcons(mob);
+  const iconMap = resolveIcons(mob);
 
-  // Categorie dal DB - queste sono TUTTE le categorie, ignorando i resolver
-  const allMobCats     = getMobCategories(mob, MobCategories);
-
-  // Separa categorie normali da quelle speciali (o con variant lettera singola = suffix badge)
-  const normalCategories  = allMobCats.filter(c => !c.special && !/^[A-Z]$/.test(c.variant));
-  const specialCategories = allMobCats.filter(c =>  c.special ||  /^[A-Z]$/.test(c.variant));
+  // Unica fonte per categorie, badge e tooltip: record del database.
+  const allMobCats = Array.isArray(mob.categories) ? mob.categories : [];
+  const normalCategories = allMobCats.filter(c => c && !c.special);
+  const specialCategories = allMobCats.filter(c => c && c.special);
+  // Mostra un badge per ogni tipo: una categoria speciale e una normale possono coesistere.
+  const specialCardBadge = specialCategories[0] ?? null;
+  const normalCardBadge = normalCategories[0] ?? null;
 
   const suffixDisplay = specialCategories.length > 0
     ? `(${specialCategories.map(c => c.label.replace(/^Special\s*-\s*/i, '')).join(', ')})`
@@ -150,17 +91,12 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
 
   const navigateToCategory = (categoryId) => {
     setTooltipPos(null); isOpen.current = false;
-    const cat = MobCategories.find(c => c.id === categoryId);
-    if (cat?.special) {
-      navigate(`/${cat.slug || cat.id}`);
+    const category = allMobCats.find(cat => cat.id === categoryId);
+    if (category?.special) {
+      navigate(`/${category.slug || category.id}`);
     } else {
       navigate(`/categories/${categoryId}`);
     }
-  };
-
-  const navigateToSpecial = (slug) => {
-    setTooltipPos(null); isOpen.current = false;
-    navigate(`/${slug}`);
   };
 
   const borderClass = isCaptured ? 'border-green-600' : isTracked ? 'border-yellow-500' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-1';
@@ -182,18 +118,20 @@ const MobCard = ({ mob, isTracked, isCaptured, isSelected, captureMode, selectio
                 <div className={`${mob.complexBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md`}>{mob.complexBadge.label}</div>
               </div>
             )}
-            {/* Badge dalla categoria speciale con priorità più alta (special=true, variant) */}
-            {topSuffixBadge && (
-              <div className={isVillager ? 'absolute bottom-1 left-1/2 -translate-x-1/2 z-20' : 'absolute top-1 right-1 z-20'}>
-                <div className={`${topSuffixBadge.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md whitespace-nowrap`}>{topSuffixBadge.label}</div>
-              </div>
-            )}
-            {/* Badge dalla prima categoria normale che ha colorHex (es. saddled, chested...) */}
-            {!topSuffixBadge && !mob.complexBadge && normalCategories.length > 0 && normalCategories[0].colorHex && (
+            {/* Badge derivati esclusivamente dalle categorie assegnate dal DB. */}
+            {specialCardBadge && (
               <div className="absolute top-1 right-1 z-20">
                 <div className="text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md whitespace-nowrap text-white"
-                  style={{ backgroundColor: normalCategories[0].colorHex }}>
-                  {normalCategories[0].label}
+                  style={{ backgroundColor: specialCardBadge.colorHex || specialCardBadge.color || '#57534e' }}>
+                  {specialCardBadge.label}
+                </div>
+              </div>
+            )}
+            {normalCardBadge && (
+              <div className={specialCardBadge || isVillager ? 'absolute bottom-1 left-1/2 -translate-x-1/2 z-20' : 'absolute top-1 right-1 z-20'}>
+                <div className="text-[10px] px-2 py-1 border-2 border-stone-900 leading-none shadow-md whitespace-nowrap text-white"
+                  style={{ backgroundColor: normalCardBadge.colorHex || normalCardBadge.color || '#57534e' }}>
+                  {normalCardBadge.label}
                 </div>
               </div>
             )}

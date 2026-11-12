@@ -7,7 +7,6 @@ import Stats from '../components/Stats';
 import { parseFileName } from '../utils/mobParser';
 import { SuffixConfig, ComplexConfig, SpecialFolderMap } from '../config/mobConfig';
 import { VillagerBiomes, VillagerJobs } from '../config/mobIcons';
-import { MobCategories } from '../config/mobCategories';
 import Footer from '../components/Footer';
 import useTrackerData from '../utils/mobDatabase';
 
@@ -127,9 +126,9 @@ const MobTracker = () => {
     const job = [];
     const col = [];
 
-    // MobCategories è già sincronizzato col DB e ha id testuali corretti
-    for (const cat of MobCategories) {
-      if (cat.special) continue;
+    // Una sola fonte: categorie normalizzate direttamente dal DB.
+    for (const cat of dbCategories) {
+      if (!cat || typeof cat.id !== 'string' || cat.special) continue;
       if (cat.id.startsWith('biome-')) {
         bio.push(cat);
       } else if (cat.id.startsWith('profession-')) {
@@ -141,7 +140,7 @@ const MobTracker = () => {
       }
     }
     return { standardCategories: std, biomeCategories: bio, jobCategories: job, colorCategories: col };
-  }, []);
+  }, [dbCategories]);
 
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [sortBy, setSortBy]                 = useState(() => localStorage.getItem('mobTracker_sort') || 'alpha-asc');
