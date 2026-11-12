@@ -228,6 +228,7 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
       {selectedMob && (() => {
         const vm        = selectedMob;
         const vTracked  = !!tracked[vm.fileName];
+        const vCaptured = !!captured[vm.fileName];
         const vDesc     = vm.description || null;
         const vCats     = getMobCategories(vm, MobCategories);
         const vCatsNormal  = vCats.filter(c => !c.special && !/^[A-Z]$/.test(c.variant));
