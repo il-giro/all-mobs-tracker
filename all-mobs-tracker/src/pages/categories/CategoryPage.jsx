@@ -19,20 +19,28 @@ const CatIcon = ({ icon, label, className = '' }) => {
 };
 
 // ─── Icona sulla card ─────────────────────────────────────────────────────────
-const MobIcon = ({ icon }) => {
+const MobIcon = ({ icon, cardSize }) => {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
+
+  // Evita che l'icona copra la card quando la griglia viene ridotta.
+  const sizeClass = cardSize <= 80
+    ? 'w-3 h-3'
+    : cardSize <= 100
+      ? 'w-4 h-4'
+      : SIZE_CLASSES[icon.size ?? 'sm'];
+
   return (
     <div className={`${POSITION_CLASSES[icon.position]} border border-stone-900 bg-stone-950/70`}>
       <img src={icon.src} alt={icon.alt} draggable={false}
         onError={icon.fallbackHide ? () => setVisible(false) : undefined}
-        className={`${SIZE_CLASSES[icon.size ?? 'sm']} object-contain pixelated`} />
+        className={`${sizeClass} object-contain pixelated`} />
     </div>
   );
 };
 
 // ─── Card mob con badge e icone ───────────────────────────────────────────────
-const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageClick }) => {
+const MobCard = ({ mob, isTracked, isCaptured, captureMode, cardSize, onToggle, onImageClick }) => {
   const borderClass = isCaptured ? 'border-green-600' : isTracked ? 'border-yellow-500' : 'border-stone-700 hover:border-stone-400 hover:-translate-y-0.5';
   const imgClass    = isCaptured ? 'opacity-40' : isTracked ? 'opacity-60' : '';
   const isVillager  = hasVillagerIcons(mob);
@@ -65,10 +73,10 @@ const MobCard = ({ mob, isTracked, isCaptured, captureMode, onToggle, onImageCli
                 <div className={`${topSuffix.color} text-[10px] px-2 py-1 border-2 border-stone-900 leading-none whitespace-nowrap`}>{topSuffix.label}</div>
               </div>
             )}
-            {[...iconMap.values()].filter(i => !i.tooltipOnly).map(icon => <MobIcon key={icon.resolverId} icon={icon} />)}
+            {[...iconMap.values()].filter(i => !i.tooltipOnly).map(icon => <MobIcon key={icon.resolverId} icon={icon} cardSize={cardSize} />)}
           </>
         )}
-        {[...iconMap.values()].filter(i => i.alwaysVisible).map(icon => <MobIcon key={`av_${icon.resolverId}`} icon={icon} />)}
+        {[...iconMap.values()].filter(i => i.alwaysVisible).map(icon => <MobIcon key={`av_${icon.resolverId}`} icon={icon} cardSize={cardSize} />)}
         {isCaptured  && <div className="absolute inset-0 flex items-center justify-center z-10"><span className="text-green-500 text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">✔</span></div>}
         {!isCaptured && isTracked && <div className="absolute inset-0 flex items-center justify-center z-10"><span className="text-yellow-400 text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)]">👁</span></div>}
       </div>
@@ -378,6 +386,7 @@ const CategoryPage = ({ categoryId: propId } = {}) => {
                   isTracked={!!tracked[mob.fileName]}
                   isCaptured={!!captured[mob.fileName]}
                   captureMode={captureMode}
+                  cardSize={cardSize}
                   onToggle={toggle}
                   onImageClick={setSelectedMob}
                 />
